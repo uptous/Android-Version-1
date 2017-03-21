@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rounded_all_files"
+    android:gravity="center"
+    android:padding="@dimen/_10sdp"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Are you sure you want to delete your assignment?"
+        android:textColor="#000"
+        android:textSize="@dimen/_15sdp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:gravity="center_horizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/button_cancel"
+            android:layout_width="@dimen/_90sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_below="@+id/text_view_cancel_message"
+            android:background="@color/tab_indicator"
+            android:padding="@dimen/_5sdp"
+            android:text="Cancel"
+            android:textColor="#fff" />
+
+        <Button
+            android:id="@+id/button_ok"
+            android:layout_width="@dimen/_90sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_below="@+id/text_view_cancel_message"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_toRightOf="@+id/button_cancel"
+            android:background="@color/tab_indicator"
+            android:padding="@dimen/_5sdp"
+            android:text="Ok"
+            android:textColor="#fff" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000"
+
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+
+    <TextView
+        android:id="@+id/text_view_picture_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
+        android:gravity="center"
+        android:text=""
+        android:textColor="#fff"
+        android:textSize="@dimen/_15sdp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/text_view_picture_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_view_picture_name"
+        android:gravity="center"
+        android:text=""
+        android:textColor="#fff"
+        android:textSize="@dimen/_12sdp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/images_album"
+        android:layout_below="@+id/text_view_picture_date">
+
+        <ImageView
+            android:layout_marginTop="@dimen/_5sdp"
+            android:scaleType="fitXY"
+            android:id="@+id/image_view_album_detail"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+
+
+    <android.support.v7.widget.RecyclerView
+
+        android:background="#fff"
+        android:id="@+id/images_album"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_100sdp"
+
+        android:layout_alignParentBottom="true"
+        android:layout_margin="@dimen/_10sdp"></android.support.v7.widget.RecyclerView>
+</RelativeLayout>

@@ -1,0 +1,119 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#fcf9eb"
+    android:orientation="vertical">
+
+    <RelativeLayout
+
+        android:id="@+id/layout_search"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_35sdp"
+        android:background="#c9c9c3"
+        android:orientation="horizontal">
+
+
+        <RelativeLayout
+            android:id="@+id/layout_searchbar"
+
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:layout_toLeftOf="@+id/text_view_cancel"
+            android:background="@drawable/rounded_all_files"
+            android:gravity="center">
+
+
+            <android.support.v7.widget.SearchView
+                android:maxLines="1"
+                android:id="@+id/serach_view_filter"
+                style="@style/AppTheme.SearchView"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_25sdp"
+                />
+
+            <TextView
+
+                android:id="@+id/text_view_search"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="@dimen/_30sdp"
+                android:text="Search"
+                android:textSize="@dimen/_12sdp" />
+        </RelativeLayout>
+
+
+        <TextView
+            android:id="@+id/text_view_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:text="Cancel"
+            android:textColor="@color/tab_indicator"
+            android:textSize="@dimen/_12sdp"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/layout_search">
+
+
+        <android.support.v7.widget.RecyclerView
+
+            android:id="@+id/recycler_view_home"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </android.support.v7.widget.RecyclerView>
+
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:layout_margin="@dimen/_5sdp"
+                android:background="@drawable/fab"
+                android:gravity="center"
+                android:src="@mipmap/edit_post"
+                app:backgroundTint="#90000000"
+                app:borderWidth="0dp"
+                app:elevation="0dp"
+                app:fabSize="normal"
+                app:pressedTranslationZ="@dimen/_12sdp"
+                app:rippleColor="#90000000" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/_15sdp"
+                android:elevation="7dp"
+                android:text="Post"
+                android:textColor="#fff"
+                android:textSize="@dimen/_8sdp" />
+
+        </FrameLayout>
+    </RelativeLayout>
+
+
+    <include layout="@layout/fab_layout" />
+</RelativeLayout>

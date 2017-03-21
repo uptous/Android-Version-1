@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/_5sdp">
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_all_files"
+        android:padding="@dimen/_5sdp">
+
+        <ImageView
+            android:id="@+id/image_view_files"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_40sdp"
+            android:src="@mipmap/clipicon" />
+
+
+        <TextView
+            android:id="@+id/text_view_file_name"
+            android:layout_width="@dimen/_180sdp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_toRightOf="@+id/image_view_files"
+            android:text="My File.pdf"
+            android:textColor="#000"
+            android:textSize="@dimen/_12sdp" />
+
+        <ImageView
+            android:id="@+id/image_view_down_arrow"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:src="@mipmap/downloadbutton" />
+    </RelativeLayout>
+</LinearLayout>

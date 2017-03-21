@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+android:gravity="center"
+
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:padding="@dimen/_10sdp"
+        android:background="@drawable/rounded_all_files"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:gravity="center"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:layout_marginTop="@dimen/_5sdp"
+            android:id="@+id/button_camera"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:padding="@dimen/_5sdp"
+            android:text="Take Photo"
+            android:textColor="#000"
+            android:textSize="@dimen/_15sdp" />
+        <TextView
+            android:background="#cccccc"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp" />
+        <TextView
+            android:id="@+id/button_album"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:padding="@dimen/_5sdp"
+            android:text="Choose From Gallery"
+            android:textColor="#000"
+            android:textSize="@dimen/_15sdp" />
+        <TextView
+            android:background="#cccccc"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp" />
+        <TextView
+            android:id="@+id/button_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:padding="@dimen/_5sdp"
+            android:text="Cancel"
+            android:textColor="#000"
+            android:textSize="@dimen/_15sdp" />
+    </LinearLayout>
+</RelativeLayout>

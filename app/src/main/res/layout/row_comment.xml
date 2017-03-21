@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    android:layout_marginTop="@dimen/_2sdp"
+    android:background="@drawable/rounded_comment"
+    android:orientation="vertical"
+    android:padding="@dimen/_5sdp">
+
+
+    <com.uptous.controller.utils.RoundedImageView
+        android:id="@+id/image_view_comment_user"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:src="@mipmap/nature" />
+
+    <TextView
+        android:id="@+id/text_view_comment_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_toRightOf="@+id/image_view_comment_user"
+        android:text="Anna Amith"
+        android:textColor="#000"
+        android:textSize="@dimen/_12sdp" />
+
+    <TextView
+        android:id="@+id/text_view_comment_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_view_comment_user"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_3sdp"
+        android:layout_toRightOf="@+id/image_view_comment_user"
+        android:text="Nov 27, 2016"
+
+        android:textSize="@dimen/_9sdp" />
+
+    <TextView
+        android:id="@+id/text_view_comment_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_view_comment_date"
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_3sdp"
+        android:layout_toRightOf="@+id/image_view_comment_user"
+        android:text="Testing Testing"
+        android:textColor="#000"
+        android:textSize="@dimen/_12sdp" />
+</RelativeLayout>

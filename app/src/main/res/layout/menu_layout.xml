@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="@dimen/_250sdp"
+    android:layout_height="match_parent"
+    android:background="#333333"
+    android:orientation="vertical">
+
+
+    <com.uptous.controller.utils.RoundedImageView
+        android:id="@+id/image_view_profile_picture"
+        android:layout_width="@dimen/_80sdp"
+        android:layout_height="@dimen/_80sdp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/_30sdp"
+        android:scaleType="fitXY"
+        android:src="@mipmap/profile_icon" />
+
+    <TextView
+        android:id="@+id/text_view_user_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:maxLength="15"
+        android:maxLines="1"
+        android:text="user name"
+        android:textColor="#fff"
+        android:textSize="@dimen/_15sdp" />
+
+    <Button
+        android:id="@+id/button_uploaded_picture"
+        android:layout_width="@dimen/_120sdp"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:background="#5284e0"
+        android:textSize="@dimen/_10sdp"
+        android:text="UPLOAD PICTURE"
+        android:textColor="#fff" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/_20sdp"
+        android:layout_marginRight="@dimen/_20sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:orientation="vertical">
+
+
+        <TextView
+            android:id="@+id/text_view_notifications"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:gravity="center_vertical"
+            android:text="NOTIFICATIONS"
+            android:textColor="#fff"
+            android:textSize="@dimen/_12sdp" />
+
+        <TextView
+android:layout_marginTop="@dimen/_5sdp"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#999999" />
+
+        <TextView
+            android:id="@+id/text_view_profile"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:gravity="center_vertical"
+            android:text="PROFILE"
+            android:textColor="#fff"
+            android:textSize="@dimen/_12sdp" />
+
+        <TextView
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="#999999" />
+
+        <TextView
+            android:layout_marginTop="@dimen/_5sdp"
+            android:id="@+id/text_view_help"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:gravity="center_vertical"
+            android:text="HELP"
+            android:textColor="#fff"
+            android:textSize="@dimen/_12sdp" />
+    </LinearLayout>
+</LinearLayout>
+

@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">UpToUs</string>
+
+    <string name="network_error">Please check your network connection</string>
+    <string name="error">Some error occurred</string>
+    <string name="please_wait">Please wait..</string>
+    <string name="AuthenticationId">AuthenticationId</string>
+    <string name="AuthenticationPassword">AuthenticationPassword</string>
+    <string name="sing_up_not_allow">We\'re sorry but for now, this type of sign-up is not accessible with the app</string>
+    <string name="all_communities">All Communities</string>
+</resources>

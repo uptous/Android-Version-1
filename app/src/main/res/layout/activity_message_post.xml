@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fcf9eb"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Choose a community to post in"
+            android:textColor="#000"
+            android:textSize="@dimen/_17sdp" />
+
+
+        <Spinner
+            android:id="@+id/spinner_Community"
+            style="@style/spinner_style_second"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_35sdp"
+            android:layout_marginRight="@dimen/_5sdp"
+
+            android:layout_marginTop="@dimen/_10sdp"
+            android:dropDownVerticalOffset="@dimen/_35sdp"
+            android:popupBackground="#fff"
+
+            android:textColor="#ff6600"
+            android:textSize="@dimen/_12sdp" />
+
+
+        <EditText
+            android:id="@+id/edit_text_subject"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_35sdp"
+            android:layout_marginRight="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/rounded_edit_text_message_post"
+            android:cursorVisible="true"
+            android:hint="SUBJECT"
+            android:paddingLeft="@dimen/_10sdp"
+            android:textCursorDrawable="@drawable/cursor_drawable"
+            android:textSize="@dimen/_12sdp" />
+
+        <EditText
+            android:id="@+id/edit_text_message"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_80sdp"
+            android:layout_marginRight="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="#fff"
+            android:cursorVisible="true"
+            android:gravity="top"
+            android:hint="MESSAGE"
+            android:padding="@dimen/_10sdp"
+            android:textCursorDrawable="@drawable/cursor_drawable"
+            android:textSize="@dimen/_12sdp" />
+
+        <Button
+            android:id="@+id/button_send_message"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginRight="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_20sdp"
+            android:background="#5284e0"
+            android:text="Send"
+            android:textAllCaps="false"
+            android:textColor="#fff"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</ScrollView>
+</LinearLayout>

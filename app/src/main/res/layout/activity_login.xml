@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/login_bg"
+    android:orientation="vertical">
+
+
+    <ImageView
+        android:layout_width="@dimen/_100sdp"
+        android:layout_height="@dimen/_100sdp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/_70sdp"
+        android:src="@mipmap/login_logo" />
+
+    <EditText
+        android:cursorVisible="true"
+        android:textCursorDrawable="@drawable/cursor_drawable"
+        android:id="@+id/edit_text_email"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginLeft="@dimen/_30sdp"
+        android:layout_marginRight="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_50sdp"
+        android:background="@drawable/edit_text"
+        android:gravity="center"
+        android:hint="YOUR EMAIL"
+        android:inputType="textEmailAddress"
+        android:textColor="#000"
+        android:textSize="@dimen/_15sdp" />
+
+    <EditText
+        android:cursorVisible="true"
+        android:textCursorDrawable="@drawable/cursor_drawable"
+        android:id="@+id/edit_text_password"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginLeft="@dimen/_30sdp"
+        android:layout_marginRight="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:background="@drawable/edit_text"
+        android:gravity="center"
+        android:hint="YOUR PASSWORD"
+        android:inputType="textPassword"
+        android:textColor="#000"
+        android:textSize="@dimen/_15sdp" />
+
+    <LinearLayout
+        android:id="@+id/layout_login"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_marginLeft="@dimen/_30sdp"
+        android:layout_marginRight="@dimen/_30sdp"
+        android:layout_marginTop="@dimen/_60sdp"
+        android:background="#2f7f36"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="@dimen/_5sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LOG IN"
+            android:textColor="#fff"
+            android:textSize="@dimen/_17sdp" />
+
+        <ImageView
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:src="@mipmap/arrow_login" />
+    </LinearLayout>
+
+</LinearLayout>

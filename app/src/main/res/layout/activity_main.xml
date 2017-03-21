@@ -1,0 +1,83 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relative"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+
+
+    <com.uptous.controller.utils.SlidingTabLayout
+android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_alignParentBottom="true"
+        android:background="#fff"
+
+        android:minHeight="?attr/actionBarSize"
+
+        android:scrollbars="horizontal">
+
+    </com.uptous.controller.utils.SlidingTabLayout>
+
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_35sdp"
+        app:tabIndicatorColor="@color/tab_indicator"
+        app:tabIndicatorHeight="@dimen/_5sdp"
+
+        app:tabMode="fixed"
+        android:background="#fff"
+        app:tabGravity="fill"/>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/tabs"
+        android:layout_below="@+id/layout_search"
+
+        android:background="@color/background_material_light">
+
+    </android.support.v4.view.ViewPager>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/layout_search"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_35sdp"
+        android:layout_below="@+id/toolbar"
+        android:background="#cdcdcd"
+        android:orientation="horizontal">
+
+
+        <android.support.v7.widget.SearchView
+            android:id="@+id/serach_view_filter_feed"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_25sdp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="end"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:layout_toLeftOf="@+id/text_view_cancel"
+            android:background="@drawable/rounded_all_files"
+            android:queryHint="Input Location" />
+
+        <TextView
+            android:id="@+id/text_view_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:text="Cancel"
+            android:textColor="#b2b2b5"
+            android:textSize="@dimen/_12sdp" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
