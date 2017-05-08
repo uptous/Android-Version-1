@@ -3,6 +3,7 @@ package com.uptous.controller.apiservices;
 import android.util.Base64;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -20,13 +21,14 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ServiceGenerator {
 
-    public static final String API_BASE_URL = "https://www.uptous.com/";
+    private static final String API_BASE_URL = "https://www.uptous.com/";
 
     private static OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
                     .baseUrl(API_BASE_URL)
+
                     .addConverterFactory(GsonConverterFactory.create());
 
     public static <S> S createService(Class<S> serviceClass) {
@@ -56,6 +58,8 @@ public class ServiceGenerator {
         }
 
         OkHttpClient client = httpClient.build();
+        httpClient.connectTimeout(10000, TimeUnit.SECONDS);
+        httpClient.readTimeout(10000, TimeUnit.SECONDS).build();
         Retrofit retrofit = builder.client(client).build();
         return retrofit.create(serviceClass);
     }

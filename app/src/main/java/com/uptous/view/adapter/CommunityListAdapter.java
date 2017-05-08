@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Created by Prakash .
  */
-public class CommunityListAdapter extends BaseAdapter implements View.OnClickListener {
+public class CommunityListAdapter extends BaseAdapter {
 
 
     Activity activity;
@@ -72,7 +72,7 @@ public class CommunityListAdapter extends BaseAdapter implements View.OnClickLis
 
         holder = new ViewHolder();
         holder.mTextViewName = (TextView) vi.findViewById(R.id.text_view_item);
-//
+
         if (position == getCount()){
             holder.mTextViewName.setText("SELECT COMMUNITY");
             holder.mTextViewName.setTextColor(Color.GRAY);
@@ -89,12 +89,7 @@ public class CommunityListAdapter extends BaseAdapter implements View.OnClickLis
         return vi;
     }
 
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
 
-        }
-    }
 
     public static class ViewHolder {
         private TextView mTextViewName;

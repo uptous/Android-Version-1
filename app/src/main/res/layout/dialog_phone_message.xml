@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/rounded_all_files"
+        android:gravity="center"
+
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+
+        <TextView
+            android:id="@+id/button_phone"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_35sdp"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:drawableLeft="@mipmap/phone"
+            android:drawablePadding="@dimen/_15sdp"
+            android:padding="@dimen/_5sdp"
+            android:text="Phone"
+            android:textColor="@color/tab_indicator"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:visibility="gone"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_2sdp"
+            android:background="@color/tab_indicator"
+          />
+
+        <TextView
+
+            android:id="@+id/button_message"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_35sdp"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:drawableLeft="@mipmap/message"
+            android:drawablePadding="@dimen/_15sdp"
+            android:padding="@dimen/_5sdp"
+            android:text="Message"
+            android:textColor="@color/tab_indicator"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:background="#cccccc"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/button_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_gravity="right"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:padding="@dimen/_5sdp"
+            android:text="Cancel"
+            android:textColor="@color/tab_indicator"
+            android:textSize="@dimen/_17sdp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</RelativeLayout>

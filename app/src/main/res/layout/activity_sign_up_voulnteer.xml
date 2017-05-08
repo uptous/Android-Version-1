@@ -83,7 +83,7 @@
                 android:layout_weight=".5"
                 android:background="#fff"
                 android:cursorVisible="true"
-                android:gravity="top"
+                android:gravity="bottom"
                 android:hint="Type comments here..."
                 android:padding="@dimen/_5sdp"
                 android:textColor="#000"

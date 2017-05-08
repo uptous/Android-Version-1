@@ -1,5 +1,6 @@
 package com.uptous.view.activity;
 
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -18,6 +19,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
@@ -38,8 +41,8 @@ import retrofit2.Response;
 
 /**
  * FileName : ProfileActivity
- * Description :Show user profile detail
- * Dependencies :
+ * Description :Show user profile detail,also user signout from uptous
+ * Dependencies :ProfileActivity
  */
 public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -49,15 +52,19 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private EditText mTextFirstNameEditText, mTextLastNameEditText, mTextEmailEditText, mTextPhoneEditText;
 
+    private TextView mTextViewSignOut;
+
     private Button mButtonSave;
 
     private LinearLayout mLinearLayoutProfileDetail;
 
-    private String mFirstName, mLastName, mEmail, mPhone, mPhoto, mAuthenticationId, mAuthenticationPassword;
+    private String mFirstName, mLastName, mEmail, mImagePath, mPhone, mAuthenticationId, mAuthenticationPassword;
+
+    private Helper mHelper;
+
+    private CustomizeDialog mCustomizeDialog;
 
     public static final int LOAD_IMAGE_RESULTS = 1;
-
-    Helper helper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,6 +74,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
 
         initView();
+
     }
 
     @Override
@@ -76,66 +84,116 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 finish();
                 break;
             case R.id.button_save:
-                helper.keyBoardHidden(ProfileActivity.this);
+                mHelper.keyBoardHidden(ProfileActivity.this);
                 checkValidationOnView();
 
 
                 break;
             case R.id.image_view_edit:
 
-                dialogForCameraGallery();
+                CropImage.activity(null)
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(this);
                 break;
+            case R.id.text_view_sign_out:
+                logOut();
 
 
         }
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (requestCode == LOAD_IMAGE_RESULTS && resultCode == RESULT_OK && null != data) {
-
-            Bitmap yourImage;
-            Uri selectedImageUri = data.getData();
-            try {
-                if (selectedImageUri == null) {
-                    Bundle extra2 = data.getExtras();
-                    yourImage = extra2.getParcelable("data");
-                } else {
-                    yourImage = new UserPicture(selectedImageUri, getContentResolver()).getBitmap();
-                }
-
-                // convert bitmap to byte
-                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                yourImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                byte imageInByte[] = stream.toByteArray();
-
-                mPhoto = Base64.encodeToString(imageInByte, Base64.DEFAULT);
+        // handle result of CropImageActivity
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                mViewProfileRoundedImageView.setImageURI(result.getUri());
+                Bitmap yourImage;
+                Uri selectedImageUri = result.getUri();
                 try {
-                    mViewProfileRoundedImageView.setImageBitmap(yourImage);
+
+                    yourImage = new UserPicture(selectedImageUri, getContentResolver()).getBitmap();
+
+                    // convert bitmap to byte
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    if (yourImage != null) {
+                        yourImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                    }
+                    byte imageInByte[] = stream.toByteArray();
+
+                    mImagePath = Base64.encodeToString(imageInByte, Base64.DEFAULT);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
             }
         }
     }
 
+    public void logOut() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
+    }
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//
+//
+//        if (requestCode == LOAD_IMAGE_RESULTS && resultCode == RESULT_OK && null != data) {
+//
+//            Bitmap yourImage;
+//            Uri selectedImageUri = data.getData();
+//            try {
+//                if (selectedImageUri == null) {
+//                    Bundle extra2 = data.getExtras();
+//                    yourImage = extra2.getParcelable("data");
+//                } else {
+//                    yourImage = new UserPicture(selectedImageUri, getContentResolver()).getBitmap();
+//                }
+//
+//                // convert bitmap to byte
+//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//                if (yourImage != null) {
+//                    yourImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//                }
+//                byte imageInByte[] = stream.toByteArray();
+//
+//                mImagePath = Base64.encodeToString(imageInByte, Base64.DEFAULT);
+//                try {
+//                    mViewProfileRoundedImageView.setImageBitmap(yourImage);
+//
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+
     //method to initialize view
     private void initView() {
-        helper = new Helper();
+        mHelper = new Helper();
 
-        //Local Variables
+        //Local Variables Initialization
         TextView mTextViewTitle = (TextView) findViewById(R.id.text_view_title);
         LinearLayout mLinearLayoutSlideMenu = (LinearLayout) findViewById(R.id.imgmenuleft);
-        ImageView mImageViewFilter = (ImageView) findViewById(R.id.image_view_down);
+        ImageView imageViewFilter = (ImageView) findViewById(R.id.image_view_down);
 
-        //Global Variables
+        //Global Variables Initialization
         mLinearLayoutProfileDetail = (LinearLayout) findViewById(R.id.layout_profile_detail);
-
+        mTextViewSignOut = (TextView) findViewById(R.id.text_view_sign_out);
         mButtonSave = (Button) findViewById(R.id.button_save);
 
         mViewEditImageView = (ImageView) findViewById(R.id.image_view_edit);
@@ -148,11 +206,13 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         mTextEmailEditText = (EditText) findViewById(R.id.edit_text_email);
         mTextPhoneEditText = (EditText) findViewById(R.id.edit_text_phone);
 
-        mTextViewTitle.setText("My profile");
+        mTextViewTitle.setText(R.string.my_profile);
         mTextViewTitle.setVisibility(View.VISIBLE);
         mImageViewBack.setVisibility(View.VISIBLE);
         mLinearLayoutSlideMenu.setVisibility(View.GONE);
-        mImageViewFilter.setVisibility(View.GONE);
+        imageViewFilter.setVisibility(View.GONE);
+        mTextViewSignOut.setVisibility(View.VISIBLE);
+        mTextViewSignOut.setText(R.string.sign_out);
 
         getData();
 
@@ -177,6 +237,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         mImageViewBack.setOnClickListener(this);
         mButtonSave.setOnClickListener(this);
         mViewEditImageView.setOnClickListener(this);
+        mTextViewSignOut.setOnClickListener(this);
 
     }
 
@@ -200,18 +261,56 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 if (response.body() != null) {
 
                     if (response.isSuccessful()) {
-                        mLinearLayoutProfileDetail.setVisibility(View.VISIBLE);
-                        mTextFirstNameEditText.setText(response.body().getFirstName());
-                        mTextLastNameEditText.setText(response.body().getLastName());
-                        mTextEmailEditText.setText(response.body().getEmail());
-                        mTextPhoneEditText.setText(response.body().getPhone());
+                        try {
+                            mLinearLayoutProfileDetail.setVisibility(View.VISIBLE);
+                            mTextFirstNameEditText.setText(response.body().getFirstName());
+                            mTextLastNameEditText.setText(response.body().getLastName());
+                            mTextEmailEditText.setText(response.body().getEmail());
+                            mTextPhoneEditText.setText(response.body().getPhone());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
-                        Picasso.with(ProfileActivity.this).load(response.body().getPhoto()).into(mViewProfileRoundedImageView);
+
+                        Picasso.with(ProfileActivity.this).load(response .body().getPhoto()).into(mViewProfileRoundedImageView);
+
+//                        mViewProfileRoundedImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+//                        Picasso.with(ProfileActivity.this).load(response.body().getPhoto()).into(new Target() {
+//                            @Override
+//                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+//                                int width = bitmap.getWidth();
+//                                int height = bitmap.getHeight();
+//
+//                                mViewProfileRoundedImageView.setImageBitmap(bitmap);
+////                                mViewProfileRoundedImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//
+////                                if (width == 100) {
+////                                    versionViewHolder.mImageViewUploaded.setScaleType(ImageView.ScaleType.FIT_XY);
+////
+////                                }
+//
+//                            }
+//
+//                            @Override
+//
+//                            public void onBitmapFailed(Drawable errorDrawable) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onPrepareLoad(Drawable placeHolderDrawable) {
+//
+//                            }
+//                        });
+
 
                     }
                 } else {
 
-                    Toast.makeText(ProfileActivity.this, "Server Error! Please Try After Some Time", Toast.LENGTH_SHORT).show();
+
+                    mCustomizeDialog = mHelper.CustomizeDialogAlert(ProfileActivity.this, R.layout.dialog_password_change,
+                            YesButtonClickListener);
                 }
             }
 
@@ -226,6 +325,17 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         });
     }
 
+    View.OnClickListener YesButtonClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+
+            mCustomizeDialog.dismiss();
+            logOut();
+
+
+        }
+    };
+
     // Post webservice to update profile
     private void postApiUpdateProfile() {
         final ProgressDialog mProgressDialog = new ProgressDialog(ProfileActivity.this);
@@ -236,7 +346,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
-        Call<ProfileResponseModel> call = service.UpdateProfile(mFirstName, mLastName, mEmail, mPhone, mPhoto);
+        Call<ProfileResponseModel> call = service.UpdateProfile(mFirstName, mLastName, mEmail, mPhone, mImagePath);
         call.enqueue(new retrofit2.Callback<ProfileResponseModel>() {
             @Override
             public void onResponse(Call<ProfileResponseModel> call, Response<ProfileResponseModel> response) {
@@ -304,39 +414,43 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     //Method to show dialog for pick image from camera and gallery
     private void dialogForCameraGallery() {
-        final CustomizeDialog customizeDialog = new CustomizeDialog(ProfileActivity.this);
-        customizeDialog.show();
-        customizeDialog.setContentView(R.layout.dialog_camera_gallery);
-        TextView buttonCamera = (TextView) customizeDialog.findViewById(R.id.button_camera);
-        TextView buttonAlbum = (TextView) customizeDialog.findViewById(R.id.button_album);
-        TextView buttonCancel = (TextView) customizeDialog.findViewById(R.id.button_cancel);
-        buttonCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                customizeDialog.dismiss();
-            }
-        });
-
-        buttonCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(takePicture, LOAD_IMAGE_RESULTS);
-                customizeDialog.dismiss();
-            }
-        });
-
-        buttonAlbum.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, LOAD_IMAGE_RESULTS);
-                customizeDialog.dismiss();
-            }
-        });
-
+//        final CustomizeDialog customizeDialog = new CustomizeDialog(ProfileActivity.this);
+//        customizeDialog.show();
+//        customizeDialog.setContentView(R.layout.dialog_phone_message);
+//        TextView buttonCamera = (TextView) customizeDialog.findViewById(R.id.button_camera);
+//        TextView buttonAlbum = (TextView) customizeDialog.findViewById(R.id.button_album);
+//        TextView buttonCancel = (TextView) customizeDialog.findViewById(R.id.button_cancel);
+//        buttonCancel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                customizeDialog.dismiss();
+//            }
+//        });
+//
+//        buttonCamera.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//                startActivityForResult(takePicture, LOAD_IMAGE_RESULTS);
+//                customizeDialog.dismiss();
+//            }
+//        });
+//
+//        buttonAlbum.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                startActivityForResult(i, LOAD_IMAGE_RESULTS);
+//
+//                customizeDialog.dismiss();
+//            }
+//        });
+//
 
     }
+
 }
 
 

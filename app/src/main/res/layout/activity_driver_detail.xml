@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fcf9eb"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
@@ -55,7 +57,8 @@
                 android:layout_below="@+id/text_view_driving_to"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:text="Date and time"
-                android:textSize="@dimen/_10sdp" />
+                android:textColor="#000"
+                android:textSize="@dimen/_12sdp" />
 
 
             <LinearLayout
@@ -83,6 +86,8 @@
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:background="@drawable/black_edit_text"
                     android:inputType="number"
+                    android:singleLine="true"
+                    android:imeOptions="actionDone"
                     android:maxLength="10"
                     android:paddingLeft="@dimen/_5sdp" />
 
@@ -116,7 +121,7 @@
                 android:layout_weight=".5"
                 android:background="#fff"
                 android:cursorVisible="true"
-                android:gravity="top"
+                android:gravity="bottom"
                 android:hint="Type comments here..."
                 android:padding="@dimen/_5sdp"
                 android:textColor="#000"

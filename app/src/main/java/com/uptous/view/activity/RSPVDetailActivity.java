@@ -41,13 +41,14 @@ public class RSPVDetailActivity extends AppCompatActivity implements View.OnClic
 
     private ImageView mImageViewBack;
     private TextView mTextViewTitle, mViewDateTimeTextView, mTextViewSignUpSend;
-    private int mItemID, NumberOfAttendees = 0;
+    private int mItemID;
+    private String NumberOfAttendees;
     private EditText mEditTextComment, mEditTextNumberOfAttendees;
     private RSPVDetailAdapter mRspvDetailAdapter;
     private RecyclerView mRecyclerViewRspvComment;
     private String mComment, mAuthenticationId, mAuthenticationPassword;
 
-    Helper helper;
+    private Helper mHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,11 +67,12 @@ public class RSPVDetailActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.text_view_send_comment:
 
-                helper.keyBoardHidden(RSPVDetailActivity.this);
+                mHelper.keyBoardHidden(RSPVDetailActivity.this);
                 mComment = mEditTextComment.getText().toString().replace("\n", "<br>");
-//                NumberOfAttendees = Integer.parseInt(mEditTextNumberOfAttendees.getText().toString());
+                NumberOfAttendees = mEditTextNumberOfAttendees.getText().toString();
 
                 if (ConnectionDetector.isConnectingToInternet(this)) {
+
                     postApiComment();
 
                 } else {
@@ -83,22 +85,22 @@ public class RSPVDetailActivity extends AppCompatActivity implements View.OnClic
 
     //method to initialize view
     private void initView() {
-        helper = new Helper();
+        mHelper = new Helper();
 
-        //Local Variables
+        //Local Variables Initialization
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
         LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
         PlayGifView playGifView = (PlayGifView) findViewById(R.id.image_gif);
         LinearLayoutManager layoutManagerFiles
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        //Global Variables
+        //Global Variables Initialization
         mRecyclerViewRspvComment = (RecyclerView) findViewById(R.id.recycler_view_rspv_comment);
         mRecyclerViewRspvComment.setLayoutManager(layoutManagerFiles);
 
         mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
         mEditTextNumberOfAttendees = (EditText) findViewById(R.id.edit_text_number_of_attendees);
-
+        mEditTextNumberOfAttendees.clearFocus();
         mViewDateTimeTextView = (TextView) findViewById(R.id.text_view_date_time);
         mTextViewSignUpSend = (TextView) findViewById(R.id.text_view_send_comment);
         mTextViewTitle = (TextView) findViewById(R.id.text_view_message_toolbar);
@@ -157,7 +159,7 @@ public class RSPVDetailActivity extends AppCompatActivity implements View.OnClic
         mItemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
 
 
-        APIServices service =/* = retrofit.create(APIServices.class,"","");*/
+        APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<List<SignUpDetailResponseModel>> call = service.GetItem(OpId, mItemID);
 
@@ -225,7 +227,7 @@ public class RSPVDetailActivity extends AppCompatActivity implements View.OnClic
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
-        Call<PostCommentResponseModel> call = service.SignUp_Send_RSPV(OpId, itemID, mComment, 2);
+        Call<PostCommentResponseModel> call = service.SignUp_Send_RSPV(OpId, itemID, mComment, NumberOfAttendees);
         call.enqueue(new retrofit2.Callback<PostCommentResponseModel>() {
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
@@ -250,8 +252,8 @@ public class RSPVDetailActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-                Toast.makeText(RSPVDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
                 mProgressDialog.dismiss();
+                Toast.makeText(RSPVDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
 
 
             }

@@ -1,15 +1,20 @@
 package com.uptous.view.adapter;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.model.FileResponseModel;
+import com.uptous.view.activity.WebviewActivity;
 
 import java.util.List;
 
@@ -44,7 +49,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
 
         // Set Data in your views comes from CollectionClass
 
-        String s = listEntities.get(i).getTitle();
+        String s = listEntities.get(i).getPath();
         String result = s.substring(s.lastIndexOf(".") + 1);
 
         if (result.equalsIgnoreCase("jpeg")) {
@@ -64,6 +69,56 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
         }
         versionViewHolder.mTextViewProductName.setText(listEntities.get(i).getTitle().replace("%20", " "));
 
+        versionViewHolder.mImageViewDownload.setTag(i);
+        versionViewHolder.mImageViewDownload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int position = (int) view.getTag();
+                String path = listEntities.get(position).getPath();
+                String s = listEntities.get(position).getTitle();
+                String result = path.substring(path.lastIndexOf(".") + 1);
+
+                if (result.equalsIgnoreCase("jpeg")) {
+                    MyApplication.editor.putString("Imagepath", path);
+                    MyApplication.editor.putString("AlbumDetail", "albumdetail");
+                    MyApplication.editor.commit();
+                    Intent intent = new Intent(activity, WebviewActivity.class);
+                    activity.startActivity(intent);
+                } else if (result.equalsIgnoreCase("jpg")) {
+                    MyApplication.editor.putString("Imagepath", path);
+                    MyApplication.editor.putString("AlbumDetail", "albumdetail");
+                    MyApplication.editor.commit();
+                    Intent intent = new Intent(activity, WebviewActivity.class);
+                    activity.startActivity(intent);
+                } else if (result.equalsIgnoreCase("MOV")) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(path), "video/*");
+                    activity.startActivity(intent);
+                } else if (result.equalsIgnoreCase("mp3")) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setDataAndType(Uri.parse(path), "audio/*");
+                    activity.startActivity(intent);
+                } else if (result.equalsIgnoreCase("xlsx") || result.equalsIgnoreCase("xls") ||
+                        result.equalsIgnoreCase("pdf") || result.equalsIgnoreCase("docx")||
+                        result.equalsIgnoreCase("tif")) {
+                    MyApplication.editor.putString("path", path);
+                    MyApplication.editor.commit();
+                    MyApplication.editor.putString("AlbumDetail", "albumdetail");
+                    Intent intent = new Intent(activity, WebviewActivity.class);
+                    activity.startActivity(intent);
+                } else if (result.equalsIgnoreCase("zip")) {
+                    Toast.makeText(activity, "Files in this format cannot be \n download to the Android", Toast.LENGTH_SHORT).
+                            show();
+                } else if (result.equalsIgnoreCase("csv")) {
+                    Toast.makeText(activity, "Files in this format cannot be \n download to the Android", Toast.LENGTH_SHORT).
+                            show();
+                } else {
+                    Toast.makeText(activity, "Files in this format cannot be \n download to the Android", Toast.LENGTH_SHORT).
+                            show();
+                }
+            }
+        });
+
 
     }
 
@@ -78,7 +133,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
         TextView mTextViewProductName;
-        ImageView imageView;
+        ImageView imageView,mImageViewDownload;
 
         public VersionViewHolder(View itemView) {
             super(itemView);
@@ -86,10 +141,15 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
 
             mTextViewProductName = (TextView) itemView.findViewById(R.id.text_view_file_name);
             imageView = (ImageView) itemView.findViewById(R.id.image_view_files);
+            mImageViewDownload= (ImageView) itemView.findViewById(R.id.image_view_down_arrow);
             mView = itemView;
 
 
         }
     }
+    @Override
+    public int getItemViewType(int position) {
 
+        return position;
+    }
 }

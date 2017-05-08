@@ -21,7 +21,6 @@ public class DriverDetailAdapter extends RecyclerView.Adapter<DriverDetailAdapte
     Activity activity;
 
 
-
     public DriverDetailAdapter(Activity a, List<SignUpDetailResponseModel.ItemsBean.VolunteersBean> listEntities) {
 
         this.listEntities = listEntities;
@@ -45,19 +44,9 @@ public class DriverDetailAdapter extends RecyclerView.Adapter<DriverDetailAdapte
         // Set Data in your views comes from CollectionClass
 
         versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName());
-        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
+        versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
+        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
 
-//        for (int j = 0; j > listEntities.get(i).getItems().size(); j++) {
-//
-//            for (int K = 0; K > listEntities.get(i).getItems().get(j).getVolunteers().size(); K++) {
-//                versionViewHolder.sTextViewTitle.setText(listEntities.get(i).getItems().get(j).getVolunteers().get(K).getFirstName());
-//            }
-//
-//
-//        }
-
-
-//        versionViewHolder.mTextViewDate.setText(dateText);
     }
 
 
@@ -70,7 +59,7 @@ public class DriverDetailAdapter extends RecyclerView.Adapter<DriverDetailAdapte
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewCommentedUserName, mTextViewComment;
+        TextView mTextViewCommentedUserName, mTextViewComment, mTextViewPhone;
 
 
         public VersionViewHolder(View itemView) {
@@ -79,6 +68,7 @@ public class DriverDetailAdapter extends RecyclerView.Adapter<DriverDetailAdapte
             mTextViewCommentedUserName = (TextView) itemView.findViewById(R.id.text_view_user_name);
 
             mTextViewComment = (TextView) itemView.findViewById(R.id.text_view_comment);
+            mTextViewPhone = (TextView) itemView.findViewById(R.id.text_view_phone);
             mView = itemView;
 
 

@@ -26,14 +26,14 @@ import java.io.InvalidObjectException;
 
 public class UserPicture {
 
-    static int MAX_WIDTH = 600;
-    static int MAX_HEIGHT = 800;
-    Uri uri;
-    ContentResolver resolver;
-    String path;
-    Matrix orientation;
-    int storedHeight;
-    int storedWidth;
+    private  static int MAX_WIDTH = 600;
+    private  static int MAX_HEIGHT = 800;
+  private   Uri uri;
+    private  ContentResolver resolver;
+    private  String path;
+    private Matrix orientation;
+    private int storedHeight;
+    private  int storedWidth;
 
     public UserPicture(Uri uri, ContentResolver resolver) {
         this.uri = uri;
@@ -122,7 +122,9 @@ public class UserPicture {
            to reliably wrap the input stream on a buffered stream, but it's not possible because
            decodeStream() places an upper read limit of 1024 bytes for a reset to be made (it calls
            mark(1024) on the stream). */
-        input.close();
+        if (input != null) {
+            input.close();
+        }
 
         if (options.outHeight <= 0 || options.outWidth <= 0)
             return false;

@@ -1,6 +1,9 @@
 package com.uptous.view.activity;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -21,6 +24,7 @@ import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.view.adapter.SignUpShiftAdapter;
@@ -47,7 +51,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
 
     private TextView mViewEventDescriptionTextView, mViewOrganizerOneTextView, mViewOrganizerSecondTextView,
             mTextViewOrgnizer, mTextViewFirstNameContactOne, mTextViewTitle, mTextViewSecondNameContactOne,
-            mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewEventDateSignUp;
+            mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewEventDateSignUp,mTextViewCutOffDateSignUp;
 
     private RoundedImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
 
@@ -57,6 +61,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
 
     private LinearLayout mLinearLayoutBackgroundFirstContact, mLinearLayoutBackgroundSecondContact,
             mLinearLayoutOrganizerOne, mLinearLayoutOrganizerTwo;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,14 +95,14 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
     //Method to initialize view
     private void initView() {
 
-        //Local Variables
+        //Local Variables Initialization
         LinearLayout linearLayoutNavigation = (LinearLayout) findViewById(R.id.imgmenuleft);
         ImageView imageViewFilter = (ImageView) findViewById(R.id.image_view_down);
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        //Global Variables
+        //Global Variables Initialization
         mRecyclerViewOpenSpot = (RecyclerView) findViewById(R.id.recycler_view_open_spots);
         mRecyclerViewOpenSpot.setLayoutManager(layoutManager);
 
@@ -116,7 +121,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
         mTextViewSecondNameContactOne = (TextView) findViewById(R.id.textview_last_name);
         mTextViewFirstNameContactTwo = (TextView) findViewById(R.id.textview_first_name_second_contact);
         mTextViewSecondNameContactTwo = (TextView) findViewById(R.id.textview_last_name_second_contact);
-
+        mTextViewCutOffDateSignUp = (TextView) findViewById(R.id.text_view_cutoff_date);
         mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
         mViewOrganizerOneRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_one);
         mViewOrganizerSecondRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_two);
@@ -132,11 +137,11 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
 
         clickListenerOnViews();
 
-        if (ConnectionDetector.isConnectingToInternet(this)) {
-            getApiSignUpDetail();
-        } else {
-            Toast.makeText(SignUpShiftsActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-        }
+//        if (ConnectionDetector.isConnectingToInternet(this)) {
+//            getApiSignUpDetail();
+//        } else {
+//            Toast.makeText(SignUpShiftsActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+//        }
 
 
     }
@@ -168,11 +173,11 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
                 try {
                     mProgressDialog.dismiss();
 
-                    if (response.isSuccessful()) {
+                    if (response.body()!=null) {
                         final List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
 
-                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes());
+                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n"," "));
                         mTextViewTitle.setVisibility(View.VISIBLE);
 
                         String Name = eventResponseModels.get(0).getName();
@@ -204,7 +209,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
                         if (Image1 != null) {
                             mResultOne = Image1.substring(Image1.lastIndexOf(".") + 1);
                             if (mResultOne.equalsIgnoreCase("gif")) {
-                                String BackgroundColor = eventResponseModels.get(0).getOrganizer2BackgroundColor();
+                                String BackgroundColor = eventResponseModels.get(0).getOrganizer1BackgroundColor();
 
                                 if (BackgroundColor != null) {
 
@@ -250,7 +255,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
                             }
 
                         } else {
-                            String BackgroundColor = eventResponseModels.get(0).getOrganizer2BackgroundColor();
+                            String BackgroundColor = eventResponseModels.get(0).getOrganizer1BackgroundColor();
 
                             if (BackgroundColor != null) {
                                 mLinearLayoutBackgroundFirstContact.setVisibility(View.VISIBLE);
@@ -388,7 +393,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
                             mTextViewEventDateSignUp.setVisibility(View.GONE);
                         } else {
                             Date date = new Date(val);
-                            SimpleDateFormat df2 = new SimpleDateFormat("MMM dd");
+                            SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
                             SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
                             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -396,27 +401,69 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
                             String dateTime = dfTime.format(date);
 
                             String EndTime = response.body().get(0).getEndTime();
-                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM")) {
-                                mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime + " - " + EndTime);
+                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM")&& !EndTime.equalsIgnoreCase("1:00 AM")) {
+                                    mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime + " - " + EndTime);
 
-                            } else {
-                                if (dateTime != null && !dateTime.equalsIgnoreCase("1:00AM")) {
-                                    mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
                                 } else {
-                                    mTextViewEventDateSignUp.setText(dateText);
-                                }
+                                    if(dateTime!=null){
+                                        if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
+                                            mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
+                                        } else {
+                                            mTextViewEventDateSignUp.setText(dateText);
+                                        }
+                                    }
+
                             }
 
 
                         }
+                        long valCutOff = eventResponseModels.get(0).getCutoffDate();
+                        if (valCutOff == 0) {
+                            mTextViewCutOffDateSignUp.setVisibility(View.GONE);
+                        } else {
+                            Date date = new Date(valCutOff);
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat df2 =
+                                    new SimpleDateFormat("MMM d");
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat dfTime =
+                                    new SimpleDateFormat("h:mm aa");
+                            df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+                            dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+                            String dateText = df2.format(date);
+//                            String dateTime = dfTime.format(date);
 
+                            String EndTime = response.body().get(0).getEndTime();
+                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM") && !EndTime.equalsIgnoreCase("1:00 AM")) {
+                                mTextViewCutOffDateSignUp.setText(dateText);
+
+                            } else {
+
+//                                    if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
+                                mTextViewCutOffDateSignUp.setText(dateText);
+//                                    } else {
+//                                        mTextViewCutOffDateSignUp.setText(dateText);
+//                                    }
+//                                }
+
+                            }
+                        }
                         mSignUpShiftAdapter = new SignUpShiftAdapter(SignUpShiftsActivity.this,
                                 eventResponseModels.get(0).getItems());
                         mRecyclerViewOpenSpot.setAdapter(mSignUpShiftAdapter);
 
 
                     } else {
-                        Toast.makeText(SignUpShiftsActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(SignUpShiftsActivity.this);
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                               logout();
+                            }
+                        });
                     }
 
 
@@ -442,5 +489,15 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
         mImageViewBack.setOnClickListener(this);
     }
 
+    //Method to logout from app
+    private void logout() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
+    }
 
 }

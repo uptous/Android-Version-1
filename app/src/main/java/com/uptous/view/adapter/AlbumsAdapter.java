@@ -1,6 +1,7 @@
 package com.uptous.view.adapter;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,8 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.model.PhotoAlbumResponseModel;
+import com.uptous.view.activity.AlbumDetailActivity;
 
 import java.util.List;
 
@@ -50,6 +53,19 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.VersionVie
 
         versionViewHolder.mTextViewProductName.setText(listEntities.get(i).getTitle().replace("%20", " "));
         Picasso.with(activity).load(listEntities.get(i).getThumb()).into(versionViewHolder.imageView);
+        versionViewHolder.imageView.setTag(i);
+        versionViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int Position=(int) view.getTag();
+                int AlbumID = listEntities.get(Position).getId();
+                MyApplication.editor.putInt("NewsItemID", AlbumID);
+                MyApplication.editor.putString("AlbumDetail", "albumdetail");
+                MyApplication.editor.commit();
+                Intent intent = new Intent(activity, AlbumDetailActivity.class);
+                activity.startActivity(intent);
+            }
+        });
 
 
     }
@@ -78,6 +94,11 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.VersionVie
 
 
         }
+    }
+    @Override
+    public int getItemViewType(int position) {
+
+        return position;
     }
 
 }

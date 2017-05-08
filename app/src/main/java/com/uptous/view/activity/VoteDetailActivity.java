@@ -46,8 +46,8 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
     private RecyclerView mRecyclerViewRspvComment;
     private String mComment, mAuthenticationId, mAuthenticationPassword;
     private int mItemID;
-
-    Helper helper;
+    private String mNumberOfAttendees;
+    private Helper mHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,9 +66,9 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
                 break;
             case R.id.text_view_send_comment:
 
-                helper.keyBoardHidden(VoteDetailActivity.this);
+                mHelper.keyBoardHidden(VoteDetailActivity.this);
                 mComment = mEditTextComment.getText().toString().replace("\n", "<br>");
-//                NumberOfAttendees = Integer.parseInt(mEditTextNumberOfAttendees.getText().toString());
+                mNumberOfAttendees = mEditTextNumberOfAttendees.getText().toString();
 
                 if (ConnectionDetector.isConnectingToInternet(this)) {
                     postApiComment();
@@ -83,9 +83,9 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
     //Method to initialize view
     private void initView() {
 
-        helper = new Helper();
+        mHelper = new Helper();
 
-        //Local Variables
+        //Local Variables Initialization
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
         LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
         PlayGifView playGifView = (PlayGifView) findViewById(R.id.image_gif);
@@ -93,7 +93,7 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
         LinearLayoutManager layoutManagerFiles
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        //Global Variables
+        //Global Variables Initialization
         mRecyclerViewRspvComment = (RecyclerView) findViewById(R.id.recycler_view_rspv_comment);
         mRecyclerViewRspvComment.setLayoutManager(layoutManagerFiles);
 
@@ -167,7 +167,7 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
                                                 Response<List<SignUpDetailResponseModel>> response) {
                              try {
                                  mProgressDialog.dismiss();
-                                 if (response.isSuccessful()) {
+                                 if (response.body() != null) {
 
                                      List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
@@ -189,8 +189,6 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
                                      }
 
 
-                                 } else {
-                                     Toast.makeText(VoteDetailActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
                                  }
 
 
@@ -226,7 +224,7 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
-        Call<PostCommentResponseModel> call = service.SignUp_Send_RSPV(OpId, itemID, mComment, 2);
+        Call<PostCommentResponseModel> call = service.SignUp_Send_RSPV(OpId, itemID, mComment, mNumberOfAttendees);
         call.enqueue(new Callback<PostCommentResponseModel>() {
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
@@ -258,4 +256,5 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
             }
         });
     }
+
 }

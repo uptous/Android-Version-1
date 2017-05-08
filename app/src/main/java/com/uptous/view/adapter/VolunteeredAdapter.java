@@ -47,7 +47,7 @@ public class VolunteeredAdapter extends RecyclerView.Adapter<VolunteeredAdapter.
         // Set Data in your views comes from CollectionClass
 
         versionViewHolder.mTextViewUserName.setText(listEntities.get(i).getFirstName()
-                + " - " + listEntities.get(i).getAttendees() + " attendees");
+        );
 
 
 //        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
@@ -58,11 +58,38 @@ public class VolunteeredAdapter extends RecyclerView.Adapter<VolunteeredAdapter.
 //                    setText(Html.fromHtml(listEntities.get(i).getPhone()));
 //        }
 
-        versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
-//        versionViewHolder.mTextViewPhone.
-//                setText(Html.fromHtml(listEntities.get(i).getComment()));
+//        versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
+////        versionViewHolder.mTextViewPhone.
+////                setText(Html.fromHtml(listEntities.get(i).getComment()));
+//
+//        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
 
-        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
+        String Comment = listEntities.get(i).getComment();
+        String Phone = listEntities.get(i).getPhone();
+
+        if (Phone != null && Comment == null) {
+            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
+        }
+        if (Phone == null && Comment != null) {
+            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
+        }
+        if (Phone != null && Comment != null) {
+            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
+            versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
+        }
+//        if (listEntities.get(i).getPhone() != null) {
+
+//            if (Comment != null) {
+//        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
+////            } else {
+//        versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
+//
+//            }
+//        } else {
+//            versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getComment());
+//        }
+
+
 //        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
 
     }

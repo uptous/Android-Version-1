@@ -59,13 +59,14 @@
                 android:textSize="@dimen/_12sdp" />
 
             <ImageView
+
+
+
                 android:id="@+id/image_view_uploaded_picture"
-                android:layout_width="@dimen/_120sdp"
+                android:layout_width="@dimen/_150sdp"
                 android:layout_height="@dimen/_100sdp"
                 android:layout_below="@+id/text_view_title"
                 android:layout_centerHorizontal="true"
-
-                android:scaleType="fitXY"
                 android:visibility="gone" />
 
 

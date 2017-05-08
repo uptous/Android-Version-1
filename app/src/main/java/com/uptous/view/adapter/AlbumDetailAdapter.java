@@ -15,7 +15,7 @@ import com.uptous.model.AlbumDetailResponseModel;
 import java.util.List;
 
 /**
- * Created by Prakash on 1/3/2017.
+ * Created by Prakash .
  */
 
 public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.VersionViewHolder> {
@@ -48,8 +48,8 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
         // Set Data in your views comes from CollectionClass
 
 
-
-        Picasso.with(activity).load(listEntities.get(i).getPhoto()).into(versionViewHolder.imageView);
+        Picasso.with(activity).load(listEntities.get(i).getPhoto()).placeholder(R.drawable.loader)
+                .into(versionViewHolder.imageView);
 
 
     }
@@ -64,23 +64,16 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewTitle, mTextViewProductModel, mTextViewProductName;
+        TextView mTextViewTitle;
         ImageView imageView;
 
         public VersionViewHolder(View itemView) {
             super(itemView);
 
-
             imageView = (ImageView) itemView.findViewById(R.id.imageView_all);
             mView = itemView;
 
-            mView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
 
-
-                }
-            });
 
         }
     }

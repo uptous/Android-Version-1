@@ -52,7 +52,7 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
 
     private int mItemID;
 
-    Helper helper;
+   private Helper mHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
                 finish();
                 break;
             case R.id.text_view_send_comment:
-                helper.keyBoardHidden(ShiftDetailActivity.this);
+                mHelper.keyBoardHidden(ShiftDetailActivity.this);
                 mComment = mEditTextComment.getText().toString().replace("\n", "<br>");
 
 
@@ -90,14 +90,14 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
     //Method to initialize view
     private void initView() {
 
-        helper = new Helper();
-        //Local Variables
+        mHelper = new Helper();
+        //Local Variables Initialization
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
         LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
         LinearLayoutManager layoutManagerFiles
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        //Global Variables
+        //Global Variables Initialization
         mRecyclerViewShiftsComment = (RecyclerView) findViewById(R.id.recycler_view_shifts_comment);
         mRecyclerViewShiftsComment.setLayoutManager(layoutManagerFiles);
 

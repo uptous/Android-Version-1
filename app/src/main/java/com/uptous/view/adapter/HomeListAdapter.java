@@ -5,8 +5,11 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.ScrollingMovementMethod;
@@ -21,6 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
@@ -79,7 +83,7 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
         // Set Data in your views comes from CollectionClass
 
 
-        versionViewHolder.mTextViewTitle.setText(Html.fromHtml(listEntities.get(i).getNewsItemName().replace("%20", " ")));
+        versionViewHolder.mTextViewTitle.setText(Html.fromHtml(listEntities.get(i).getNewsItemName().replace("%20", " ").replace("%2520", "%20")));
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             versionViewHolder.mTextViewNewsItemDescription.
@@ -101,7 +105,8 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
         String s = listEntities.get(i).getNewsItemName();
         String result = s.substring(s.lastIndexOf(".") + 1);
         if (result.equalsIgnoreCase("pdf")) {
-            versionViewHolder.mTextViewNewsItemDescription.setText(listEntities.get(i).getNewsItemName().replace("%20", " "));
+            versionViewHolder.mTextViewNewsItemDescription.setText(listEntities.get(i).getNewsItemName().replace("%20", " ")
+                    .replace("%2520", "%20"));
             versionViewHolder.mImageViewGoDetail.setImageResource(R.mipmap.downloadbutton);
             versionViewHolder.mImageViewFile.setImageResource(R.mipmap.attachment);
 
@@ -166,11 +171,12 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
 
 
                 int colorTextView = Color.parseColor(listEntities.get(i).getOwnerTextColor());
+                String OwnerN = listEntities.get(i).getOwnerName();
+                String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
 
-
-                versionViewHolder.mTextViewOwnerFirstName.setText(listEntities.get(i).getOwnerName());
+                versionViewHolder.mTextViewOwnerFirstName.setText(OwnerN);
                 versionViewHolder.mTextViewOwnerFirstName.setTextColor(colorTextView);
-                versionViewHolder.mTextViewOwnerSecondName.setText(listEntities.get(i).getOwnerName());
+                versionViewHolder.mTextViewOwnerSecondName.setText(resultLastName);
                 versionViewHolder.mTextViewOwnerSecondName.setTextColor(colorTextView);
 
 
@@ -251,7 +257,7 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
             versionViewHolder.mTextViewNewsItemName.setText(Html.fromHtml(listEntities.get(i).getNewsItemDescription()));
             versionViewHolder.mTextViewNewsItemName.setMovementMethod(new ScrollingMovementMethod());
 
-            if (listEntities.get(i).getNewsItemDescription().length() > 150) {
+            if (listEntities.get(i).getNewsItemDescription().length() > 300) {
                 versionViewHolder.mTextViewMore.setVisibility(View.VISIBLE);
             }
 
@@ -264,6 +270,7 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
                     customizeDialog.setContentView(R.layout.dialog_read_more);
                     TextView textView = (TextView) customizeDialog.findViewById(R.id.text_view_news_item_name_expand);
                     textView.setText(Html.fromHtml(NewsItem));
+
                     customizeDialog.setCancelable(true);
                     customizeDialog.show();
                 }
@@ -302,11 +309,12 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
                 MyApplication.editor.putString("OwnerBackground", listEntities.get(position).getOwnerBackgroundColor());
                 MyApplication.editor.putString("OwnerTextColor", listEntities.get(position).getOwnerTextColor());
                 MyApplication.editor.putString("Image", Image);
+                MyApplication.editor.putString("Detail", "detail");
                 MyApplication.editor.putString("ImageNewsItem", NewsItem);
-                MyApplication.editor.putString("Date", dateText+", "+dateTime);
+                MyApplication.editor.putString("Date", dateText + ", " + dateTime);
                 MyApplication.editor.putString("NewsItemName", NewsItemName);
                 MyApplication.editor.putString("OwnerName", OwnerName);
-                MyApplication.editor.putString("CommunityName", CommunityName);
+                MyApplication.editor.putString("FeedCommunityName", CommunityName);
                 MyApplication.editor.putString("NewsItemDescription", NewsItemNameDescription);
                 MyApplication.editor.putString("NewsType", NewsType);
                 MyApplication.editor.commit();
@@ -340,16 +348,17 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
                 String dateText = df2.format(date);
                 String dateTime = dfTime.format(date);
                 MyApplication.editor.putInt("FeedId", FeedId);
+                MyApplication.editor.putString("Detail", "detail");
                 MyApplication.editor.putInt("NewsItemID", NewsItemID);
                 MyApplication.editor.putInt("CommunityId", CommunityID);
                 MyApplication.editor.putString("OwnerBackground", listEntities.get(position).getOwnerBackgroundColor());
                 MyApplication.editor.putString("OwnerTextColor", listEntities.get(position).getOwnerTextColor());
                 MyApplication.editor.putString("Image", Image);
                 MyApplication.editor.putString("ImageNewsItem", NewsItem);
-                MyApplication.editor.putString("Date", dateText+", "+dateTime);
+                MyApplication.editor.putString("Date", dateText + ", " + dateTime);
                 MyApplication.editor.putString("NewsItemName", NewsItemName);
                 MyApplication.editor.putString("OwnerName", OwnerName);
-                MyApplication.editor.putString("CommunityName", CommunityName);
+                MyApplication.editor.putString("FeedCommunityName", CommunityName);
                 MyApplication.editor.putString("NewsItemDescription", NewsItemNameDescription);
                 MyApplication.editor.putString("NewsType", NewsType);
                 MyApplication.editor.commit();
@@ -368,13 +377,46 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
             if (Image != null && !Image.equalsIgnoreCase("")) {
                 versionViewHolder.mRelativeLayoutFileDetail.setVisibility(View.GONE);
                 versionViewHolder.mImageViewUploaded.setVisibility(View.VISIBLE);
-                Picasso.with(activity).load(listEntities.get(i).getNewsItemPhoto()).into(versionViewHolder.mImageViewUploaded);
+//                Picasso.with(activity).load(listEntities.get(i).getNewsItemPhoto())
+//
+//                        .into( versionViewHolder.mImageViewUploaded);
+
+
+                Picasso.with(activity).load(listEntities.get(i).getNewsItemPhoto()).into(new Target() {
+                    @Override
+                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                        int width = bitmap.getWidth();
+                        int height = bitmap.getHeight();
+
+                        versionViewHolder.mImageViewUploaded.setImageBitmap(bitmap);
+
+                        if (width == 100) {
+                            versionViewHolder.mImageViewUploaded.setScaleType(ImageView.ScaleType.FIT_XY);
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onBitmapFailed(Drawable errorDrawable) {
+
+                    }
+
+                    @Override
+                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                    }
+                });
+
+
+//                Picasso.with(activity).load(listEntities.get(i).getNewsItemPhoto()).into(versionViewHolder.mImageViewUploaded);
                 versionViewHolder.mImageViewUploaded.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         int position = (int) view.getTag();
                         int NewsItemID = listEntities.get(position).getNewsItemId();
                         MyApplication.editor.putInt("NewsItemID", NewsItemID);
+                        MyApplication.editor.putString("Detail", "detail");
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, AlbumDetailActivity.class);
                         activity.startActivity(intent);
@@ -397,46 +439,53 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
                     String result = s.substring(s.lastIndexOf(".") + 1);
                     String resultImage = path.substring(path.lastIndexOf('.') + 1).trim();
 
-                    if (result.equalsIgnoreCase("pdf")) {
+                    if (resultImage.equalsIgnoreCase("pdf")) {
                         MyApplication.editor.putString("path", path);
+                        MyApplication.editor.putString("Detail", "detail");
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, WebviewActivity.class);
                         activity.startActivity(intent);
-                    } else if (result.equalsIgnoreCase("zip")) {
+                    } else if (resultImage.equalsIgnoreCase("zip")) {
 
 //                        MyApplication.editor.putString("path", path);
 //                        MyApplication.editor.commit();
 //                        Intent intent = new Intent(activity, WebViewActivity.class);
 //                        activity.startActivity(intent);
 
-                    } else if (result.equalsIgnoreCase("docx")) {
+                    } else if (resultImage.equalsIgnoreCase("docx")) {
                         MyApplication.editor.putString("path", path);
+                        MyApplication.editor.putString("Detail", "detail");
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, WebviewActivity.class);
                         activity.startActivity(intent);
-                    } else if (result.equalsIgnoreCase("xls")) {
+                    } else if (resultImage.equalsIgnoreCase("xls")) {
                         MyApplication.editor.putString("path", path);
+                        MyApplication.editor.putString("Detail", "detail");
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, WebviewActivity.class);
                         activity.startActivity(intent);
                     } else if (resultImage.equalsIgnoreCase("png")) {
                         MyApplication.editor.putString("Imagepath", path);
+                        MyApplication.editor.putString("Detail", "detail");
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, WebviewActivity.class);
                         activity.startActivity(intent);
                     } else if (resultImage.equalsIgnoreCase("jpg")) {
                         MyApplication.editor.putString("Imagepath", path);
+                        MyApplication.editor.putString("Detail", "detail");
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, WebviewActivity.class);
                         activity.startActivity(intent);
                     } else if (resultImage.equalsIgnoreCase("jpeg")) {
                         MyApplication.editor.putString("Imagepath", path);
+                        MyApplication.editor.putString("Detail", "detail");
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, WebviewActivity.class);
                         activity.startActivity(intent);
                     } else {
                         int CommunityID = listEntities.get(position).getNewsItemId();
                         MyApplication.editor.putInt("CommunityID", CommunityID);
+                        MyApplication.editor.putString("Detail", "detail");
                         MyApplication.editor.commit();
 
                         getApiSignUp();
@@ -452,8 +501,18 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
         versionViewHolder.mLinearLayoutReplytoSingle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                int position = (int) view.getTag();
+                String StrEmail = listEntities.get(position).getOwnerEmail();
+                String StrTitle = listEntities.get(position).getNewsItemName();
+
+                MyApplication.editor.putString("Detail", "detail");
+                MyApplication.editor.commit();
                 Intent emailIntent = new Intent(Intent.ACTION_SEND);
                 emailIntent.setType("text/html");
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{StrEmail});
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, StrTitle);
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Sent from my Android");
                 final PackageManager pm = activity.getPackageManager();
                 final List<ResolveInfo> matches = pm.queryIntentActivities(emailIntent, 0);
                 String className = null;
@@ -484,14 +543,16 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewUserName,  mTextViewMore,
+        TextView mTextViewUserName, mTextViewMore,
                 mTextViewNewsItemName, mTextViewReply, mTextViewNewsDetailExpand,
                 mTextViewCommentCount, mTextViewCommunityName, mTextViewTitle,
                 mTextViewComment, mTextViewDate, mTextViewNewsItemDescription, mTextViewOwnerFirstName, mTextViewOwnerSecondName;
         RelativeLayout mRelativeLayoutFile;
-        ImageView mImageViewUser, mImageViewFile, mImageViewUploaded,  mImageViewGoDetail;
-        LinearLayout mLinearLayoutReplytoSingle,  mLinearLayoutComment,
-                 mLinearLayoutRoundedBackGround;
+        ImageView mImageViewUser, mImageViewFile, mImageViewGoDetail, mImageViewUploaded;
+
+
+        LinearLayout mLinearLayoutReplytoSingle, mLinearLayoutComment,
+                mLinearLayoutRoundedBackGround;
         RelativeLayout mRelativeLayoutDetailComment, mRelativeLayoutFileDetail, mRelativeLayoutMain;
 
         public VersionViewHolder(View itemView) {
@@ -543,7 +604,6 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
             public void onResponse(Call<List<SignUpResponseModel>> call, Response<List<SignUpResponseModel>> response) {
                 mProgressDialog.dismiss();
                 try {
-
 
 
                     mSignUpResponseModelList = response.body();

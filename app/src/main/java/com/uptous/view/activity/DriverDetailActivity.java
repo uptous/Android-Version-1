@@ -1,6 +1,8 @@
 package com.uptous.view.activity;
 
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,7 @@ import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.PostCommentResponseModel;
@@ -54,7 +57,7 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
 
     private int mItemID;
 
-    Helper helper;
+    private Helper mHelper;
 
 
     @Override
@@ -72,13 +75,13 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
                 finish();
                 break;
             case R.id.text_view_send_comment:
-                helper.keyBoardHidden(DriverDetailActivity.this);
+                mHelper.keyBoardHidden(DriverDetailActivity.this);
 
                 mComment = mEditTextComment.getText().toString().replace("\n", "<br>");
                 mPhone = mEditTextPhone.getText().toString().replace("\n", "<br>");
 
                 if (ConnectionDetector.isConnectingToInternet(this)) {
-                        postApiComment();
+                    postApiComment();
                 } else {
                     Toast.makeText(DriverDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                 }
@@ -88,13 +91,14 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
 
     //Method to initialize view
     private void initView() {
-        helper = new Helper();
-
+        mHelper = new Helper();
+        //Global Variables Initialization
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
         LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
         LinearLayoutManager layoutManagerFiles
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
+        //Global Variables Initialization
         mRecyclerViewDriverComment = (RecyclerView) findViewById(R.id.recycler_view_driver_comment);
         mRecyclerViewDriverComment.setLayoutManager(layoutManagerFiles);
 
@@ -105,11 +109,11 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
 
         mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
         mEditTextPhone = (EditText) findViewById(R.id.edit_text_phone);
-
+        mEditTextPhone.clearFocus();
         mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
 
         mImageViewBack.setVisibility(View.VISIBLE);
-        mViewDateTimeTextView.setVisibility(View.GONE);
+
         linearLayoutCommunityFilter.setVisibility(View.GONE);
         linearLayoutImageMenuLeft.setVisibility(View.GONE);
 
@@ -142,7 +146,9 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
 
         mViewDrivingFromTextView.setText("Driving from: " + FromName);
         mViewDrivingToTextView.setText("To: " + ToName);
-//        mViewDateTimeTextView.setText(Date);
+
+        if (Date != null)
+            mViewDateTimeTextView.setText(Date);
     }
 
     // Get webservice to get all driver comments
@@ -167,7 +173,7 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
                                                 Response<List<SignUpDetailResponseModel>> response) {
                              try {
                                  mProgressDialog.dismiss();
-                                 if (response.isSuccessful()) {
+                                 if (response.body() != null) {
                                      List<SignUpDetailResponseModel> eventResponseModels = response.body();
                                      for (int i = 0; eventResponseModels.size() >= i; i++) {
 
@@ -186,7 +192,32 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
                                      }
 
                                  } else {
-                                     Toast.makeText(DriverDetailActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
+                                     final CustomizeDialog customizeDialog = new CustomizeDialog(DriverDetailActivity.this);
+                                     customizeDialog.setCancelable(false);
+                                     customizeDialog.setContentView(R.layout.dialog_password_change);
+                                     TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                                     customizeDialog.show();
+                                     textViewOk.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View view) {
+                                             customizeDialog.dismiss();
+                                             MyApplication.editor.putString("CommunityName", null);
+                                             MyApplication.editor.putInt("CommunityId", 0);
+                                             MyApplication.editor.putString("Attachment", null);
+                                             MyApplication.editor.putString("Album", null);
+                                             MyApplication.editor.putString("Feed", null);
+                                             MyApplication.editor.putString("AuthenticationId", null);
+                                             MyApplication.editor.putString("AuthenticationPassword", null);
+                                             MyApplication.editor.putBoolean(MyApplication.ISLOGIN, false);
+                                             MyApplication.editor.commit();
+
+                                             Application app = getApplication();
+                                             Intent intent = new Intent(app, LogInActivity.class);
+                                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                             app.startActivity(intent);
+                                         }
+                                     });
                                  }
 
 

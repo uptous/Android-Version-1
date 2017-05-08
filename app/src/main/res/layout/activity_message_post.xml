@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fcf9eb"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:orientation="vertical">
 
     <include layout="@layout/toolbar" />
@@ -31,11 +33,9 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/_35sdp"
             android:layout_marginRight="@dimen/_5sdp"
-
             android:layout_marginTop="@dimen/_10sdp"
             android:dropDownVerticalOffset="@dimen/_35sdp"
             android:popupBackground="#fff"
-
             android:textColor="#ff6600"
             android:textSize="@dimen/_12sdp" />
 

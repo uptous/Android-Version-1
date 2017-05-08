@@ -1,7 +1,7 @@
 package com.uptous.model;
 
 /**
- * Created by Prakash on 1/13/2017.
+ * Created by Prakash .
  */
 
 public class FileResponseModel {

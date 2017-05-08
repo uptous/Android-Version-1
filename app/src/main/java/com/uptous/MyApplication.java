@@ -5,9 +5,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-/**
- * Created by T011Prakash on 11/18/2015.
- */
+
 public class MyApplication extends Application {
     public static SharedPreferences mSharedPreferences;
     public static SharedPreferences.Editor editor;

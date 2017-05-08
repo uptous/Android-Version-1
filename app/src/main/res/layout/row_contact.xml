@@ -98,7 +98,7 @@
         android:background="#e1e2e3" />
 
     <RelativeLayout
-android:visibility="gone"
+        android:visibility="gone"
         android:id="@+id/row_contact_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -136,7 +136,7 @@ android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLength="1"
-                    android:text="Ram"
+                    android:text=""
                     android:textSize="@dimen/_15sdp" />
 
                 <TextView
@@ -144,7 +144,7 @@ android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:maxLength="1"
-                    android:text="Ram"
+                    android:text=""
                     android:textSize="@dimen/_15sdp" />
             </LinearLayout>
         </RelativeLayout>
@@ -221,7 +221,7 @@ android:visibility="gone"
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="phone:"
+                android:text="mobile:"
                 android:textSize="@dimen/_12sdp" />
 
             <TextView

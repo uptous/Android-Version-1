@@ -45,6 +45,16 @@ public class SignUpDetailResponseModel {
     private String notes;
     private int id;
     private String type;
+
+    public long getCutoffDate() {
+        return cutoffDate;
+    }
+
+    public void setCutoffDate(long cutoffDate) {
+        this.cutoffDate = cutoffDate;
+    }
+
+    private long cutoffDate;
     private String opportunityStatus;
     private int communityId;
     private int createdByUserId;

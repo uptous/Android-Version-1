@@ -1,12 +1,15 @@
 package com.uptous.view.adapter;
 
 import android.app.Activity;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -58,7 +61,41 @@ public class AnnouncementsListAdapter extends RecyclerView.Adapter<Announcements
             versionViewHolder.mTextViewCommentDes.
                     setText(Html.fromHtml(listEntities.get(i).getBody()));
         }
-        Picasso.with(activity).load(listEntities.get(i).getOwnerPhotoUrl()).into(versionViewHolder.imageView);
+        String CommentUserImage = listEntities.get(i).getOwnerPhotoUrl();
+        String result1 = CommentUserImage.substring(CommentUserImage.lastIndexOf(".") + 1);
+        if (CommentUserImage != null && !result1.equalsIgnoreCase("gif")) {
+            versionViewHolder.imageView.setVisibility(View.VISIBLE);
+            versionViewHolder.mLinearLayoutRoundedBackGround.setVisibility(View.GONE);
+            Picasso.with(activity).load(listEntities.get(i).getOwnerPhotoUrl()).into(versionViewHolder.imageView);
+        } else {
+            String BackgroundColor = listEntities.get(i).getOwnerBackgroundColor();
+
+            if (BackgroundColor != null) {
+                versionViewHolder.imageView.setVisibility(View.GONE);
+                int color = Color.parseColor(BackgroundColor);
+                versionViewHolder.mLinearLayoutRoundedBackGround.setVisibility(View.VISIBLE);
+                versionViewHolder.mLinearLayoutRoundedBackGround.setBackgroundResource(R.drawable.circle);
+                GradientDrawable gd = (GradientDrawable)
+                        versionViewHolder.mLinearLayoutRoundedBackGround.getBackground().getCurrent();
+                gd.setColor(color);
+                gd.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
+                String TextColor = listEntities.get(i).getOwnerTextColor();
+
+                if (TextColor != null) {
+                    int colorTextView = Color.parseColor(TextColor);
+                    String OwnerNAME = listEntities.get(i).getCreatedByUserName();
+                    String resultLastName = OwnerNAME.substring(OwnerNAME.lastIndexOf(' ') + 1).trim();
+
+                    versionViewHolder.mTextViewFirstName.setText(OwnerNAME);
+                    versionViewHolder.mTextViewFirstName.setTextColor(colorTextView);
+                    versionViewHolder.mTextViewLastName.setText(resultLastName);
+                    versionViewHolder.mTextViewLastName.setTextColor(colorTextView);
+                }
+
+
+            }
+
+        }
 
 
         long val = listEntities.get(i).getCreateTime();
@@ -88,8 +125,9 @@ public class AnnouncementsListAdapter extends RecyclerView.Adapter<Announcements
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewProductName, mTextViewDate, mTextViewCommentDes;
+        TextView mTextViewProductName, mTextViewDate, mTextViewCommentDes, mTextViewFirstName, mTextViewLastName;
         ImageView imageView;
+        LinearLayout mLinearLayoutRoundedBackGround;
 
         public VersionViewHolder(View itemView) {
             super(itemView);
@@ -98,10 +136,19 @@ public class AnnouncementsListAdapter extends RecyclerView.Adapter<Announcements
             mTextViewProductName = (TextView) itemView.findViewById(R.id.text_view_comment_user);
             imageView = (ImageView) itemView.findViewById(R.id.image_view_comment_user);
             mTextViewDate = (TextView) itemView.findViewById(R.id.text_view_comment_date);
+            mTextViewFirstName = (TextView) itemView.findViewById(R.id.textview_first_name);
+            mTextViewLastName = (TextView) itemView.findViewById(R.id.textview_last_name);
+            mLinearLayoutRoundedBackGround = (LinearLayout) itemView.findViewById(R.id.layout_contact);
             mView = itemView;
 
 
         }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        return position;
     }
 
 }

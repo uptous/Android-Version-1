@@ -7,14 +7,14 @@
     android:orientation="vertical">
 
     <ImageView
-        android:layout_marginLeft="@dimen/_2sdp"
-        android:layout_marginRight="@dimen/_2sdp"
-        android:layout_marginTop="@dimen/_2sdp"
+
+        android:layout_marginLeft="@dimen/_1sdp"
+        android:layout_marginRight="@dimen/_1sdp"
+        android:layout_marginTop="@dimen/_1sdp"
         android:id="@+id/image_view_albums"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_80sdp"
-
-        android:scaleType="fitXY" />
+        android:layout_height="@dimen/_90sdp"
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/text_view_image_name"
@@ -23,6 +23,8 @@
         android:layout_below="@+id/image_view_albums"
         android:gravity="center"
         android:padding="@dimen/_5sdp"
+        android:textStyle="bold"
+        android:maxLines="2"
         android:text="File Name Name Name"
         android:textColor="#000"
         android:textSize="@dimen/_10sdp" />

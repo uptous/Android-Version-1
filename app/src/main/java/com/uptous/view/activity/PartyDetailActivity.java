@@ -1,0 +1,270 @@
+package com.uptous.view.activity;
+
+import android.app.ProgressDialog;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.uptous.MyApplication;
+import com.uptous.R;
+import com.uptous.controller.apiservices.APIServices;
+import com.uptous.controller.apiservices.ServiceGenerator;
+import com.uptous.controller.utils.ConnectionDetector;
+import com.uptous.controller.utils.Helper;
+import com.uptous.model.PostCommentResponseModel;
+import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.view.adapter.PartyDetailAdapter;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * FileName : PartyDetailActivity
+ * Description :show all Party/Potluck sign_up comment and also user can comment it.
+ * Dependencies : PartyDetailActivity
+ */
+public class PartyDetailActivity extends AppCompatActivity implements View.OnClickListener {
+
+
+    private ImageView mImageViewBack;
+
+    private TextView mTextViewEventName, mTextViewEventDate, mTextViewSignUpSend, mTextViewMoreSpot;
+
+    private EditText mEditTextComment;
+
+    private PartyDetailAdapter mPartyDetailAdapter;
+
+    private RecyclerView mRecyclerViewShiftsComment;
+
+    private String mComment, mAuthenticationId, mAuthenticationPassword;
+
+    private int mItemID;
+
+   private Helper mHelper;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sign_up_voulnteer);
+
+        initView();
+
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.image_view_back:
+                finish();
+                break;
+            case R.id.text_view_send_comment:
+                mHelper.keyBoardHidden(PartyDetailActivity.this);
+                mComment = mEditTextComment.getText().toString().replace("\n", "<br>");
+
+
+                if (ConnectionDetector.isConnectingToInternet(this)) {
+
+
+                    postApiComment();
+
+
+                } else {
+                    Toast.makeText(PartyDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
+    //Method to initialize view
+    private void initView() {
+
+        mHelper = new Helper();
+        //Local Variables Initialization
+        LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
+        LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
+        LinearLayoutManager layoutManagerFiles
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+
+        //Global Variables Initialization
+        mRecyclerViewShiftsComment = (RecyclerView) findViewById(R.id.recycler_view_shifts_comment);
+        mRecyclerViewShiftsComment.setLayoutManager(layoutManagerFiles);
+
+        mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
+
+        mTextViewEventName = (TextView) findViewById(R.id.text_view_event_name);
+        mTextViewEventDate = (TextView) findViewById(R.id.text_view_date_time);
+        mTextViewSignUpSend = (TextView) findViewById(R.id.text_view_send_comment);
+        mTextViewMoreSpot = (TextView) findViewById(R.id.text_view_more_spots);
+
+        mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
+
+        mImageViewBack.setVisibility(View.VISIBLE);
+        linearLayoutCommunityFilter.setVisibility(View.GONE);
+        linearLayoutImageMenuLeft.setVisibility(View.GONE);
+
+
+        getData();
+
+        clickListenerOnViews();
+
+
+        if (ConnectionDetector.isConnectingToInternet(PartyDetailActivity.this)) {
+            getApiPartyDetail();
+        } else {
+            Toast.makeText(PartyDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    // Method to Get data from SharedPreference
+    private void getData() {
+        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
+        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+
+        String openSpot = MyApplication.mSharedPreferences.getString("Total Spot", null);
+        String totalSpot = MyApplication.mSharedPreferences.getString("Number of volunteer", null);
+        String name = MyApplication.mSharedPreferences.getString("Name", null);
+        String date = MyApplication.mSharedPreferences.getString("Date", null);
+
+        mTextViewEventName.setText(name);
+
+        if (date != null) {
+            mTextViewEventDate.setText(date);
+        }
+
+        if (totalSpot != null && !totalSpot.equalsIgnoreCase("null")) {
+            mTextViewMoreSpot.setText(openSpot + " out of " + totalSpot + " spots open");
+        } else {
+            mTextViewMoreSpot.setText("More spots are open");
+        }
+
+    }
+
+    //Method to set on clickListener on views
+    private void clickListenerOnViews() {
+        mImageViewBack.setOnClickListener(this);
+        mTextViewSignUpSend.setOnClickListener(this);
+    }
+
+    // Get webservice to get Party sign_up comments
+    private void getApiPartyDetail() {
+
+        final ProgressDialog mProgressDialog = new ProgressDialog(PartyDetailActivity.this);
+        mProgressDialog.setMessage("Please wait...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
+        mItemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+
+
+        APIServices service =
+                ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+        Call<List<SignUpDetailResponseModel>> call = service.GetItem(OpId, mItemID);
+
+        call.enqueue(new Callback<List<SignUpDetailResponseModel>>() {
+                         @Override
+                         public void onResponse(Call<List<SignUpDetailResponseModel>> call,
+                                                Response<List<SignUpDetailResponseModel>> response) {
+                             try {
+                                 mProgressDialog.dismiss();
+                                 if (response.isSuccessful()) {
+
+                                     List<SignUpDetailResponseModel> eventResponseModels = response.body();
+
+                                     for (int i = 0; eventResponseModels.size() >= i; i++) {
+
+                                         List<SignUpDetailResponseModel.ItemsBean> eventResponseModelsItem =
+                                                 response.body().get(i).getItems();
+
+                                         for (int j = 0; eventResponseModelsItem.size() > j; j++) {
+                                             int itemid = eventResponseModelsItem.get(j).getId();
+                                             if (itemid == mItemID) {
+                                                 mPartyDetailAdapter = new PartyDetailAdapter(PartyDetailActivity.this,
+                                                         eventResponseModelsItem.get(j).getVolunteers());
+                                                 mRecyclerViewShiftsComment.setAdapter(mPartyDetailAdapter);
+                                             }
+
+
+                                         }
+                                     }
+
+                                 } else {
+                                     Toast.makeText(PartyDetailActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
+                                 }
+
+                             } catch (Exception e) {
+                                 e.printStackTrace();
+                             }
+
+                         }
+
+                         @Override
+                         public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
+                             mProgressDialog.dismiss();
+                             Toast.makeText(PartyDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                             Log.d("onFailure", t.toString());
+                         }
+
+                     }
+
+        );
+    }
+
+    // Post webservice to post Shifts sign_up comments
+    private void postApiComment() {
+        final ProgressDialog mProgressDialog = new ProgressDialog(PartyDetailActivity.this);
+        mProgressDialog.setMessage("Please wait...");
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+
+
+        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
+        int itemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+        APIServices service =
+                ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+
+        Call<PostCommentResponseModel> call = service.SignUp_Send(OpId, itemID, mComment, "");
+        call.enqueue(new Callback<PostCommentResponseModel>() {
+            @Override
+            public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
+
+                mProgressDialog.dismiss();
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+
+                        if (response.isSuccessful()) {
+
+                            finish();
+
+                        }
+                    } else {
+                        Toast.makeText(PartyDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(PartyDetailActivity.this, "Couldn't comment", Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
+                Toast.makeText(PartyDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                mProgressDialog.dismiss();
+
+
+            }
+        });
+    }
+}

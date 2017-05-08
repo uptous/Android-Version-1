@@ -1,5 +1,6 @@
 package com.uptous.view.fragment;
 
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,14 +9,12 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +22,9 @@ import com.uptous.MyApplication;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.FeedResponseModel;
+import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.activity.MessagePostActivity;
 import com.uptous.view.activity.PicturePostActivity;
@@ -41,31 +42,23 @@ import retrofit2.Response;
 /**
  * FileName : HomeFragment
  * Description : Show all new feeds like message, album, files etc.
- * Dependencies : HomeAdapter, InternetConnection
+ * Dependencies : HomeAdapter
  */
-public class HomeFragment extends Fragment implements View.OnClickListener, SearchView.OnQueryTextListener {
+public class HomeFragment extends Fragment implements View.OnClickListener {
 
-    private RecyclerView mViewHomeRecyclerView;
+    public static RecyclerView mViewHomeRecyclerView;
     private HomeListAdapter mHomeListAdapter;
-    private TextView mTextViewCancel;
 
-    private List<FeedResponseModel> mFeedResponseModelList = new ArrayList<>();
+    public static List<FeedResponseModel> feedResponseModelList = new ArrayList<>();
 
     private boolean FAB_Status = false;
-    private FloatingActionButton mFabPost, mFabMessagePost, mFabPicturePost;
+    public static FloatingActionButton mFabPost, mFabMessagePost, mFabPicturePost;
     private Animation mAnimationFabMessagePost, mHideAnimationFabMessagePost, mAnimationFabPicturePost,
             mHideAnimationFabPicturePost;
 
     private String mAuthenticationId, mAuthenticationPassword;
 
-    private RelativeLayout mRelativeLayoutSearchBar;
-
-    public  SearchView SearchView;
-    public  TextView  TextViewSearch;
-
-    protected ContactFragment contactFragment;
-
-    protected SignUpFragment signUpFragment;
+    private TextView mTextViewSearchResult;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,6 +74,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
         initView(view);
 
         return view;
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        FAB_Status = false;
     }
 
     @Override
@@ -112,6 +112,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
                     FAB_Status = false;
 
                 }
+                MyApplication.editor.putString("FeedDetail", "feed");
+                MyApplication.editor.commit();
+
                 Intent intent2 = new Intent(getActivity(), MessagePostActivity.class);
                 startActivity(intent2);
 
@@ -127,76 +130,46 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
                     hideFAB();
                     FAB_Status = false;
                 }
-
+                MyApplication.editor.putString("FeedDetail", "feed");
+                MyApplication.editor.commit();
                 Intent intent1 = new Intent(getActivity(), PicturePostActivity.class);
                 startActivity(intent1);
 
                 break;
 
-            case R.id.image_view_community_invitations:
-                break;
-            case R.id.text_view_cancel:
-                SearchView.clearFocus();
-                SearchView.onActionViewCollapsed();
-                TextViewSearch.setVisibility(View.VISIBLE);
-                break;
-            case R.id.layout_searchbar:
-                SearchView.onActionViewExpanded();
-                TextViewSearch.setVisibility(View.GONE);
-                break;
-
 
         }
     }
 
+
     @Override
     public void onResume() {
         super.onResume();
-        SearchView.onActionViewCollapsed();
-        SearchView.clearFocus();
-        MyApplication.editor.putString("Files", "file");
-        MyApplication.editor.commit();
 
-        String mMessagePost = MyApplication.mSharedPreferences.getString("MessagePost", null);
-        String mPicturePost = MyApplication.mSharedPreferences.getString("PicturePost", null);
+        String messagePost = MyApplication.mSharedPreferences.getString("MessagePost", null);
+        String picturePost = MyApplication.mSharedPreferences.getString("PicturePost", null);
+        String Feed = MyApplication.mSharedPreferences.getString("FeedDetail", null);
 
         if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-            if (mMessagePost != null) {
+            if (messagePost != null) {
                 getApiFeed();
             }
-            if (mPicturePost != null) {
+            if (picturePost != null) {
                 getApiFeed();
             }
+            if (Feed == null) {
+                if (ConnectionDetector.isConnectingToInternet(getActivity())) {
+                    getApiFeed();
+                } else {
+                    Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+
 
         } else {
             Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
         }
 
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        MyApplication.editor.putString("CommunityName", null);
-        MyApplication.editor.putString("CommunityFilter", null);
-        MyApplication.editor.putInt("CommunityId", 0);
-        MyApplication.editor.putString("All", null);
-        MyApplication.editor.commit();
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-
-        filter(mFeedResponseModelList, newText);
-
-
-        return true;
     }
 
     //Method to clear SharedPreference
@@ -223,49 +196,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
         mViewHomeRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_home);
         mViewHomeRecyclerView.setLayoutManager(layoutManager);
         mViewHomeRecyclerView.setNestedScrollingEnabled(false);
-        SearchView = (SearchView) view.findViewById(R.id.serach_view_filter);
-        SearchView.setOnQueryTextListener(this);
-
-        mTextViewCancel = (TextView) view.findViewById(R.id.text_view_cancel);
         mFabPost = (FloatingActionButton) view.findViewById(R.id.fab);
         mFabMessagePost = (FloatingActionButton) view.findViewById(R.id.fab_2);
         mFabPicturePost = (FloatingActionButton) view.findViewById(R.id.fab_3);
-        TextViewSearch = (TextView) view.findViewById(R.id.text_view_search);
-        mRelativeLayoutSearchBar = (RelativeLayout) view.findViewById(R.id.layout_searchbar);
-
-        SearchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                TextViewSearch.setVisibility(View.GONE);
-                SearchView.onActionViewExpanded();
-
-            }
-        });
-
-
-        SearchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                SearchView.clearFocus();
-                SearchView.onActionViewCollapsed();
-                TextViewSearch.setVisibility(View.VISIBLE);
-                return false;
-            }
-        });
+        mTextViewSearchResult = (TextView) view.findViewById(R.id.search_result);
 
         clickListenerOnViews();
 
-        handleSearchView();
-
         getData();
 
-        if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-            getApiFeed();
-        } else {
-            Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
-        }
     }
 
+    // Get data from SharedPreference
     private void getData() {
         mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
         mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
@@ -277,32 +219,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
         mFabPost.setOnClickListener(this);
         mFabMessagePost.setOnClickListener(this);
         mFabPicturePost.setOnClickListener(this);
-        mRelativeLayoutSearchBar.setOnClickListener(this);
-        mTextViewCancel.setOnClickListener(this);
-
-
-    }
-
-    // Method to handle search view
-    private void handleSearchView() {
-        try {
-            MainActivity activity = ((MainActivity) getActivity());
-            contactFragment = (ContactFragment) activity.mViewPagerAdapter.getItem(1);
-            if (contactFragment != null) {
-                contactFragment.SearchView.clearFocus();
-                contactFragment.SearchView.onActionViewCollapsed();
-            }
-
-            signUpFragment = (SignUpFragment) activity.mViewPagerAdapter.getItem(2);
-            if (signUpFragment != null) {
-                signUpFragment.SearchView.clearFocus();
-                signUpFragment.SearchView.onActionViewCollapsed();
-            }
-
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
 
     }
@@ -331,7 +247,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
     private void hideFAB() {
 
 
-//        Floating Action Button 2
+        //Floating Action Button 2
         FrameLayout.LayoutParams layoutParams2 = (FrameLayout.LayoutParams) mFabMessagePost.getLayoutParams();
         layoutParams2.rightMargin -= (int) (mFabMessagePost.getWidth() * 1.5);
         layoutParams2.bottomMargin -= (int) (mFabMessagePost.getHeight() * 1.5);
@@ -355,7 +271,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
 
-        APIServices service =/* = retrofit.create(APIServices.class,"","");*/
+        APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<List<FeedResponseModel>> call = service.GetNewsFeed();
 
@@ -365,11 +281,31 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
                 mProgressDialog.dismiss();
                 try {
 
-                    mFeedResponseModelList = response.body();
-                    mHomeListAdapter = new HomeListAdapter(getActivity(), mFeedResponseModelList);
-                    mViewHomeRecyclerView.setAdapter(mHomeListAdapter);
+                    if (response.body() != null) {
+                        mTextViewSearchResult.setVisibility(View.GONE);
+                        feedResponseModelList = response.body();
+                        mHomeListAdapter = new HomeListAdapter(getActivity(), feedResponseModelList);
+                        mViewHomeRecyclerView.setAdapter(mHomeListAdapter);
 
+                        int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+                        if (communityId != 0) {
+                            FilterCommunityForFeed(feedResponseModelList, communityId);
+                        }
 
+                    } else {
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                                logout();
+                            }
+                        });
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -386,30 +322,90 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Sear
     }
 
     // Method to filter feed by search string
-    private List<FeedResponseModel> filter(List<FeedResponseModel> models, String query) {
+    public List<FeedResponseModel> SearchFilterForFeed(List<FeedResponseModel> models, String query) {
         query = query.toLowerCase();
 
         final List<FeedResponseModel> filteredModelList = new ArrayList<>();
         try {
             for (FeedResponseModel model : models) {
+                String NewsItemName = model.getNewsItemName();
+                String OwnerName = model.getOwnerName();
+
+                String text = "";
+                if (NewsItemName != null)
+                    text = text + NewsItemName.toLowerCase();
+                if (OwnerName != null)
+                    text = text + OwnerName.toLowerCase();
 
 
-                String text = model.getNewsItemName().toLowerCase() +
-                        "" + model.getOwnerName().toLowerCase() + "" + model.getNewsItemDescription().toLowerCase();
+                if (text != null) {
+                    if (text.contains(query)) {
+                        filteredModelList.add(model);
+                    }
 
 
-                if (text.contains(query)) {
-                    filteredModelList.add(model);
                 }
+
                 mViewHomeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 mHomeListAdapter = new HomeListAdapter(getActivity(), filteredModelList);
                 mViewHomeRecyclerView.setAdapter(mHomeListAdapter);
                 mHomeListAdapter.notifyDataSetChanged();
+                if (query.equalsIgnoreCase("")) {
+                    mTextViewSearchResult.setVisibility(View.GONE);
+                } else {
+                    mTextViewSearchResult.setVisibility(View.VISIBLE);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return filteredModelList;
+    }
+
+    // Method to filter feed by community
+    private List<FeedResponseModel> FilterCommunityForFeed(List<FeedResponseModel> models, int Id) {
+        feedResponseModelList = new ArrayList<>();
+        try {
+            for (FeedResponseModel model : models) {
+                final int CommunityID = model.getCommunityId();
+                if (CommunityID == Id) {
+                    feedResponseModelList.add(model);
+                }
+                mViewHomeRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                mHomeListAdapter = new HomeListAdapter(getActivity(), feedResponseModelList);
+                mViewHomeRecyclerView.setAdapter(mHomeListAdapter);
+                mHomeListAdapter.notifyDataSetChanged();
+
+            }
+
+            int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
+
+            MainActivity activity = (MainActivity) getActivity();
+            if (Position == 0) {
+                if (feedResponseModelList.size() == 0) {
+                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
+                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+                } else {
+                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return feedResponseModelList;
+
+    }
+
+    //Method to logout from app
+    private void logout() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getActivity().getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
     }
 
 }

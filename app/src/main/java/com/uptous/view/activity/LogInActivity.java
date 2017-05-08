@@ -36,7 +36,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
 
     private LinearLayout mLinearLayoutLogin;
 
-    Helper helper;
+   private Helper mHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.layout_login:
-                helper.keyBoardHidden(LogInActivity.this);
+                mHelper.keyBoardHidden(LogInActivity.this);
                 mEmail = mTextEmailEditText.getText().toString();
                 mPassword = mTextPasswordEditText.getText().toString();
                 MyApplication.editor.putString("AuthenticationId", mEmail);
@@ -84,8 +84,8 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
     //method to initialize view
     private void initView() {
 
-        helper =new Helper();
-        //Global Variables
+        mHelper =new Helper();
+        //Global Variables Initialization
         mTextEmailEditText = (EditText) findViewById(R.id.edit_text_email);
         mTextPasswordEditText = (EditText) findViewById(R.id.edit_text_password);
         mLinearLayoutLogin = (LinearLayout) findViewById(R.id.layout_login);
@@ -94,20 +94,12 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
 
         setOnClickListener();
 
-        setData();
-
 
     }
 
     //Method to set on clickListener on views
     private void setOnClickListener() {
         mLinearLayoutLogin.setOnClickListener(this);
-    }
-
-    //Method to set data on views
-    private void setData() {
-        mTextEmailEditText.setText("testp3@uptous.com");
-        mTextPasswordEditText.setText("alpha1");
     }
 
     //Method to check user already logged in or not
@@ -156,8 +148,7 @@ public class LogInActivity extends AppCompatActivity implements View.OnClickList
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
 
                 mProgressDialog.dismiss();
-                Toast.makeText(LogInActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-
+                Toast.makeText(LogInActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
 
             }
         });

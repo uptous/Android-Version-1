@@ -1,11 +1,15 @@
 package com.uptous.view.activity;
 
+import android.Manifest;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -24,6 +28,7 @@ import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.UserPicture;
@@ -46,7 +51,7 @@ import retrofit2.Response;
 
 public class PicturePostActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ImageView mImageViewBack,mImageViewSelected;
+    private ImageView mImageViewBack, mImageViewSelected;
 
     private CommunityListAdapter mCommunityListAdapter;
 
@@ -64,8 +69,8 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
 
     public static final int LOAD_IMAGE_RESULTS = 1;
 
-    Helper helper;
-
+    private Helper mHelper;
+    public static final int REQUEST_CAMERA = 1;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,15 +104,20 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
                 break;
 
             case R.id.button_upload:
-                helper.keyBoardHidden(PicturePostActivity.this);
+                mHelper.keyBoardHidden(PicturePostActivity.this);
                 mAlbumTitle = mEditTextFileName.getText().toString().replace("\n", "<br>");
                 mImageCaption = mEditTextSubject.getText().toString().replace("\n", "<br>");
 
 
                 if (mAlbumTitle.length() > 0 && mImageCaption.length() > 0) {
-                    postApiPicturePost();
+                    if (mImagePath != null && mImagePath.length() > 0) {
+                        postApiPicturePost();
+                    } else {
+                        Toast.makeText(PicturePostActivity.this, "Please select image", Toast.LENGTH_SHORT).show();
+                    }
+
                 } else {
-                    Toast.makeText(PicturePostActivity.this, "Please fill all field", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PicturePostActivity.this, R.string.fill_all_field, Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -130,7 +140,9 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
 
                 // convert bitmap to byte
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                yourImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                if (yourImage != null) {
+                    yourImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                }
                 byte imageInByte[] = stream.toByteArray();
 
                 mImagePath = Base64.encodeToString(imageInByte, Base64.DEFAULT);
@@ -149,14 +161,14 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
 
     //method to initialize view
     private void initView() {
-        helper =new Helper();
+        mHelper = new Helper();
 
-        //Local Variables
+        //Local Variables Initialization
         TextView textViewTitle = (TextView) findViewById(R.id.text_view_title);
         LinearLayout linearLayoutNavigation = (LinearLayout) findViewById(R.id.imgmenuleft);
         ImageView imageViewFilter = (ImageView) findViewById(R.id.image_view_down);
 
-        //Global Variables
+        //Global Variables Initialization
         mEditTextFileName = (EditText) findViewById(R.id.edit_text_file_name_picture_post);
         mEditTextSubject = (EditText) findViewById(R.id.edit_text_subject_picture_post);
 
@@ -170,7 +182,7 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
 
         mButtonUpload = (Button) findViewById(R.id.button_upload);
 
-        textViewTitle.setText("Picture Post");
+        textViewTitle.setText(R.string.picture_post);
         imageViewFilter.setVisibility(View.GONE);
         linearLayoutNavigation.setVisibility(View.GONE);
         mImageViewBack.setVisibility(View.VISIBLE);
@@ -212,26 +224,43 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
             public void onResponse(Call<List<CommnunitiesResponseModel>> call, Response<List<CommnunitiesResponseModel>> response) {
                 try {
                     progressDialog.dismiss();
-                    final List<CommnunitiesResponseModel> eventResponseModels = response.body();
 
-                    CommnunitiesResponseModel resultsEntity = new CommnunitiesResponseModel();
-                    resultsEntity.setName("SELECT COMMUNITY");
-                    resultsEntity.setId("-1");
-                    eventResponseModels.add(eventResponseModels.size(), resultsEntity);
-                    mCommunityListAdapter = new CommunityListAdapter(PicturePostActivity.this, eventResponseModels);
-                    mSpinnerCommunity.setAdapter(mCommunityListAdapter);
-                    mSpinnerCommunity.setSelection(mCommunityListAdapter.getCount());
-                    mSpinnerCommunity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            mCommunityID = eventResponseModels.get(i).getId();
-                        }
+                    if (response.body() != null) {
+                        final List<CommnunitiesResponseModel> eventResponseModels = response.body();
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
+                        CommnunitiesResponseModel resultsEntity = new CommnunitiesResponseModel();
+                        resultsEntity.setName("SELECT COMMUNITY");
+                        resultsEntity.setId("-1");
+                        eventResponseModels.add(eventResponseModels.size(), resultsEntity);
+                        mCommunityListAdapter = new CommunityListAdapter(PicturePostActivity.this, eventResponseModels);
+                        mSpinnerCommunity.setAdapter(mCommunityListAdapter);
+                        mSpinnerCommunity.setSelection(mCommunityListAdapter.getCount());
+                        mSpinnerCommunity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                mCommunityID = eventResponseModels.get(i).getId();
+                            }
 
-                        }
-                    });
+                            @Override
+                            public void onNothingSelected(AdapterView<?> adapterView) {
+
+                            }
+                        });
+                    } else {
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(PicturePostActivity.this);
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                                logout();
+                            }
+                        });
+                    }
+
                 } catch (Exception e) {
                     Log.d("onResponse", "There is an error");
                     e.printStackTrace();
@@ -254,7 +283,7 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
 
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
-        Call<PostCommentResponseModel> call = service.PostPicture(mAlbumTitle, mCommunityID, mImageCaption, "File", mImagePath);
+        Call<PostCommentResponseModel> call = service.PostPicture(mImageCaption, mCommunityID, mAlbumTitle, "File", mImagePath);
 
         final ProgressDialog mProgressDialog = new ProgressDialog(PicturePostActivity.this);
         mProgressDialog.setMessage("Please wait...");
@@ -269,6 +298,7 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
 
                     if (response.isSuccessful()) {
                         MyApplication.editor.putString("PicturePost", "picture");
+                        MyApplication.editor.putString("Feed", null);
                         MyApplication.editor.commit();
                         finish();
 
@@ -286,6 +316,15 @@ public class PicturePostActivity extends AppCompatActivity implements View.OnCli
         });
     }
 
-
+    //Method to logout from app
+    private void logout() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
+    }
 }
 

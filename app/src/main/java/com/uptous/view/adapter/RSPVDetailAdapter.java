@@ -44,7 +44,14 @@ public class RSPVDetailAdapter extends RecyclerView.Adapter<RSPVDetailAdapter.Ve
 
         // Set Data in your views comes from CollectionClass
 
-        versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName()+" - "+listEntities.get(i).getAttendees());
+
+
+        if(listEntities.get(i).getAttendees()!=0){
+            versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName()
+                    +" - "+listEntities.get(i).getAttendees()+" attendees");
+        }else {
+            versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName());
+        }
         versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
 
     }

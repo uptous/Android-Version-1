@@ -1,6 +1,9 @@
 package com.uptous.view.activity;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -21,6 +24,7 @@ import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.view.adapter.SignUpDriverAdapter;
@@ -50,7 +54,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
     private TextView mViewOrganizerOneTextView, mViewOrganizerSecondTextView, mViewEventDescriptionTextView,
             mTextViewTitle, mTextViewEventDateSignUp, mTextViewOrganizer,
             mTextViewFirstNameContactOne, mTextViewSecondNameContactOne, mTextViewSecondNameContactTwo,
-            mTextViewFirstNameContactTwo;
+            mTextViewFirstNameContactTwo,mTextViewCutOffDateSignUp;
 
     private SignUpDriverAdapter mSignUpDriverAdapter;
 
@@ -92,12 +96,12 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
     //Method to initialize view
     private void initView() {
 
-        //Local Variables
+        //Local Variables Initialization
         LinearLayout linearLayoutNavigation = (LinearLayout) findViewById(R.id.imgmenuleft);
         ImageView imageViewFilter = (ImageView) findViewById(R.id.image_view_down);
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
 
-        //Global Variables
+        //Global Variables Initialization
         mLinearLayoutOrganizerOne = (LinearLayout) findViewById(R.id.layout_organizer_one);
         mLinearLayoutOrganizerTwo = (LinearLayout) findViewById(R.id.layout_organizer_two);
         mLinearLayoutBackgroundFirstContact = (LinearLayout) findViewById(R.id.layout_contact);
@@ -113,7 +117,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
         mTextViewSecondNameContactOne = (TextView) findViewById(R.id.textview_last_name);
         mTextViewFirstNameContactTwo = (TextView) findViewById(R.id.textview_first_name_second_contact);
         mTextViewSecondNameContactTwo = (TextView) findViewById(R.id.textview_last_name_second_contact);
-
+        mTextViewCutOffDateSignUp = (TextView) findViewById(R.id.text_view_cutoff_date);
         mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
         mViewOrganizerOneRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_one);
         mViewOrganizerSecondRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_two);
@@ -134,11 +138,11 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
         clickListenerOnViews();
 
 
-        if (ConnectionDetector.isConnectingToInternet(this)) {
-            getApiSignUpDetail();
-        } else {
-            Toast.makeText(SignUpDRIVERActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-        }
+//        if (ConnectionDetector.isConnectingToInternet(this)) {
+//            getApiSignUpDetail();
+//        } else {
+//            Toast.makeText(SignUpDRIVERActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+//        }
 
 
     }
@@ -175,10 +179,10 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                 try {
                     mProgressDialog.dismiss();
 
-                    if (response.isSuccessful()) {
+                    if (response.body() != null) {
                         final List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
-                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes());
+                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n"," "));
                         mTextViewTitle.setVisibility(View.VISIBLE);
 
                         String Name = eventResponseModels.get(0).getName();
@@ -215,16 +219,16 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                         if (Image1 != null) {
                             mResultOne = Image1.substring(Image1.lastIndexOf(".") + 1);
                             if (mResultOne.equalsIgnoreCase("gif")) {
-                                String BackgroundColor = eventResponseModels.get(0).getOrganizer2BackgroundColor();
+                                String BackgroundColor = eventResponseModels.get(0).getOrganizer1BackgroundColor();
 
                                 if (BackgroundColor != null) {
 
                                     int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer1TextColor());
-
-
-                                    mTextViewFirstNameContactOne.setText(eventResponseModels.get(0).getContact());
+                                    String OwnerN=eventResponseModels.get(0).getContact();
+                                    String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
+                                    mTextViewFirstNameContactOne.setText(OwnerN);
                                     mTextViewFirstNameContactOne.setTextColor(colorTextView);
-                                    mTextViewSecondNameContactOne.setText(eventResponseModels.get(0).getContact());
+                                    mTextViewSecondNameContactOne.setText(resultLastName);
                                     mTextViewSecondNameContactOne.setTextColor(colorTextView);
                                     mLinearLayoutBackgroundFirstContact.setVisibility(View.VISIBLE);
                                     int color = Color.parseColor(BackgroundColor);
@@ -240,7 +244,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                             }
 
                         } else {
-                            String BackgroundColor = eventResponseModels.get(0).getOrganizer2BackgroundColor();
+                            String BackgroundColor = eventResponseModels.get(0).getOrganizer1BackgroundColor();
 
                             if (BackgroundColor != null) {
                                 mLinearLayoutBackgroundFirstContact.setVisibility(View.VISIBLE);
@@ -248,9 +252,11 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                 int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer1TextColor());
 
 
-                                mTextViewFirstNameContactOne.setText(eventResponseModels.get(0).getContact());
+                                String OwnerN=eventResponseModels.get(0).getContact();
+                                String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
+                                mTextViewFirstNameContactOne.setText(OwnerN);
                                 mTextViewFirstNameContactOne.setTextColor(colorTextView);
-                                mTextViewSecondNameContactOne.setText(eventResponseModels.get(0).getContact());
+                                mTextViewSecondNameContactOne.setText(resultLastName);
                                 mTextViewSecondNameContactOne.setTextColor(colorTextView);
                                 int color = Color.parseColor(BackgroundColor);
                                 mLinearLayoutBackgroundFirstContact.setBackgroundResource(R.drawable.circle);
@@ -274,11 +280,12 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                     gd.setColor(color);
                                     gd.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
                                     int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer2TextColor());
+                                    String OwnerN=eventResponseModels.get(0).getContact2();
+                                    String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
 
-
-                                    mTextViewFirstNameContactTwo.setText(eventResponseModels.get(0).getContact2());
+                                    mTextViewFirstNameContactTwo.setText(OwnerN);
                                     mTextViewFirstNameContactTwo.setTextColor(colorTextView);
-                                    mTextViewSecondNameContactTwo.setText(eventResponseModels.get(0).getContact2());
+                                    mTextViewSecondNameContactTwo.setText(resultLastName);
                                     mTextViewSecondNameContactTwo.setTextColor(colorTextView);
                                 }
 
@@ -302,9 +309,12 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                 int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer2TextColor());
 
 
-                                mTextViewFirstNameContactTwo.setText(eventResponseModels.get(0).getContact2());
+                                String OwnerN=eventResponseModels.get(0).getContact2();
+                                String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
+
+                                mTextViewFirstNameContactTwo.setText(OwnerN);
                                 mTextViewFirstNameContactTwo.setTextColor(colorTextView);
-                                mTextViewSecondNameContactTwo.setText(eventResponseModels.get(0).getContact2());
+                                mTextViewSecondNameContactTwo.setText(resultLastName);
                                 mTextViewSecondNameContactTwo.setTextColor(colorTextView);
                             }
 
@@ -314,7 +324,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                             mTextViewEventDateSignUp.setVisibility(View.GONE);
                         } else {
                             Date date = new Date(val);
-                            SimpleDateFormat df2 = new SimpleDateFormat("MMM dd");
+                            SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
                             SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
                             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -322,26 +332,68 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                             String dateTime = dfTime.format(date);
 
                             String EndTime = response.body().get(0).getEndTime();
-                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM")) {
+                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM") && !EndTime.equalsIgnoreCase("1:00 AM")) {
                                 mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime + " - " + EndTime);
 
                             } else {
-                                if (dateTime != null && !dateTime.equalsIgnoreCase("1:00AM")) {
-                                    mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
-                                } else {
-                                    mTextViewEventDateSignUp.setText(dateText);
+                                if (dateTime != null) {
+                                    if (!dateTime.equalsIgnoreCase("1:00AM") && !dateTime.equalsIgnoreCase("1:00 AM")) {
+                                        mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
+                                    } else {
+                                        mTextViewEventDateSignUp.setText(dateText);
+                                    }
                                 }
+
                             }
 
-
                         }
+                        long valCutOff = eventResponseModels.get(0).getCutoffDate();
+                        if (valCutOff == 0) {
+                            mTextViewCutOffDateSignUp.setVisibility(View.GONE);
+                        } else {
+                            Date date = new Date(valCutOff);
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat df2 =
+                                    new SimpleDateFormat("MMM d");
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat dfTime =
+                                    new SimpleDateFormat("h:mm aa");
+                            df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+                            dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+                            String dateText = df2.format(date);
+//                            String dateTime = dfTime.format(date);
 
+                            String EndTime = response.body().get(0).getEndTime();
+                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM") && !EndTime.equalsIgnoreCase("1:00 AM")) {
+                                mTextViewCutOffDateSignUp.setText(dateText);
+
+                            } else {
+
+//                                    if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
+                                mTextViewCutOffDateSignUp.setText(dateText);
+//                                    } else {
+//                                        mTextViewCutOffDateSignUp.setText(dateText);
+//                                    }
+//                                }
+
+                            }
+                        }
                         mSignUpDriverAdapter = new SignUpDriverAdapter(SignUpDRIVERActivity.this, eventResponseModels.get(0).getItems());
                         mRecyclerViewOpenSpot.setAdapter(mSignUpDriverAdapter);
 
 
                     } else {
-                        Toast.makeText(SignUpDRIVERActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(SignUpDRIVERActivity.this);
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                               logout();
+
+                            }
+                        });
                     }
 
 
@@ -362,5 +414,15 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
         });
     }
 
+    //Method to logout from app
+    private void logout() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
+    }
 
 }

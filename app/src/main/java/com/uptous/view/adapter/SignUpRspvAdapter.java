@@ -23,14 +23,15 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * Created by Prakash on 1/24/2017.
+ * Created by Prakash .
  */
 
 public class SignUpRspvAdapter extends RecyclerView.Adapter<SignUpRspvAdapter.VersionViewHolder> {
 
     List<SignUpDetailResponseModel.ItemsBean> listEntities;
     Activity activity;
-String dateTextMain;
+String dateTextMain,dateTextTime;
+    long val;
 
 
     public SignUpRspvAdapter(Activity a, List<SignUpDetailResponseModel.ItemsBean> listEntities) {
@@ -55,25 +56,35 @@ String dateTextMain;
 
         // Set Data in your views comes from CollectionClass
 
-        long val = listEntities.get(i).getDateTime();
+        val = listEntities.get(i).getDateTime();
         if (val == 0) {
             versionViewHolder.mTextViewDate.setVisibility(View.GONE);
         } else {
             Date date = new Date(val);
-            SimpleDateFormat df2 = new SimpleDateFormat("MMM dd");
+            SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
             SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+            dateTextMain = df2.format(date) ;
+            dateTextTime=dfTime.format(date);
+            if(!dateTextTime.equalsIgnoreCase("1:00AM") &&
+                    !dateTextTime.equalsIgnoreCase("1:00 AM")){
+                versionViewHolder.mTextViewDate.setText(dateTextMain+", "+dateTextTime);
+                if (listEntities.get(i).getEndTime() != null && !listEntities.get(i).getEndTime().equalsIgnoreCase("")) {
+                    if (!listEntities.get(i).getEndTime().equalsIgnoreCase("1:00AM") &&
+                            !listEntities.get(i).getEndTime().equalsIgnoreCase("1:00 AM")) {
+                        dateTextMain = df2.format(date) + ", " + dfTime.format(date) + " - " + listEntities.get(i).getEndTime();
+                        versionViewHolder.mTextViewDate.setText(dateTextMain + " - " + listEntities.get(i).getEndTime());
+                    } else {
+                        versionViewHolder.mTextViewDate.setText(dateTextMain);
+                    }
 
-            dateTextMain = df2.format(date) + ", " + dfTime.format(date);
-
-            if (listEntities.get(i).getEndTime() != null && !listEntities.get(i).getEndTime().equalsIgnoreCase("")) {
-
-                versionViewHolder.mTextViewDate.setText(dateTextMain + " - " + listEntities.get(i).getEndTime());
-            } else {
+                } else {
+                    versionViewHolder.mTextViewDate.setText(dateTextMain);
+                }
+            }else {
                 versionViewHolder.mTextViewDate.setText(dateTextMain);
             }
-
 
         }
 
@@ -96,7 +107,7 @@ String dateTextMain;
                     int ItemId = listEntities.get(position).getId();
 
                     MyApplication.editor.putInt("ItemId", ItemId);
-                    MyApplication.editor.putString("Name", Name);
+                    MyApplication.editor.putString("Name",  listEntities.get(position).getName());
                     MyApplication.editor.putString("Date", dateTextMain);
                     MyApplication.editor.commit();
                     Intent intent = new Intent(activity, RSPVDetailActivity.class);
@@ -138,6 +149,8 @@ String dateTextMain;
                         int ItemId = listEntities.get(position).getId();
                         MyApplication.editor.putString("Type", "RSPV");
                         MyApplication.editor.putInt("ItemId", ItemId);
+                        MyApplication.editor.putString("ToName","");
+                        MyApplication.editor.putString("FromName", listEntities.get(position).getName());
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);

@@ -1,16 +1,15 @@
 package com.uptous.view.fragment;
 
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,16 +18,12 @@ import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.ItemClickSupport;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.CommnunitiesResponseModel;
 import com.uptous.model.SignUpResponseModel;
+import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
-import com.uptous.view.activity.SignUpOngoingActivity;
-import com.uptous.view.activity.SignUpShiftsActivity;
-import com.uptous.view.activity.SignUpDRIVERActivity;
-import com.uptous.view.activity.SignUpRSPVActivity;
-import com.uptous.view.activity.SignUpSnackActivity;
-import com.uptous.view.activity.SignUpVoteActivity;
+import com.uptous.view.activity.ProfileActivity;
 import com.uptous.view.adapter.SignUpSheetsListAdapter;
 
 import java.util.ArrayList;
@@ -41,32 +36,22 @@ import retrofit2.Response;
 /**
  * FileName : SignUpFragment
  * Description : Show all sing_up types and also show open ,full, volunteer spots etc.
- * Dependencies : SignUpSheetsListAdapter, InternetConnection
+ * Dependencies : SignUpSheetsListAdapter
  */
 
-public class SignUpFragment extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener {
+public class SignUpFragment extends Fragment {
 
     private SignUpSheetsListAdapter mSignUpSheetsListAdapter;
 
-    private RecyclerView mViewSignUpRecyclerView;
-
-    private TextView mTextViewSearch;
-
+    public static RecyclerView mViewSignUpRecyclerView;
 
     private String mAuthenticationId, mAuthenticationPassword;
 
-    private List<SignUpResponseModel> mSignUpResponseModelList = new ArrayList<>();
+    private TextView mTextViewSearchResult;
 
-    private List<CommnunitiesResponseModel> CommunityList = new ArrayList<>();
+    public static List<SignUpResponseModel> signUpResponseModelList = new ArrayList<>();
 
-    private List<SignUpResponseModel> mFilteredModelList = new ArrayList<>();
-
-
-    public  SearchView SearchView;
-
-    protected ContactFragment contactFragment;
-
-    protected HomeFragment homeFragment;
+    private List<CommnunitiesResponseModel> mCommunityList = new ArrayList<>();
 
 
     @Override
@@ -77,66 +62,31 @@ public class SignUpFragment extends Fragment implements SearchView.OnQueryTextLi
 
         getData();
 
-        if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-            getApiCommunityList();
-            getApiSignUp();
-        } else {
-            Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
-        }
 
         return view;
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        if (!newText.equalsIgnoreCase("")) {
-            mTextViewSearch.setVisibility(View.GONE);
-        } else {
-            mTextViewSearch.setVisibility(View.VISIBLE);
-        }
-        mFilteredModelList = filter(mSignUpResponseModelList, newText);
-
-
-        return true;
-    }
-
-    @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.text_view_cancel:
-                SearchView.clearFocus();
-                SearchView.onActionViewCollapsed();
-                mTextViewSearch.setVisibility(View.VISIBLE);
-                break;
-        }
-    }
 
     @Override
     public void onResume() {
         super.onResume();
-        SearchView.clearFocus();
-        SearchView.onActionViewCollapsed();
-        MyApplication.editor.putString("Files", "file");
-        MyApplication.editor.commit();
+        String Detail = MyApplication.mSharedPreferences.getString("SignUpDetail", null);
+
+
+        if (Detail == null) {
+            if (ConnectionDetector.isConnectingToInternet(getActivity())) {
+
+                getApiCommunityList();
+                getApiSignUp();
+            } else {
+                Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
+            }
+
+        }
 
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        MyApplication.editor.putString("CommunityName", null);
-        MyApplication.editor.putString("CommunityFilter", null);
-        MyApplication.editor.putInt("CommunityId", 0);
-        MyApplication.editor.putString("All", null);
-        MyApplication.editor.commit();
-    }
 
     //Method to initialize view
     private void initView(View view) {
@@ -145,36 +95,7 @@ public class SignUpFragment extends Fragment implements SearchView.OnQueryTextLi
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mViewSignUpRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_sign_up);
         mViewSignUpRecyclerView.setLayoutManager(layoutManager);
-        TextView mTextViewCancel = (TextView) view.findViewById(R.id.text_view_cancel);
-        mTextViewCancel.setOnClickListener(this);
-        SearchView = (SearchView) view.findViewById(R.id.serach_view_filter);
-        SearchView.setOnQueryTextListener(this);
-        mTextViewSearch = (TextView) view.findViewById(R.id.text_view_search);
-        RelativeLayout mRelativeLayoutSearchBar = (RelativeLayout) view.findViewById(R.id.layout_searchbar);
-
-        mRelativeLayoutSearchBar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SearchView.onActionViewExpanded();
-                mTextViewSearch.setVisibility(View.GONE);
-            }
-        });
-        SearchView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SearchView.onActionViewExpanded();
-                mTextViewSearch.setVisibility(View.GONE);
-            }
-        });
-
-        SearchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                mTextViewSearch.setVisibility(View.VISIBLE);
-                return false;
-            }
-        });
-        handleSearchView();
+        mTextViewSearchResult = (TextView) view.findViewById(R.id.search_result);
     }
 
 
@@ -184,35 +105,6 @@ public class SignUpFragment extends Fragment implements SearchView.OnQueryTextLi
         mAuthenticationPassword = MyApplication.mSharedPreferences.getString(String.valueOf(R.string.AuthenticationPassword), null);
     }
 
-    // Method to handle search view
-    private void handleSearchView() {
-        try {
-            MainActivity activity = ((MainActivity) getActivity());
-            contactFragment = (ContactFragment) activity.mViewPagerAdapter.getItem(1);
-            if (contactFragment != null) {
-                contactFragment.SearchView.clearFocus();
-                contactFragment.SearchView.onActionViewCollapsed();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-        try {
-            MainActivity activity = ((MainActivity) getActivity());
-            homeFragment = (HomeFragment) activity.mViewPagerAdapter.getItem(0);
-
-            if (homeFragment != null) {
-                homeFragment.SearchView.clearFocus();
-                homeFragment.SearchView.onActionViewCollapsed();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
     // Get webservice to show all sign_up_types
     private void getApiSignUp() {
 
@@ -220,7 +112,7 @@ public class SignUpFragment extends Fragment implements SearchView.OnQueryTextLi
         mProgressDialog.setMessage("Please wait...");
         mProgressDialog.setCancelable(false);
         mProgressDialog.show();
-        APIServices service =/* = retrofit.create(APIServices.class,"","");*/
+        APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<List<SignUpResponseModel>> call = service.GetSignUp();
 
@@ -229,115 +121,32 @@ public class SignUpFragment extends Fragment implements SearchView.OnQueryTextLi
             public void onResponse(Call<List<SignUpResponseModel>> call, Response<List<SignUpResponseModel>> response) {
                 mProgressDialog.dismiss();
                 try {
-                    mSignUpResponseModelList = response.body();
-                    mSignUpSheetsListAdapter = new SignUpSheetsListAdapter(getActivity(), mSignUpResponseModelList, CommunityList);
-                    mViewSignUpRecyclerView.setAdapter(mSignUpSheetsListAdapter);
 
-                    ItemClickSupport.addTo(mViewSignUpRecyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-                        @Override
-                        public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-
-                            if (mFilteredModelList.size() == 0) {
-                                if (mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("RSVP")) {
-                                    int OpId = mSignUpResponseModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpRSPVActivity.class);
-                                    startActivity(intent);
-                                } else if (mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Vote")) {
-                                    int OpId = mSignUpResponseModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpVoteActivity.class);
-                                    startActivity(intent);
-                                } else if (mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Drivers")) {
-                                    int OpId = mSignUpResponseModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpDRIVERActivity.class);
-                                    startActivity(intent);
-                                } else if (mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Shifts") ||
-                                        mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Games") ||
-                                        mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Potluck/Party") ||
-                                        mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Wish List") ||
-                                        mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Volunteer") ||
-                                        mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Multi Game/Event RSVP")) {
-                                    int OpId = mSignUpResponseModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.putString("Type", mSignUpResponseModelList.get(position).getType());
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpShiftsActivity.class);
-                                    startActivity(intent);
-                                } else if (mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Snack Schedule")) {
-                                    int OpId = mSignUpResponseModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.putString("Type", mSignUpResponseModelList.get(position).getType());
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpSnackActivity.class);
-                                    startActivity(intent);
-                                } else if (mSignUpResponseModelList.get(position).getType().equalsIgnoreCase("Ongoing Volunteering")) {
-                                    int OpId = mSignUpResponseModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.putString("Type", mSignUpResponseModelList.get(position).getType());
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpOngoingActivity.class);
-                                    startActivity(intent);
-                                } else {
-                                    Toast.makeText(getActivity(), R.string.sing_up_not_allow, Toast.LENGTH_SHORT).show();
-                                }
-
-                            } else {
-
-                                if (mFilteredModelList.get(position).getType().equalsIgnoreCase("RSVP")) {
-                                    int OpId = mFilteredModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpRSPVActivity.class);
-                                    startActivity(intent);
-                                } else if (mFilteredModelList.get(position).getType().equalsIgnoreCase("Vote")) {
-                                    int OpId = mFilteredModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpVoteActivity.class);
-                                    startActivity(intent);
-                                } else if (mFilteredModelList.get(position).getType().equalsIgnoreCase("Drivers")) {
-                                    int OpId = mFilteredModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpDRIVERActivity.class);
-                                    startActivity(intent);
-                                } else if (mFilteredModelList.get(position).getType().equalsIgnoreCase("Shifts") ||
-                                        mFilteredModelList.get(position).getType().equalsIgnoreCase("Games")
-                                        || mFilteredModelList.get(position).getType().equalsIgnoreCase("Potluck/Party") ||
-                                        mFilteredModelList.get(position).getType().equalsIgnoreCase("Wish List")
-                                        || mFilteredModelList.get(position).getType().equalsIgnoreCase("Volunteer")
-                                        || mFilteredModelList.get(position).getType().equalsIgnoreCase("Multi Game/Event RSVP")) {
-                                    int OpId = mFilteredModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.putString("Type", mSignUpResponseModelList.get(position).getType());
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpShiftsActivity.class);
-                                    startActivity(intent);
-                                } else if (mFilteredModelList.get(position).getType().equalsIgnoreCase("Snack Schedule")) {
-                                    int OpId = mFilteredModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.putString("Type", mSignUpResponseModelList.get(position).getType());
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpSnackActivity.class);
-                                    startActivity(intent);
-                                } else if (mFilteredModelList.get(position).getType().equalsIgnoreCase("Ongoing Volunteering")) {
-                                    int OpId = mFilteredModelList.get(position).getId();
-                                    MyApplication.editor.putInt("Id", OpId);
-                                    MyApplication.editor.putString("Type", mSignUpResponseModelList.get(position).getType());
-                                    MyApplication.editor.commit();
-                                    Intent intent = new Intent(getActivity(), SignUpOngoingActivity.class);
-                                    startActivity(intent);
-                                } else {
-                                    Toast.makeText(getActivity(), R.string.sing_up_not_allow, Toast.LENGTH_SHORT).show();
-                                }
-                            }
+                    if (response.body() != null) {
+                        mViewSignUpRecyclerView.setVisibility(View.VISIBLE);
+                        mTextViewSearchResult.setVisibility(View.GONE);
+                        signUpResponseModelList = response.body();
+                        mSignUpSheetsListAdapter = new SignUpSheetsListAdapter(getActivity(), signUpResponseModelList, mCommunityList);
+                        mViewSignUpRecyclerView.setAdapter(mSignUpSheetsListAdapter);
+                        int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+                        if (communityId != 0) {
+                            FilterCommunityForSignUp(signUpResponseModelList, communityId);
                         }
-                    });
+                    } else {
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                                logout();
+                            }
+                        });
+
+                    }
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -354,21 +163,37 @@ public class SignUpFragment extends Fragment implements SearchView.OnQueryTextLi
         });
     }
 
+
     // Method to filter sign_up by search string
-    private List<SignUpResponseModel> filter(List<SignUpResponseModel> models, String query) {
+    public List<SignUpResponseModel> SearchFilterForSignUp(List<SignUpResponseModel> models, String query) {
         query = query.toLowerCase();
 
         final List<SignUpResponseModel> filteredModelList = new ArrayList<>();
         try {
             for (SignUpResponseModel model : models) {
-                final String text = model.getName().toLowerCase();
-                if (text.contains(query)) {
-                    filteredModelList.add(model);
+
+                String Name = model.getName();
+                String text = "";
+                if (Name != null)
+                    text = text + Name.toLowerCase();
+
+
+                if (text != null) {
+                    if (text.contains(query)) {
+                        filteredModelList.add(model);
+
+                    }
                 }
+
                 mViewSignUpRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                mSignUpSheetsListAdapter = new SignUpSheetsListAdapter(getActivity(), filteredModelList, CommunityList);
+                mSignUpSheetsListAdapter = new SignUpSheetsListAdapter(getActivity(), filteredModelList, mCommunityList);
                 mViewSignUpRecyclerView.setAdapter(mSignUpSheetsListAdapter);
                 mSignUpSheetsListAdapter.notifyDataSetChanged();
+                if (query.equalsIgnoreCase("")) {
+                    mTextViewSearchResult.setVisibility(View.GONE);
+                } else {
+                    mTextViewSearchResult.setVisibility(View.VISIBLE);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -391,9 +216,29 @@ public class SignUpFragment extends Fragment implements SearchView.OnQueryTextLi
         call.enqueue(new Callback<List<CommnunitiesResponseModel>>() {
             @Override
             public void onResponse(Call<List<CommnunitiesResponseModel>> call, Response<List<CommnunitiesResponseModel>> response) {
+                progressDialog.dismiss();
                 try {
-                    progressDialog.dismiss();
-                    CommunityList = response.body();
+
+                    if (response.body() != null) {
+                        mCommunityList = response.body();
+                    } else {
+
+                        ProfileActivity profileActivity = new ProfileActivity();
+                        profileActivity.logOut();
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                                logout();
+                            }
+                        });
+
+                    }
 
 
                 } catch (Exception e) {
@@ -412,5 +257,47 @@ public class SignUpFragment extends Fragment implements SearchView.OnQueryTextLi
         });
     }
 
+    // Method to filter feed by community
+    private List<SignUpResponseModel> FilterCommunityForSignUp(List<SignUpResponseModel> models, int Id) {
+        signUpResponseModelList = new ArrayList<>();
+        try {
+            for (SignUpResponseModel model : models) {
+                final int CommunityID = model.getCommunityId();
+                if (CommunityID == Id) {
+                    signUpResponseModelList.add(model);
+                }
+                mViewSignUpRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                mSignUpSheetsListAdapter = new SignUpSheetsListAdapter(getActivity(), signUpResponseModelList, mCommunityList);
+                mViewSignUpRecyclerView.setAdapter(mSignUpSheetsListAdapter);
+                mSignUpSheetsListAdapter.notifyDataSetChanged();
 
+            }
+            int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
+
+            MainActivity activity = (MainActivity) getActivity();
+            if (Position == 2) {
+                if (signUpResponseModelList.size() == 0) {
+                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
+                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+                } else {
+                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return signUpResponseModelList;
+    }
+
+    //Method to logout from app
+    private void logout() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getActivity().getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
+    }
 }

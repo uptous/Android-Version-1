@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -61,7 +62,8 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
     private String mOwnerImage, mNewsItemImage, mDate, mNewsName, mOwnerName, mCommunityName, mNewsType,
             mNewsItemDescription, mComment, mAuthenticationId, mAuthenticationPassword;
 
-    Helper helper;
+    private Helper mHelper;
+    private ScrollView mScrollView;
 
 
     @Override
@@ -81,7 +83,7 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
                 finish();
                 break;
             case R.id.text_view_send_comment:
-                helper.keyBoardHidden(CommentDetailActivity.this);
+                mHelper.keyBoardHidden(CommentDetailActivity.this);
 
                 mComment = mEditTextComment.getText().toString().trim().replace("\n", "<br>");
 
@@ -107,23 +109,30 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        MyApplication.editor.putInt("CommunityId", 0);
+        MyApplication.editor.commit();
+    }
+
     //Method to initialize view
     private void initView() {
-        helper = new Helper();
+        mHelper = new Helper();
 
-        //Local Variables
+        //Local Variables Initialization
         TextView textViewFilterText = (TextView) findViewById(R.id.text_view_title);
         ImageView imageViewFilter = (ImageView) findViewById(R.id.image_view_down);
         LinearLayout linearLayoutNavigation = (LinearLayout) findViewById(R.id.imgmenuleft);
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        //Global Variables
+        //Global Variables Initialization
         mRecyclerViewComment = (RecyclerView) findViewById(R.id.recycler_view_comment);
         mRecyclerViewComment.setLayoutManager(layoutManager);
 
         mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
-
+        mScrollView=(ScrollView)findViewById(R.id.scroll_view_des);
         mLinearLayoutRoundedBackGround = (LinearLayout) findViewById(R.id.layout_contact);
 
         mImageViewNewsItem = (ImageView) findViewById(R.id.image_view_news_item);
@@ -176,7 +185,7 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
         mDate = MyApplication.mSharedPreferences.getString("Date", null);
         mNewsName = MyApplication.mSharedPreferences.getString("NewsItemName", null);
         mOwnerName = MyApplication.mSharedPreferences.getString("OwnerName", null);
-        mCommunityName = MyApplication.mSharedPreferences.getString("CommunityName", null);
+        mCommunityName = MyApplication.mSharedPreferences.getString("FeedCommunityName", null);
         mNewsItemDescription = MyApplication.mSharedPreferences.getString("NewsItemDescription", null);
 
         setData();
@@ -187,6 +196,7 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
         if (mNewsItemImage != null && !mNewsItemImage.equalsIgnoreCase("")) {
             mImageViewNewsItem.setVisibility(View.VISIBLE);
             mTextViewNewsDetail.setVisibility(View.GONE);
+            mScrollView.setVisibility(View.GONE);
             Picasso.with(CommentDetailActivity.this).load(mNewsItemImage).into(mImageViewNewsItem);
         } else {
             mImageViewNewsItem.setVisibility(View.GONE);
@@ -238,9 +248,9 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
 
 
                 int colorTextView = Color.parseColor(TextColor);
-                String resultLastName = OwnerNAME.substring(OwnerNAME.lastIndexOf(' ') + 1).trim();
+                String resultLastName = mOwnerName.substring(mOwnerName.lastIndexOf(' ') + 1).trim();
 
-                mTextViewFirstName.setText(OwnerNAME);
+                mTextViewFirstName.setText(mOwnerName);
                 mTextViewFirstName.setTextColor(colorTextView);
                 mTextViewLastName.setText(resultLastName);
                 mTextViewLastName.setTextColor(colorTextView);
@@ -333,17 +343,7 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
                     mAnnouncementsListAdapter = new AnnouncementsListAdapter(CommentDetailActivity.this, eventResponseModels);
                     mRecyclerViewComment.setAdapter(mAnnouncementsListAdapter);
 
-                    ItemClickSupport.addTo(mRecyclerViewComment).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-                        @Override
-                        public void onItemClicked(RecyclerView recyclerView, int position, View v) {
-
-
-                        }
-                    });
-
-
                 } catch (Exception e) {
-                    Log.d("onResponse", "There is an error");
                     e.printStackTrace();
                 }
 
@@ -445,4 +445,5 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
             }
         });
     }
+
 }

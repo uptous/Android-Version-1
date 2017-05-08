@@ -1,6 +1,8 @@
 package com.uptous.view.activity;
 
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -22,6 +24,7 @@ import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.view.adapter.VolunteeredAdapter;
+import com.uptous.view.adapter.VolunteeredRspvAdapter;
 
 import java.util.List;
 
@@ -39,6 +42,7 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
 
     private ImageView mImageViewBack;
     private VolunteeredAdapter mVolunteeredAdapter;
+    private VolunteeredRspvAdapter mVolunteeredRspvAdapter;
     private RecyclerView mRecyclerViewVolunteerComment;
     private String mEventName, mDate, mEndTime, mAuthenticationId, mAuthenticationPassword, mStringType, mFromName,
             mToName;
@@ -70,13 +74,13 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
     //Method to initialize view
     private void initView() {
 
-        //Local Variables
+        //Local Variables Initialization
         LinearLayoutManager layoutManagerFiles
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
         LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
 
-        //Global Variables
+        //Global Variables Initialization
         mRecyclerViewVolunteerComment = (RecyclerView) findViewById(R.id.recycler_view_voulnteer_comment);
         mRecyclerViewVolunteerComment.setLayoutManager(layoutManagerFiles);
 
@@ -118,14 +122,17 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
 
     // Method to Set data
     private void setData() {
-
         if (mStringType != null) {
-            mViewDrivingFromTextView.setVisibility(View.VISIBLE);
-            mViewDrivingToTextView.setVisibility(View.VISIBLE);
-            mTextViewEventName.setVisibility(View.GONE);
-            mViewDrivingFromTextView.setText("Driving from: " + mFromName);
-            mViewDrivingToTextView.setText("To: " + mToName);
+            if (!mStringType.equalsIgnoreCase("Party")) {
+
+                mViewDrivingFromTextView.setVisibility(View.VISIBLE);
+                mViewDrivingToTextView.setVisibility(View.VISIBLE);
+                mTextViewEventName.setVisibility(View.GONE);
+                mViewDrivingFromTextView.setText("Driving from: " + mFromName);
+                mViewDrivingToTextView.setText("To: " + mToName);
+            }
         }
+
         mTextViewEventName.setText(mEventName);
 
 
@@ -137,11 +144,13 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
             }
         }
 
-        if(mStringType!=null){
+        if (mStringType != null) {
             if (mStringType.equalsIgnoreCase("RSPV")) {
                 mTextViewEventDate.setVisibility(View.GONE);
             } else if (mStringType.equalsIgnoreCase("Driver")) {
                 mTextViewEventDate.setVisibility(View.VISIBLE);
+            } else if (mStringType.equalsIgnoreCase("Vote")) {
+                mTextViewEventDate.setVisibility(View.GONE);
             }
         }
 
@@ -176,9 +185,8 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
                 try {
                     mProgressDialog.dismiss();
 
-                    if (response.isSuccessful()) {
-                        MyApplication.editor.putString("Type", null);
-                        MyApplication.editor.commit();
+                    if (response.body() != null) {
+
                         List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
                         for (int i = 0; eventResponseModels.size() >= i; i++) {
@@ -189,10 +197,17 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
                             for (int j = 0; eventResponseModelsItem.size() > j; j++) {
                                 int itemid = eventResponseModelsItem.get(j).getId();
                                 if (itemid == mItemID) {
+                                    if (mStringType == null || mStringType.equalsIgnoreCase("Driver")||
+                                            mStringType.equalsIgnoreCase("Party")) {
+                                        mVolunteeredAdapter = new VolunteeredAdapter(VolunteerDetailActivity.this,
+                                                eventResponseModelsItem.get(j).getVolunteers());
+                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredAdapter);
+                                    } else {
+                                        mVolunteeredRspvAdapter = new VolunteeredRspvAdapter(VolunteerDetailActivity.this,
+                                                eventResponseModelsItem.get(j).getVolunteers());
+                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredRspvAdapter);
+                                    }
 
-                                    mVolunteeredAdapter = new VolunteeredAdapter(VolunteerDetailActivity.this,
-                                            eventResponseModelsItem.get(j).getVolunteers());
-                                    mRecyclerViewVolunteerComment.setAdapter(mVolunteeredAdapter);
                                 }
 
 
@@ -201,7 +216,18 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
 
 
                     } else {
-                        Toast.makeText(VolunteerDetailActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(VolunteerDetailActivity.this);
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                                logout();
+                            }
+                        });
                     }
 
 
@@ -275,7 +301,7 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
                     }
 
                 } else {
-                    Toast.makeText(VolunteerDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VolunteerDetailActivity.this, "Could not add volunteer", Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -286,5 +312,16 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
                 Toast.makeText(VolunteerDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    //Method to logout from app
+    private void logout() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
     }
 }

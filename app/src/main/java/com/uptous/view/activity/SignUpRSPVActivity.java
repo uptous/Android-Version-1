@@ -1,6 +1,9 @@
 package com.uptous.view.activity;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -21,6 +24,7 @@ import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.view.adapter.SignUpRspvAdapter;
@@ -48,7 +52,8 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
 
     private TextView mTextViewTitle, mViewEventDescriptionTextView, mViewOrganizerOneTextView,
             mViewOrganizerSecondTextView, mTextViewFirstNameContactOne, mTextViewSecondNameContactOne,
-            mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewEventDateSignUp, mTextViewOrgnizer;
+            mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewEventDateSignUp, mTextViewOrgnizer,
+            mTextViewCutOffDateSignUp;
 
     private RoundedImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
 
@@ -92,14 +97,14 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
     //Method to initialize view
     private void initView() {
 
-        //Local Variables
+        //Local Variables Initialization
         LinearLayout linearLayoutNavigation = (LinearLayout) findViewById(R.id.imgmenuleft);
         ImageView imageViewFilter = (ImageView) findViewById(R.id.image_view_down);
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        //Global Variables
+        //Global Variables Initialization
         mRecyclerViewOpenSpot = (RecyclerView) findViewById(R.id.recycler_view_open_spots);
         mRecyclerViewOpenSpot.setLayoutManager(layoutManager);
 
@@ -118,7 +123,7 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
         mTextViewSecondNameContactOne = (TextView) findViewById(R.id.textview_last_name);
         mTextViewFirstNameContactTwo = (TextView) findViewById(R.id.textview_first_name_second_contact);
         mTextViewSecondNameContactTwo = (TextView) findViewById(R.id.textview_last_name_second_contact);
-
+        mTextViewCutOffDateSignUp = (TextView) findViewById(R.id.text_view_cutoff_date);
         mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
         mViewOrganizerOneRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_one);
         mViewOrganizerSecondRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_two);
@@ -133,11 +138,11 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
 
         clickListenerOnViews();
 
-        if (ConnectionDetector.isConnectingToInternet(this)) {
-            getApiSignUpDetail();
-        } else {
-            Toast.makeText(SignUpRSPVActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-        }
+//        if (ConnectionDetector.isConnectingToInternet(this)) {
+//            getApiSignUpDetail();
+//        } else {
+//            Toast.makeText(SignUpRSPVActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+//        }
 
     }
 
@@ -172,10 +177,10 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
                 try {
                     mProgressDialog.dismiss();
 
-                    if (response.isSuccessful()) {
+                    if (response.body()!=null) {
                         final List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
-                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes());
+                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n"," "));
                         mTextViewTitle.setVisibility(View.VISIBLE);
 
                         String Name = eventResponseModels.get(0).getName();
@@ -212,17 +217,19 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
                         if (Image1 != null) {
                             mResultOne = Image1.substring(Image1.lastIndexOf(".") + 1);
                             if (mResultOne.equalsIgnoreCase("gif")) {
-                                String BackgroundColor = eventResponseModels.get(0).getOrganizer2BackgroundColor();
+                                String BackgroundColor = eventResponseModels.get(0).getOrganizer1BackgroundColor();
 
                                 if (BackgroundColor != null) {
 
                                     int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer1TextColor());
 
 
+                                    String resultContact1LastName = eventResponseModels.get(0).getContact().
+                                            substring(eventResponseModels.get(0).getContact().lastIndexOf(' ') + 1).trim();
                                     mTextViewFirstNameContactOne.setText(eventResponseModels.get(0).getContact());
-                                    mTextViewFirstNameContactOne.setTextColor(colorTextView);
-                                    mTextViewSecondNameContactOne.setText(eventResponseModels.get(0).getContact());
-                                    mTextViewSecondNameContactOne.setTextColor(colorTextView);
+                                    mTextViewFirstNameContactOne.setTextColor(Color.WHITE);
+                                    mTextViewSecondNameContactOne.setText(resultContact1LastName);
+                                    mTextViewSecondNameContactOne.setTextColor(Color.WHITE);
                                     mLinearLayoutBackgroundFirstContact.setVisibility(View.VISIBLE);
                                     int color = Color.parseColor(BackgroundColor);
                                     mLinearLayoutBackgroundFirstContact.setBackgroundResource(R.drawable.circle);
@@ -237,17 +244,19 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
                             }
 
                         } else {
-                            String BackgroundColor = eventResponseModels.get(0).getOrganizer2BackgroundColor();
+                            String BackgroundColor = eventResponseModels.get(0).getOrganizer1BackgroundColor();
 
                             if (BackgroundColor != null) {
                                 mLinearLayoutBackgroundFirstContact.setVisibility(View.VISIBLE);
                                 int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer1TextColor());
 
 
+                                String resultContact1LastName = eventResponseModels.get(0).getContact().
+                                        substring(eventResponseModels.get(0).getContact().lastIndexOf(' ') + 1).trim();
                                 mTextViewFirstNameContactOne.setText(eventResponseModels.get(0).getContact());
-                                mTextViewFirstNameContactOne.setTextColor(colorTextView);
-                                mTextViewSecondNameContactOne.setText(eventResponseModels.get(0).getContact());
-                                mTextViewSecondNameContactOne.setTextColor(colorTextView);
+                                mTextViewFirstNameContactOne.setTextColor(Color.WHITE);
+                                mTextViewSecondNameContactOne.setText(resultContact1LastName);
+                                mTextViewSecondNameContactOne.setTextColor(Color.WHITE);
 
                                 int color = Color.parseColor(BackgroundColor);
                                 mLinearLayoutBackgroundFirstContact.setBackgroundResource(R.drawable.circle);
@@ -271,9 +280,12 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
                                     gd.setColor(color);
                                     gd.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
                                     int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer2TextColor());
+                                    String resultLastName
+                                            = eventResponseModels.get(0).getContact2().substring(eventResponseModels.get(0).getContact2().lastIndexOf(' ') + 1).trim();
+
                                     mTextViewFirstNameContactTwo.setText(eventResponseModels.get(0).getContact2());
                                     mTextViewFirstNameContactTwo.setTextColor(colorTextView);
-                                    mTextViewSecondNameContactTwo.setText(eventResponseModels.get(0).getContact2());
+                                    mTextViewSecondNameContactTwo.setText(resultLastName);
                                     mTextViewSecondNameContactTwo.setTextColor(colorTextView);
                                 }
 
@@ -295,9 +307,12 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
                                 gd.setColor(color);
                                 gd.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
                                 int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer2TextColor());
+                                String resultLastName
+                                        = eventResponseModels.get(0).getContact2().substring(eventResponseModels.get(0).getContact2().lastIndexOf(' ') + 1).trim();
+
                                 mTextViewFirstNameContactTwo.setText(eventResponseModels.get(0).getContact2());
                                 mTextViewFirstNameContactTwo.setTextColor(colorTextView);
-                                mTextViewSecondNameContactTwo.setText(eventResponseModels.get(0).getContact2());
+                                mTextViewSecondNameContactTwo.setText(resultLastName);
                                 mTextViewSecondNameContactTwo.setTextColor(colorTextView);
                             }
 
@@ -307,7 +322,7 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
                             mTextViewEventDateSignUp.setVisibility(View.GONE);
                         } else {
                             Date date = new Date(val);
-                            SimpleDateFormat df2 = new SimpleDateFormat("MMM dd");
+                            SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
                             SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
                             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -315,27 +330,66 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
                             String dateTime = dfTime.format(date);
 
                             String EndTime = response.body().get(0).getEndTime();
-                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM")) {
+                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM")&& !EndTime.equalsIgnoreCase("1:00 AM")) {
                                 mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime + " - " + EndTime);
 
                             } else {
-                                if (dateTime != null && !dateTime.equalsIgnoreCase("1:00AM")) {
-                                    mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
-                                } else {
-                                    mTextViewEventDateSignUp.setText(dateText);
+                                if(dateTime!=null){
+                                    if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
+                                        mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
+                                    } else {
+                                        mTextViewEventDateSignUp.setText(dateText);
+                                    }
                                 }
+
                             }
-
-
                         }
+                        long valCutOff = eventResponseModels.get(0).getCutoffDate();
+                        if (valCutOff == 0) {
+                            mTextViewCutOffDateSignUp.setVisibility(View.GONE);
+                        } else {
+                            Date date = new Date(valCutOff);
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat df2 =
+                                    new SimpleDateFormat("MMM d");
+                            @SuppressLint("SimpleDateFormat") SimpleDateFormat dfTime =
+                                    new SimpleDateFormat("h:mm aa");
+                            df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+                            dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+                            String dateText = df2.format(date);
+//                            String dateTime = dfTime.format(date);
 
+                            String EndTime = response.body().get(0).getEndTime();
+                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM") && !EndTime.equalsIgnoreCase("1:00 AM")) {
+                                mTextViewCutOffDateSignUp.setText(dateText);
 
+                            } else {
+
+//                                    if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
+                                mTextViewCutOffDateSignUp.setText(dateText);
+//                                    } else {
+//                                        mTextViewCutOffDateSignUp.setText(dateText);
+//                                    }
+//                                }
+
+                            }
+                        }
                         mSignUpRspvAdapter = new SignUpRspvAdapter(SignUpRSPVActivity.this, eventResponseModels.get(0).getItems());
                         mRecyclerViewOpenSpot.setAdapter(mSignUpRspvAdapter);
 
 
                     } else {
-                        Toast.makeText(SignUpRSPVActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(SignUpRSPVActivity.this);
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                               logout();
+                            }
+                        });
                     }
 
 
@@ -356,5 +410,14 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
-
+    //Method to logout from app
+    private void logout() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
+    }
 }

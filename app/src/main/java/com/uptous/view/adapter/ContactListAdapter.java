@@ -1,23 +1,32 @@
 package com.uptous.view.adapter;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+import com.uptous.MyApplication;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.ContactListResponseModel;
 import com.uptous.R;
-import com.uptous.view.activity.SignUpDRIVERActivity;
 
 import java.util.List;
 
@@ -52,21 +61,147 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
         // Set Data in your views comes from CollectionClass
 
+        String FirstName = listEntities.get(i).getFirstName();
+        String LastName = listEntities.get(i).getLastName();
 
-        versionViewHolder.mTextViewProductName.setText(listEntities.get(i).getFirstName() + " " + listEntities.get(i).getLastName());
-        versionViewHolder.mTextViewContactDetailName.setText(listEntities.get(i).getFirstName() + " " + listEntities.get(i).getLastName());
-        versionViewHolder.mTextViewContactDetailAbout.setText(listEntities.get(i).getAddress());
+
+        if (FirstName != null) {
+            if (LastName != null) {
+                versionViewHolder.mTextViewProductName.setText(FirstName + " " + LastName);
+                versionViewHolder.mTextViewContactDetailName.setText(FirstName + " " + LastName);
+            } else {
+                versionViewHolder.mTextViewProductName.setText(FirstName);
+                versionViewHolder.mTextViewContactDetailName.setText(FirstName);
+            }
+
+        } else {
+            versionViewHolder.mTextViewProductName.setText("- -");
+        }
+
+        String Address = listEntities.get(i).getAddress();
+
+        if (Address != null) {
+            versionViewHolder.mTextViewContactDetailAbout.setText(Address);
+        }
 
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            versionViewHolder.TextViewEmail.setText((Html.fromHtml("<u>" + listEntities.get(i).getEmail() +
-                    "</u> ", Html.FROM_HTML_MODE_LEGACY)));
-            versionViewHolder.TextViewPhone.setText((Html.fromHtml("<u>" + listEntities.get(i).getPhone() +
-                    "</u> ", Html.FROM_HTML_MODE_LEGACY)));
+
+            if (listEntities.get(i).getMobile() != null) {
+                versionViewHolder.TextViewPhone.setText((Html.fromHtml("<u>" + listEntities.get(i).getMobile() +
+                        "</u> ", Html.FROM_HTML_MODE_LEGACY)));
+            } else {
+                versionViewHolder.TextViewPhone.setText("");
+            }
+
+
         } else {
-            versionViewHolder.TextViewPhone.setText((Html.fromHtml("<u>" + listEntities.get(i).getPhone() + "</u> ")));
-            versionViewHolder.TextViewEmail.setText((Html.fromHtml("<u>" + listEntities.get(i).getEmail() + "</u> ")));
+            if (listEntities.get(i).getMobile() != null) {
+                versionViewHolder.TextViewPhone.setText((Html.fromHtml("<u>" + listEntities.get(i).getMobile()
+                        + "</u> ")));
+            } else {
+                versionViewHolder.TextViewPhone.setText("");
+            }
         }
+        versionViewHolder.TextViewPhone.setTag(i);
+        versionViewHolder.TextViewPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int position = (int) view.getTag();
+                final String PhoneNumber = listEntities.get(position).getMobile();
+
+                final CustomizeDialog customizeDialog = new CustomizeDialog(activity);
+
+                customizeDialog.setContentView(R.layout.dialog_phone_message);
+                TextView tetTextViewPhone = (TextView) customizeDialog.findViewById(R.id.button_phone);
+                TextView tetTextViewMessage = (TextView) customizeDialog.findViewById(R.id.button_message);
+                TextView tetTextViewCancel = (TextView) customizeDialog.findViewById(R.id.button_cancel);
+                customizeDialog.show();
+                customizeDialog.setCancelable(false);
+
+                tetTextViewCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        customizeDialog.dismiss();
+                    }
+                });
+                tetTextViewMessage.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + PhoneNumber));
+                        intent.putExtra("sms_body", "");
+                        activity.startActivity(intent);
+                        customizeDialog.dismiss();
+                    }
+                });
+
+                tetTextViewPhone.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int permissionCheck = ContextCompat.checkSelfPermission(activity, Manifest.permission.CALL_PHONE);
+
+                        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(
+                                    activity,
+                                    new String[]{Manifest.permission.CALL_PHONE},
+                                    0);
+                        } else {
+                            activity.startActivity(new Intent(Intent.ACTION_CALL).setData(Uri.parse("tel:" + PhoneNumber)));
+                        }
+                        customizeDialog.dismiss();
+                    }
+                });
+
+//
+
+
+//
+
+
+                MyApplication.editor.putString("Message", "mesage");
+                MyApplication.editor.commit();
+
+            }
+        });
+
+        if (listEntities.get(i).getEmail() != null) {
+            versionViewHolder.TextViewEmail.setText((Html.fromHtml("<u>" + listEntities.get(i).getEmail() + "</u> ")));
+        } else {
+            versionViewHolder.TextViewEmail.setText("");
+        }
+
+
+        versionViewHolder.TextViewEmail.setTag(i);
+        versionViewHolder.TextViewEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int position = (int) view.getTag();
+
+                MyApplication.editor.putString("Message", "mesage");
+                MyApplication.editor.commit();
+                String StrEmain = listEntities.get(position).getEmail();
+
+                Intent emailIntent = new Intent(Intent.ACTION_SEND);
+                emailIntent.setType("text/html");
+                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{StrEmain});
+                emailIntent.putExtra(Intent.EXTRA_TEXT, "Sent from my Android");
+                final PackageManager pm = activity.getPackageManager();
+                final List<ResolveInfo> matches = pm.queryIntentActivities(emailIntent, 0);
+                String className = null;
+                for (final ResolveInfo info : matches) {
+                    if (info.activityInfo.packageName.equals("com.google.android.gm")) {
+                        className = info.activityInfo.name;
+
+                        if (className != null && !className.isEmpty()) {
+                            break;
+                        }
+                    }
+                }
+                emailIntent.setClassName("com.google.android.gm", className);
+                activity.startActivity(emailIntent);
+
+            }
+        });
 //        gd.setStroke(2, Color.parseColor("#00FFFF"), 5, 6);
 //        versionViewHolder.linearLayoutNameBackground.setBackgroundColor(color);
 
@@ -95,15 +230,26 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
                     gd.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
                     gd1.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
 
-                    versionViewHolder.mTextViewFirstName.setText(listEntities.get(i).getFirstName().toUpperCase());
-                    versionViewHolder.mTextViewFirstName.setTextColor(colorTextView);
-                    versionViewHolder.mTextViewLastName.setText(listEntities.get(i).getLastName().toUpperCase());
-                    versionViewHolder.mTextViewLastName.setTextColor(colorTextView);
+                    String FirstNameDetail = listEntities.get(i).getFirstName();
+                    String LastNameDetail = listEntities.get(i).getLastName();
 
-                    versionViewHolder.mTextViewDetailFirstName.setText(listEntities.get(i).getFirstName().toUpperCase());
-                    versionViewHolder.mTextViewDetailFirstName.setTextColor(colorTextView);
-                    versionViewHolder.mTextViewDetailLastName.setText(listEntities.get(i).getLastName().toUpperCase());
-                    versionViewHolder.mTextViewDetailLastName.setTextColor(colorTextView);
+                    if (FirstNameDetail != null) {
+                        versionViewHolder.mTextViewFirstName.setText(listEntities.get(i).getFirstName().trim().toUpperCase());
+                        versionViewHolder.mTextViewFirstName.setTextColor(colorTextView);
+                        versionViewHolder.mTextViewDetailFirstName.setText(listEntities.get(i).getFirstName().trim().toUpperCase());
+                        versionViewHolder.mTextViewDetailFirstName.setTextColor(colorTextView);
+                    }
+
+
+                    if (LastNameDetail != null) {
+                        versionViewHolder.mTextViewLastName.setText(listEntities.get(i).getLastName().trim().toUpperCase());
+                        versionViewHolder.mTextViewLastName.setTextColor(colorTextView);
+
+
+                        versionViewHolder.mTextViewDetailLastName.setText(listEntities.get(i).getLastName().trim().toUpperCase());
+                        versionViewHolder.mTextViewDetailLastName.setTextColor(colorTextView);
+                    }
+
                 }
             } else {
                 versionViewHolder.linearLayoutNameBackground.setVisibility(View.GONE);
@@ -135,15 +281,35 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
                 gd.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
                 gd1.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
 
-                versionViewHolder.mTextViewFirstName.setText(listEntities.get(i).getFirstName().toUpperCase());
-                versionViewHolder.mTextViewFirstName.setTextColor(colorTextView);
-                versionViewHolder.mTextViewLastName.setText(listEntities.get(i).getLastName().toUpperCase());
-                versionViewHolder.mTextViewLastName.setTextColor(colorTextView);
+                String FirstNameDetail = listEntities.get(i).getFirstName();
+                String LastNameDetail = listEntities.get(i).getLastName();
 
-                versionViewHolder.mTextViewDetailFirstName.setText(listEntities.get(i).getFirstName().toUpperCase());
-                versionViewHolder.mTextViewDetailFirstName.setTextColor(colorTextView);
-                versionViewHolder.mTextViewDetailLastName.setText(listEntities.get(i).getLastName().toUpperCase());
-                versionViewHolder.mTextViewDetailLastName.setTextColor(colorTextView);
+                if (FirstNameDetail != null) {
+                    versionViewHolder.mTextViewFirstName.setText(listEntities.get(i).getFirstName().trim().toUpperCase());
+                    versionViewHolder.mTextViewFirstName.setTextColor(colorTextView);
+                    versionViewHolder.mTextViewDetailFirstName.setText(listEntities.get(i).getFirstName().trim().toUpperCase());
+                    versionViewHolder.mTextViewDetailFirstName.setTextColor(colorTextView);
+                } else {
+                    versionViewHolder.mTextViewFirstName.setText("-");
+                    versionViewHolder.mTextViewDetailFirstName.setText("-");
+                }
+
+
+                if (LastNameDetail != null) {
+                    versionViewHolder.mTextViewLastName.setText(listEntities.get(i).getLastName().trim().toUpperCase());
+                    versionViewHolder.mTextViewLastName.setTextColor(colorTextView);
+
+
+                    versionViewHolder.mTextViewDetailLastName.setText(listEntities.get(i).getLastName().trim().toUpperCase());
+                    versionViewHolder.mTextViewDetailLastName.setTextColor(colorTextView);
+                } else {
+                    versionViewHolder.mTextViewLastName.setText("-");
+                    versionViewHolder.mTextViewDetailLastName
+
+
+                            .setText("-");
+                }
+
 
             }
 
@@ -151,13 +317,20 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
         versionViewHolder.mTextViewKids.setText("");
         versionViewHolder.TextViewKidsDetail.setText("");
-        for (int j = 0; j < listEntities.get(i).getChildren().size(); j++) {
-            versionViewHolder.mTextViewKids.append(listEntities.get(i).getChildren().get(j).getFirstName());
-            versionViewHolder.TextViewKidsDetail.append(listEntities.get(i).getChildren().get(j).getFirstName());
-            if (j < listEntities.get(i).getChildren().size() - 1) {
-                versionViewHolder.mTextViewKids.append(", ");
-                versionViewHolder.TextViewKidsDetail.append(", ");
+        try {
+
+            for (int j = 0; j < listEntities.get(i).getChildren().size(); j++) {
+                versionViewHolder.mTextViewKids.append(listEntities.get(i).getChildren().get(j).getFirstName());
+                versionViewHolder.TextViewKidsDetail.append(listEntities.get(i).getChildren().get(j).getFirstName());
+                if (j < listEntities.get(i).getChildren().size() - 1) {
+                    versionViewHolder.mTextViewKids.append(", ");
+                    versionViewHolder.TextViewKidsDetail.append(", ");
+                }
+
             }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
 
@@ -181,7 +354,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewProductModel, mTextViewProductName, mTextViewContactDetailName, mTextViewContactDetailAbout,
+        TextView mTextViewProductName, mTextViewContactDetailName, mTextViewContactDetailAbout,
                 TextViewEmail, TextViewPhone, TextViewKidsDetail, mTextViewKids;
         ImageView mImageViewContactDetailImage, mImageViewExpand, mImageViewCollapsd;
         private RoundedImageView imageView;
@@ -204,7 +377,6 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             mTextViewContactDetailAbout = (TextView) itemView.findViewById(R.id.text_view_contact_detail_about);
             relativeLayoutContactDetail = (RelativeLayout) itemView.findViewById(R.id.row_contact_detail);
             mRelativeLayoutContact = (RelativeLayout) itemView.findViewById(R.id.row_contact);
-            mTextViewProductModel = (TextView) itemView.findViewById(R.id.text_view_kids);
             TextViewEmail = (TextView) itemView.findViewById(R.id.text_view_email);
             TextViewPhone = (TextView) itemView.findViewById(R.id.text_view_phone);
             TextViewKidsDetail = (TextView) itemView.findViewById(R.id.text_view_detail_kids);

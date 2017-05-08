@@ -2,13 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:gravity="center"
+    android:layout_margin="@dimen/_2sdp"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <ImageView
         android:id="@+id/imageView_all"
-        android:layout_width="@dimen/_120sdp"
-        android:layout_height="@dimen/_120sdp"
-        android:scaleType="fitXY" />
+        android:layout_width="@dimen/_70sdp"
+        android:layout_height="@dimen/_70sdp"
+        android:scaleType="centerCrop" />
 
 </LinearLayout>

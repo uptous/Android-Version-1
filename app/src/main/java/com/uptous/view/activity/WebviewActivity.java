@@ -1,5 +1,7 @@
 package com.uptous.view.activity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -12,13 +14,10 @@ import com.uptous.MyApplication;
 import com.uptous.R;
 
 /**
- * Created by Prakash on 1/13/2017.
+ * Created by Prakash.
  */
 
 public class WebviewActivity extends AppCompatActivity implements View.OnClickListener {
-    private LinearLayout mLinearLayoutSideMenu;
-    private ImageView mImageViewBack;
-    private LinearLayout mLinearLayoutFilter;
     private WebView mWebView;
     private String Audio, path, ImagePath;
 
@@ -35,20 +34,26 @@ public class WebviewActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    //Method to initialize views
     private void initView() {
-        mLinearLayoutFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
-        mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
-        mLinearLayoutSideMenu = (LinearLayout) findViewById(R.id.imgmenuleft);
+
+        //Local Variables initializations
+        LinearLayout linearLayoutFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
+        ImageView imageViewBack = (ImageView) findViewById(R.id.image_view_back);
+        LinearLayout linearLayoutSideMenu = (LinearLayout) findViewById(R.id.imgmenuleft);
+
+        //Global Variables initializations
         mWebView = (WebView) findViewById(R.id.web_view);
         mWebView.getSettings().setJavaScriptEnabled(true);
 
-        mLinearLayoutSideMenu.setVisibility(View.GONE);
-        mLinearLayoutFilter.setVisibility(View.GONE);
-        mImageViewBack.setVisibility(View.VISIBLE);
+        linearLayoutFilter.setVisibility(View.GONE);
+        linearLayoutSideMenu.setVisibility(View.GONE);
+        imageViewBack.setVisibility(View.VISIBLE);
 
-        mImageViewBack.setOnClickListener(this);
+        imageViewBack.setOnClickListener(this);
     }
 
+    //Method to get data from SharedPreferences
     private void getData() {
         path = MyApplication.mSharedPreferences.getString("path", null);
         ImagePath = MyApplication.mSharedPreferences.getString("Imagepath", null);
@@ -75,18 +80,36 @@ public class WebviewActivity extends AppCompatActivity implements View.OnClickLi
 
     private void showPdf() {
         String pdf = path;
-        mWebView.loadUrl("http://drive.google.com/viewerng/viewer?embedded=true&url=" + pdf);
+
+
+
+        String resultImage = pdf.substring(pdf.lastIndexOf('.') + 1).trim();
+        if(resultImage.equalsIgnoreCase("docx")){
+            finish();
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(Uri.parse(pdf), "text/*");
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }else {
+            String File="http://drive.google.com/viewerng/viewer?embedded=true&url=" + pdf;
+            mWebView.loadUrl(File);
+
+
+        }
+
         MyApplication.editor.putString("path", null);
         MyApplication.editor.commit();
     }
 
     private void showImage() {
 
-        String html = "<html><body><img src=\"" + ImagePath + "\" width=\"100%\" height=\"100%\"\"/></body></html>";
-        mWebView.loadData(html, "text/html", null);
-//        mWebView.loadUrl(ImagePath);
+        mWebView.loadUrl(ImagePath);
+        mWebView.getSettings().setLoadWithOverviewMode(true);
+        mWebView.getSettings().setUseWideViewPort(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
+
         MyApplication.editor.putString("Imagepath", null);
         MyApplication.editor.commit();
     }
+
 }

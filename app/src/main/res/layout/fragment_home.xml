@@ -7,66 +7,27 @@
     android:background="#fcf9eb"
     android:orientation="vertical">
 
-    <RelativeLayout
-
-        android:id="@+id/layout_search"
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/search_result"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_35sdp"
-        android:background="#c9c9c3"
-        android:orientation="horizontal">
-
-
-        <RelativeLayout
-            android:id="@+id/layout_searchbar"
-
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_25sdp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/_10sdp"
-            android:layout_marginRight="@dimen/_10sdp"
-            android:layout_toLeftOf="@+id/text_view_cancel"
-            android:background="@drawable/rounded_all_files"
-            android:gravity="center">
-
-
-            <android.support.v7.widget.SearchView
-                android:maxLines="1"
-                android:id="@+id/serach_view_filter"
-                style="@style/AppTheme.SearchView"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/_25sdp"
-                />
-
-            <TextView
-
-                android:id="@+id/text_view_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="@dimen/_30sdp"
-                android:text="Search"
-                android:textSize="@dimen/_12sdp" />
-        </RelativeLayout>
-
-
-        <TextView
-            android:id="@+id/text_view_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="@dimen/_10sdp"
-            android:text="Cancel"
-            android:textColor="@color/tab_indicator"
-            android:textSize="@dimen/_12sdp"
-            android:textStyle="bold" />
-
-    </RelativeLayout>
+        android:layout_height="@dimen/_25sdp"
+        android:layout_below="@+id/layout_search"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:background="#ddd"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/_10sdp"
+        android:text="SEARCH RESULTS"
+        android:textColor="#000"
+        android:textSize="@dimen/_15sdp"
+        android:textStyle="bold" />
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/layout_search">
+        android:layout_below="@+id/search_result"
+
+        >
 
 
         <android.support.v7.widget.RecyclerView

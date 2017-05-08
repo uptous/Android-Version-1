@@ -6,4 +6,23 @@
     android:background="#fcf9eb"
     android:layout_height="wrap_content"
     android:orientation="vertical">
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/search_result"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_25sdp"
+        android:layout_below="@+id/layout_search"
+        android:layout_marginTop="@dimen/_2sdp"
+        android:background="#ddd"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/_10sdp"
+        android:text="SEARCH RESULTS"
+        android:textColor="#000"
+        android:textSize="@dimen/_15sdp"
+        android:textStyle="bold" />
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@+id/search_result"
+        android:id="@+id/recycler_view_events"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
 </RelativeLayout>

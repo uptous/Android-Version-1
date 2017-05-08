@@ -36,18 +36,29 @@
                 android:textColor="#000"
                 android:textSize="@dimen/_12sdp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/text_view_news_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ScrollView
                 android:layout_below="@+id/text_view_news_name"
-                android:layout_marginBottom="@dimen/_40sdp"
-                android:layout_marginLeft="@dimen/_10sdp"
                 android:padding="@dimen/_5sdp"
-                android:text=""
-                android:textColor="#000"
-                android:textSize="@dimen/_12sdp" />
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:id="@+id/scroll_view_des"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_120sdp">
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    >
+                    <TextView
+                        android:id="@+id/text_view_news_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+
+                        android:padding="@dimen/_5sdp"
+                        android:text=""
+                        android:textColor="#000"
+                        android:textSize="@dimen/_12sdp" />
+                </LinearLayout>
+            </ScrollView>
+
 
 
             <LinearLayout
@@ -82,7 +93,7 @@
                 android:id="@+id/image_view_news_item"
                 android:layout_width="@dimen/_100sdp"
                 android:layout_height="@dimen/_100sdp"
-                android:layout_below="@+id/text_view_news_detail"
+                android:layout_below="@+id/scroll_view_des"
                 android:layout_margin="@dimen/_2sdp"
                 android:scaleType="fitXY"
                 android:src="@mipmap/nature"
@@ -194,7 +205,9 @@
             android:layout_weight=".5"
             android:background="#fff"
             android:cursorVisible="true"
-            android:gravity="top"
+            android:gravity="bottom"
+            android:hint=""
+
             android:padding="@dimen/_5sdp"
             android:textColor="#000"
             android:textColorHint="#dfdfdf"

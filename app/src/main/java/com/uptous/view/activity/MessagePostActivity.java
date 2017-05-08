@@ -1,6 +1,8 @@
 package com.uptous.view.activity;
 
+import android.app.Application;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,7 @@ import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
+import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.CommnunitiesResponseModel;
@@ -52,7 +55,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
     private int mCommunityID;
 
-    Helper helper;
+   private Helper mHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,11 +74,6 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-    }
 
     @Override
     public void onClick(View view) {
@@ -86,7 +84,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
             case R.id.button_send_message:
 
-                helper.keyBoardHidden(MessagePostActivity.this);
+                mHelper.keyBoardHidden(MessagePostActivity.this);
 
                 mMessage = mEditTextMessage.getText().toString().replace("\n", "<br>");
                 mSubject = mEditTextSubject.getText().toString().replace("\n", "<br>");
@@ -104,14 +102,14 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
     //method to initialize view
     private void initView() {
-        helper =new Helper();
+        mHelper =new Helper();
 
-        //Local Variables
+        //Local Variables Initialization
         LinearLayout linearLayoutNavigation = (LinearLayout) findViewById(R.id.imgmenuleft);
         TextView textViewTitle = (TextView) findViewById(R.id.text_view_title);
         ImageView imageViewFilter = (ImageView) findViewById(R.id.image_view_down);
 
-        //Global Variables
+        //Global Variables Initialization
         mSpinnerCommunity = (Spinner) findViewById(R.id.spinner_Community);
         mEditTextMessage = (EditText) findViewById(R.id.edit_text_message);
         mEditTextSubject = (EditText) findViewById(R.id.edit_text_subject);
@@ -123,7 +121,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
         linearLayoutNavigation.setVisibility(View.GONE);
         mImageViewBack.setVisibility(View.VISIBLE);
         textViewTitle.setVisibility(View.VISIBLE);
-        textViewTitle.setText("Message Post");
+        textViewTitle.setText(R.string.message_post);
 
         getData();
 
@@ -159,26 +157,44 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
             public void onResponse(Call<List<CommnunitiesResponseModel>> call, Response<List<CommnunitiesResponseModel>> response) {
                 try {
                     progressDialog.dismiss();
-                    final List<CommnunitiesResponseModel> eventResponseModels = response.body();
 
-                    CommnunitiesResponseModel resultsEntity = new CommnunitiesResponseModel();
-                    resultsEntity.setName("SELECT COMMUNITY");
-                    resultsEntity.setId("-1");
-                    eventResponseModels.add(eventResponseModels.size(), resultsEntity);
-                    mCommunityListAdapter = new CommunityListAdapter(MessagePostActivity.this, eventResponseModels);
-                    mSpinnerCommunity.setAdapter(mCommunityListAdapter);
-                    mSpinnerCommunity.setSelection(mCommunityListAdapter.getCount());
-                    mSpinnerCommunity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            mCommunityID = eventResponseModels.get(i).getId();
-                        }
+                    if(response.body()!=null) {
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
 
-                        }
-                    });
+                        final List<CommnunitiesResponseModel> eventResponseModels = response.body();
+
+                        CommnunitiesResponseModel resultsEntity = new CommnunitiesResponseModel();
+                        resultsEntity.setName("SELECT COMMUNITY");
+                        resultsEntity.setId("-1");
+                        eventResponseModels.add(eventResponseModels.size(), resultsEntity);
+                        mCommunityListAdapter = new CommunityListAdapter(MessagePostActivity.this, eventResponseModels);
+                        mSpinnerCommunity.setAdapter(mCommunityListAdapter);
+                        mSpinnerCommunity.setSelection(mCommunityListAdapter.getCount());
+                        mSpinnerCommunity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                            @Override
+                            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                mCommunityID = eventResponseModels.get(i).getId();
+                            }
+
+                            @Override
+                            public void onNothingSelected(AdapterView<?> adapterView) {
+
+                            }
+                        });
+                    }else {
+                        final CustomizeDialog customizeDialog = new CustomizeDialog(MessagePostActivity.this);
+                        customizeDialog.setCancelable(false);
+                        customizeDialog.setContentView(R.layout.dialog_password_change);
+                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+                        customizeDialog.show();
+                        textViewOk.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                customizeDialog.dismiss();
+                                logout();
+                            }
+                        });
+                    }
 
                 } catch (Exception e) {
                     Log.d("onResponse", "There is an error");
@@ -217,6 +233,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
                     if (response.isSuccessful()) {
                         MyApplication.editor.putString("MessagePost", "message");
+                        MyApplication.editor.putString("Feed",null);
                         MyApplication.editor.commit();
                         finish();
 
@@ -234,5 +251,14 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
         });
     }
 
-
+    //Method to logout from app
+    private void logout() {
+        MainActivity activity = new MainActivity();
+        activity.logOut();
+        Application app = getApplication();
+        Intent intent = new Intent(app, LogInActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        app.startActivity(intent);
+    }
 }

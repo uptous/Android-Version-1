@@ -2,9 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
     android:orientation="vertical"
-    android:padding="@dimen/_10sdp">
+    android:padding="@dimen/_5sdp">
 
 
     <RelativeLayout
@@ -40,8 +39,7 @@
                     android:gravity="center"
                     android:paddingLeft="@dimen/_5sdp"
                     android:text="Friday Oct10"
-                    android:textColor="#000"
-                    android:textSize="@dimen/_10sdp" />
+                    android:textColor="#000" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -57,8 +55,7 @@
                     android:gravity="center"
                     android:paddingLeft="@dimen/_5sdp"
                     android:text="10:30 PM until 10:30PM"
-                    android:textColor="#000"
-                    android:textSize="@dimen/_10sdp" />
+                    android:textColor="#000" />
             </LinearLayout>
 
             <RelativeLayout
@@ -71,23 +68,34 @@
                 <TextView
 
                     android:id="@+id/text_view_title_collpsed"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_5sdp"
-
-                    android:text="Friday Oct10"
+                    android:layout_toLeftOf="@+id/image_view_event_collpsd"
+                    android:text=""
                     android:textColor="#000"
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/text_view_loction_collapsed"
+                    android:id="@+id/text_view_community_collapsed"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/text_view_title_collpsed"
                     android:layout_marginLeft="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_10sdp"
+                    android:text=""
+                    android:textColor="#000" />
+
+                <TextView
+                    android:id="@+id/text_view_loction_collapsed"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/text_view_community_collapsed"
+                    android:layout_marginLeft="@dimen/_5sdp"
+                    android:layout_marginTop="@dimen/_10sdp"
                     android:text="Location:"
                     android:textColor="#000" />
+
 
                 <TextView
                     android:id="@+id/text_view_loction_value_collapsed"
@@ -96,7 +104,7 @@
                     android:layout_below="@+id/text_view_loction_collapsed"
                     android:layout_marginLeft="@dimen/_5sdp"
                     android:layout_marginTop="@dimen/_5sdp"
-                    android:text="My Street"
+                    android:text=""
                     android:textColor="#000" />
 
                 <ImageView
@@ -120,7 +128,6 @@
         android:layout_below="@+id/layout_collapsed"
         android:background="@drawable/rounded_all_files"
         android:orientation="horizontal"
-        android:padding="@dimen/_5sdp"
         android:visibility="gone"
         android:weightSum="2">
 
@@ -128,11 +135,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1.4"
+            android:background="#d3d3d3"
             android:gravity="center"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/text_view_start_time"
+                android:id="@+id/text_view_start_time_expand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -143,13 +151,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_1sdp"
                 android:layout_marginBottom="@dimen/_5sdp"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:layout_marginRight="@dimen/_5sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:background="#e1e2e3"
-                android:textColor="#000" />
+                android:background="@color/cancel_color" />
 
 
             <TextView
-                android:id="@+id/text_view_end_time"
+                android:id="@+id/text_view_end_time_expand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -160,62 +169,77 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_weight=".6">
+            android:layout_weight=".6"
+            android:padding="@dimen/_5sdp">
 
             <TextView
-                android:id="@+id/text_view_title"
-                android:layout_width="wrap_content"
+                android:id="@+id/text_view_title_expand"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_5sdp"
+                android:layout_toLeftOf="@+id/image_view_event_expand"
                 android:text="All day"
-
                 android:textColor="#000"
                 android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/text_view_community_expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text_view_title_expand"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:text=""
+                android:textColor="#000" />
 
             <TextView
                 android:id="@+id/text_view_description"
                 android:layout_width="@dimen/_160sdp"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/text_view_title"
+                android:layout_below="@+id/text_view_community_expand"
                 android:layout_marginLeft="@dimen/_5sdp"
                 android:text=""
                 android:textColor="#000" />
 
             <TextView
 
-                android:id="@+id/text_view_loction"
+                android:id="@+id/text_view_location_expand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/text_view_description"
                 android:layout_marginLeft="@dimen/_5sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:text="Location:" />
+                android:text="Location:"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/text_view_loction_value"
+                android:id="@+id/text_view_location_value_expand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/text_view_loction"
+                android:layout_below="@+id/text_view_location_expand"
                 android:layout_marginLeft="@dimen/_5sdp"
-                android:text="My Street"
+                android:text=""
                 android:textColor="#000" />
 
             <TextView
-                android:id="@+id/text_view_details"
+                android:id="@+id/text_view_details_expand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/text_view_loction_value"
+                android:layout_below="@+id/text_view_location_value_expand"
                 android:layout_marginLeft="@dimen/_5sdp"
                 android:layout_marginTop="@dimen/_5sdp"
-                android:text="Details:" />
+                android:text="Details:"
+                android:textColor="#000"
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/text_view_details_value"
+                android:id="@+id/text_view_details_value_expand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/text_view_details"
+                android:layout_below="@+id/text_view_details_expand"
                 android:layout_marginLeft="@dimen/_5sdp"
-                android:text="Details:"
+                android:text=""
                 android:textColor="#000" />
 
             <ImageView

@@ -4,10 +4,12 @@ package com.uptous.controller.apiservices;
 import com.uptous.model.AlbumDetailResponseModel;
 import com.uptous.model.CommnunitiesResponseModel;
 import com.uptous.model.ContactListResponseModel;
+import com.uptous.model.EventResponseModel;
 import com.uptous.model.FeedResponseModel;
 import com.uptous.model.FileResponseModel;
 import com.uptous.model.GetAllAnnouncementResponseModel;
 import com.uptous.model.GetAllCommentResponseModel;
+import com.uptous.model.InvitationResponseModel;
 import com.uptous.model.PhotoAlbumResponseModel;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.ProfileResponseModel;
@@ -61,6 +63,12 @@ public interface APIServices {
     @GET("api/signupsheets/opportunity/{opportunityId}/item/{item_id}/Add")
     Call<List<SignUpDetailResponseModel>> GetItem(@Path("opportunityId") int id, @Path("item_id") int item_id);
 
+    @GET("api/events/365")
+    Call<List<EventResponseModel>> GetEvent();
+
+    @GET("api/invites")
+    Call<List<InvitationResponseModel>> GetInvitation();
+
     @GET("api/comments/feed/{feedId}")
     Call<List<GetAllCommentResponseModel>> GetAllComment(@Path("feedId") int id);
 
@@ -69,7 +77,6 @@ public interface APIServices {
 
     @GET("api/profile")
     Call<ProfileResponseModel> ProfileDetail();
-
 
     @FormUrlEncoded
     @POST("api/profile/update")
@@ -80,6 +87,10 @@ public interface APIServices {
     @FormUrlEncoded
     @POST("api/comments/feed/{feedId}")
     Call<PostCommentResponseModel> PostComment(@Path("feedId") int id, @Field("contents") String contents);
+
+    @FormUrlEncoded
+    @POST("api/invites/{invitationId}/accept")
+    Call<PostCommentResponseModel> PostInvite(@Path("invitationId") int invitationId,@Field("contents") String contents);
 
 
     @FormUrlEncoded
@@ -106,7 +117,7 @@ public interface APIServices {
     @FormUrlEncoded
     @POST("api/signupsheets/opportunity/{opportunityId}/item/{item_id}/Add")
     Call<PostCommentResponseModel> SignUp_Send_RSPV(@Path("opportunityId") int opportunityId, @Path("item_id") int item_id,
-                                                    @Field("comment") String comment, @Field("numberOfAttendees") int numberOfAttendees);
+                                                    @Field("comment") String comment, @Field("numberOfAttendees") String numberOfAttendees);
 
     @FormUrlEncoded
     @POST("api/signupsheets/opportunity/{opportunityId}/item/{item_id}/Del")

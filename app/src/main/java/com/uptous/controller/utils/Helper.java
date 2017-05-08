@@ -7,6 +7,9 @@ import android.content.DialogInterface;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.TextView;
+
+import com.uptous.R;
 
 /**
  * FileName : Helper
@@ -26,6 +29,21 @@ public class Helper {
             e.printStackTrace();
         }
     }
+
+    public CustomizeDialog CustomizeDialogAlert(Activity activity, int layout, View.OnClickListener myClickListener) {
+      CustomizeDialog  mCustomizeDialog = new CustomizeDialog(activity);
+        mCustomizeDialog.setCancelable(false);
+        mCustomizeDialog.setContentView(layout);
+
+        TextView textViewOk = (TextView) mCustomizeDialog.findViewById(R.id.text_view_log_out);
+        textViewOk.setOnClickListener(myClickListener);
+
+
+        mCustomizeDialog.show();
+        return mCustomizeDialog;
+
+    }
+
 
 
 }

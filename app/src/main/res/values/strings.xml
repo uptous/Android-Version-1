@@ -7,5 +7,20 @@
     <string name="AuthenticationId">AuthenticationId</string>
     <string name="AuthenticationPassword">AuthenticationPassword</string>
     <string name="sing_up_not_allow">We\'re sorry but for now, this type of sign-up is not accessible with the app</string>
+
+    <string name="feed_all_communities">Feed - All Communities</string>
+    <string name="contacts_all_communities">Contacts - All Communities</string>
+    <string name="sign_ups_all_communities">Sign-Ups - All Communities</string>
+    <string name="library_all_communities">Library - All Communities</string>
+    <string name="event_all_communities">Calendar - All Communities</string>
     <string name="all_communities">All Communities</string>
+    <string name="invitations">Invitations</string>
+    <string name="no_record_found">No Record Found</string>
+    <string name="sign_out">Sign out</string>
+    <string name="my_profile">My profile</string>
+    <string name="message_post">Message Post</string>
+    <string name="picture_post">Picture Post</string>
+
+    <string name="fill_all_field">Please fill all field</string>
+
 </resources>

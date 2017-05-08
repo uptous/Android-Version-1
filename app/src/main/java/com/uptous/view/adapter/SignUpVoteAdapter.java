@@ -14,6 +14,7 @@ import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.utils.PlayGifView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.view.activity.PartyDetailActivity;
 import com.uptous.view.activity.RSPVDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
 import com.uptous.view.activity.VoteDetailActivity;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 /**
- * Created by Prakash on 1/24/2017.
+ * Created by Prakash .
  */
 
 public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.VersionViewHolder> {
@@ -61,7 +62,7 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
             versionViewHolder.mTextViewDate.setVisibility(View.GONE);
         } else {
             Date date = new Date(val);
-            SimpleDateFormat df2 = new SimpleDateFormat("MMM dd");
+            SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
             SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
@@ -95,12 +96,13 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                 public void onClick(View view) {
                     int position = (int) view.getTag();
                     int ItemId = listEntities.get(position).getId();
-
+                    MyApplication.editor.putString("Type", null);
                     MyApplication.editor.putInt("ItemId", ItemId);
-                    MyApplication.editor.putString("Name", Name);
-                    MyApplication.editor.putString("Date", dateTextMain);
+                    MyApplication.editor.putString("Date", "");
+                    MyApplication.editor.putString("Name", listEntities.get(position).getName());
+
                     MyApplication.editor.commit();
-                    Intent intent = new Intent(activity, VoteDetailActivity.class);
+                    Intent intent = new Intent(activity, PartyDetailActivity.class);
                     activity.startActivity(intent);
                 }
             });
@@ -114,9 +116,10 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                     public void onClick(View view) {
                         int position = (int) view.getTag();
                         int ItemId = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Type", null);
-                        MyApplication.editor.putString("FromName", listEntities.get(position).getName());
+                        MyApplication.editor.putString("Type", "Party");
+                        MyApplication.editor.putString("Name", listEntities.get(position).getName());
                         MyApplication.editor.putString("ToName","");
+                        MyApplication.editor.putString("Date", "");
                         MyApplication.editor.putInt("ItemId", ItemId);
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
@@ -137,8 +140,10 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                     public void onClick(View view) {
                         int position = (int) view.getTag();
                         int ItemId = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Type", null);
+                        MyApplication.editor.putString("Type", "Party");
                         MyApplication.editor.putInt("ItemId", ItemId);
+                        MyApplication.editor.putString("Name", listEntities.get(position).getName());
+                        MyApplication.editor.putString("Date", "");
                         MyApplication.editor.commit();
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);

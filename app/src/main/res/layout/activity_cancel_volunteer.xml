@@ -23,7 +23,7 @@
                 android:id="@+id/text_view_driving_from"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Driving form"
+                android:text="Driving from"
                 android:textColor="#000"
                 android:textSize="@dimen/_14sdp"
                 android:textStyle="bold"
@@ -45,7 +45,7 @@
                 android:id="@+id/text_view_volunteer_event_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
+
                 android:text="Event Name"
                 android:textColor="#000"
                 android:textSize="@dimen/_15sdp"
