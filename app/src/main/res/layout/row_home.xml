@@ -285,10 +285,11 @@
             android:textSize="@dimen/_15sdp" />
     </LinearLayout>
 
-    <com.uptous.controller.utils.RoundedImageView
+    <de.hdodenhof.circleimageview.CircleImageView
 
         android:id="@+id/image_view_owner"
         android:layout_width="@dimen/_40sdp"
         android:layout_height="@dimen/_40sdp"
+        android:scaleType="centerCrop"
         android:visibility="gone" />
 </RelativeLayout>

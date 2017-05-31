@@ -5,6 +5,8 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.bumptech.glide.request.target.ViewTarget;
+
 
 public class MyApplication extends Application {
     public static SharedPreferences mSharedPreferences;
@@ -15,6 +17,8 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        ViewTarget.setTagId(R.id.glide_tag);
 
         mSharedPreferences = getSharedPreferences(MYPREFERENCES, Context.MODE_PRIVATE);
         editor = mSharedPreferences.edit();

@@ -26,20 +26,20 @@
 
             <FrameLayout
                 android:id="@+id/frame_layout_profile_image"
-                android:layout_width="@dimen/_80sdp"
-                android:layout_height="@dimen/_80sdp"
+                android:layout_width="@dimen/_90sdp"
+                android:layout_height="@dimen/_90sdp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/black_circle">
 
-                <com.uptous.controller.utils.RoundedImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/image_view_profile"
-                    android:layout_width="@dimen/_77sdp"
-                    android:layout_height="@dimen/_77sdp"
+                    android:layout_width="@dimen/_87sdp"
+                    android:layout_height="@dimen/_87sdp"
                     android:layout_gravity="center"
-                    android:scaleType="centerCrop"
+                   android:scaleType="centerCrop"
 
                     />
 

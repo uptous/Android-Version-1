@@ -63,7 +63,7 @@ public class Utilities {
             String logFileName = "log.log";
 
             File directory = new File(Environment.getExternalStorageDirectory()
-                    .toString() + "/RockUExecption");
+                    .toString() + "/UpToUsExecption");
             boolean b = directory.mkdirs();
 
             if (b) {
@@ -72,7 +72,7 @@ public class Utilities {
                 directory.mkdirs();
             }
 
-            logFileName = "meetcha_exception_"
+            logFileName = "uptous_exception_"
                     + simpleDateFormat.format(new Date()) + ".txt";
             File logFile = new File(directory, logFileName);
             if (!logFile.exists()) {

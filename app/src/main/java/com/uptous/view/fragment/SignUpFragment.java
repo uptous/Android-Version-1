@@ -77,6 +77,7 @@ public class SignUpFragment extends Fragment {
             if (ConnectionDetector.isConnectingToInternet(getActivity())) {
 
                 getApiCommunityList();
+
                 getApiSignUp();
             } else {
                 Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();

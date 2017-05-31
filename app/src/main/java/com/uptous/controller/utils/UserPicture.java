@@ -21,19 +21,18 @@ import java.io.InvalidObjectException;
  * close to some expected size. This is required because the android standard library is unable to
  * create a reduced size image from an image file using memory comparable to the final size (and
  * loading a full sized multi-megapixel picture for processing may exceed application memory budget).
-
  */
 
 public class UserPicture {
 
-    private  static int MAX_WIDTH = 600;
-    private  static int MAX_HEIGHT = 800;
-  private   Uri uri;
-    private  ContentResolver resolver;
-    private  String path;
+    private static int MAX_WIDTH = 600;
+    private static int MAX_HEIGHT = 800;
+    private Uri uri;
+    private ContentResolver resolver;
+    private String path;
     private Matrix orientation;
     private int storedHeight;
-    private  int storedWidth;
+    private int storedWidth;
 
     public UserPicture(Uri uri, ContentResolver resolver) {
         this.uri = uri;

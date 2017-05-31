@@ -18,9 +18,9 @@ import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
+import com.uptous.controller.utils.GifImageView;
 import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.PlayGifView;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.view.adapter.RSPVDetailAdapter;
@@ -88,8 +88,8 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
         //Local Variables Initialization
         LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
         LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
-        PlayGifView playGifView = (PlayGifView) findViewById(R.id.image_gif);
-        playGifView.setImageResource(R.mipmap.smiley_test);
+        GifImageView playGifView = (GifImageView) findViewById(R.id.image_gif);
+        playGifView.setGifImageResource(R.mipmap.smiley_test);
         LinearLayoutManager layoutManagerFiles
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 

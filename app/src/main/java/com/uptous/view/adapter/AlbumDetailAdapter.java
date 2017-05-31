@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 import com.uptous.R;
 import com.uptous.model.AlbumDetailResponseModel;
+import com.uptous.view.activity.SignUpSnackActivity;
 
 import java.util.List;
 
@@ -50,6 +52,9 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
 
         Picasso.with(activity).load(listEntities.get(i).getPhoto()).placeholder(R.drawable.loader)
                 .into(versionViewHolder.imageView);
+
+//        Glide.with(activity).load(listEntities.get(i).getPhoto()).placeholder(R.drawable.loader).
+//                into(versionViewHolder.imageView);
 
 
     }

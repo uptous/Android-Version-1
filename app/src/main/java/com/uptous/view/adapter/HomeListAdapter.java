@@ -23,6 +23,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.uptous.MyApplication;
@@ -34,6 +35,7 @@ import com.uptous.model.FeedResponseModel;
 import com.uptous.model.SignUpResponseModel;
 import com.uptous.view.activity.AlbumDetailActivity;
 import com.uptous.view.activity.CommentDetailActivity;
+import com.uptous.view.activity.ProfileActivity;
 import com.uptous.view.activity.SignUpDRIVERActivity;
 import com.uptous.view.activity.SignUpOngoingActivity;
 import com.uptous.view.activity.SignUpRSPVActivity;
@@ -157,7 +159,10 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
 
         if (OwnerPhoto != null && !result1.equalsIgnoreCase("gif")) {
             versionViewHolder.mImageViewUser.setVisibility(View.VISIBLE);
-            Picasso.with(activity).load(OwnerPhoto).into(versionViewHolder.mImageViewUser);
+//            Picasso.with(activity).load(OwnerPhoto).into(versionViewHolder.mImageViewUser);
+
+            Glide.with(activity).load(OwnerPhoto)
+                    .into(versionViewHolder.mImageViewUser);
         } else {
             String BackgroundColor = listEntities.get(i).getOwnerBackgroundColor();
             if (BackgroundColor != null) {
@@ -382,31 +387,34 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
 //                        .into( versionViewHolder.mImageViewUploaded);
 
 
-                Picasso.with(activity).load(listEntities.get(i).getNewsItemPhoto()).into(new Target() {
-                    @Override
-                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                        int width = bitmap.getWidth();
-                        int height = bitmap.getHeight();
+                Glide.with(activity).load(listEntities.get(i).getNewsItemPhoto())
+                        .into(versionViewHolder.mImageViewUploaded);
 
-                        versionViewHolder.mImageViewUploaded.setImageBitmap(bitmap);
-
-                        if (width == 100) {
-                            versionViewHolder.mImageViewUploaded.setScaleType(ImageView.ScaleType.FIT_XY);
-
-                        }
-
-                    }
-
-                    @Override
-                    public void onBitmapFailed(Drawable errorDrawable) {
-
-                    }
-
-                    @Override
-                    public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                    }
-                });
+//                Picasso.with(activity).load(listEntities.get(i).getNewsItemPhoto()).into(new Target() {
+//                    @Override
+//                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+//                        int width = bitmap.getWidth();
+//                        int height = bitmap.getHeight();
+//
+//                        versionViewHolder.mImageViewUploaded.setImageBitmap(bitmap);
+//
+//                        if (width == 100) {
+//                            versionViewHolder.mImageViewUploaded.setScaleType(ImageView.ScaleType.FIT_XY);
+//
+//                        }
+//
+//                    }
+//
+//                    @Override
+//                    public void onBitmapFailed(Drawable errorDrawable) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onPrepareLoad(Drawable placeHolderDrawable) {
+//
+//                    }
+//                });
 
 
 //                Picasso.with(activity).load(listEntities.get(i).getNewsItemPhoto()).into(versionViewHolder.mImageViewUploaded);

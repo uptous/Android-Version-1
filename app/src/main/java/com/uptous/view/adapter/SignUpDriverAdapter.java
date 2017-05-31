@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.uptous.MyApplication;
 import com.uptous.R;
-import com.uptous.controller.utils.PlayGifView;
+import com.uptous.controller.utils.GifImageView;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.view.activity.DriverDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
@@ -31,7 +31,7 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
     List<SignUpDetailResponseModel.ItemsBean> listEntities;
     Activity activity;
 
-    String dateTextMain,dateTextTime;
+    String dateTextMain, dateTextTime;
     long val;
 
     public SignUpDriverAdapter(Activity a, List<SignUpDetailResponseModel.ItemsBean> listEntities) {
@@ -65,24 +65,24 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
             SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-            dateTextMain = df2.format(date) ;
-            dateTextTime=dfTime.format(date);
-            if(!dateTextTime.equalsIgnoreCase("1:00AM") &&
-                    !dateTextTime.equalsIgnoreCase("1:00 AM")){
+            dateTextMain = df2.format(date);
+            dateTextTime = dfTime.format(date);
+            if (!dateTextTime.equalsIgnoreCase("1:00AM") &&
+                    !dateTextTime.equalsIgnoreCase("1:00 AM")) {
 
                 if (listEntities.get(i).getEndTime() != null && !listEntities.get(i).getEndTime().equalsIgnoreCase("")) {
                     if (!listEntities.get(i).getEndTime().equalsIgnoreCase("1:00AM") &&
                             !listEntities.get(i).getEndTime().equalsIgnoreCase("1:00 AM")) {
 //                        dateTextMain = df2.format(date) + ", " + dfTime.format(date) + " - " + listEntities.get(i).getEndTime();
-                        versionViewHolder.mTextViewDate.setText(dateTextMain +", "+dateTextTime+ " - " + listEntities.get(i).getEndTime());
+                        versionViewHolder.mTextViewDate.setText(dateTextMain + ", " + dateTextTime + " - " + listEntities.get(i).getEndTime());
                     } else {
-                        versionViewHolder.mTextViewDate.setText(dateTextMain+", "+dateTextTime);
+                        versionViewHolder.mTextViewDate.setText(dateTextMain + ", " + dateTextTime);
                     }
 
                 } else {
-                    versionViewHolder.mTextViewDate.setText(dateTextMain+", "+dateTextTime);
+                    versionViewHolder.mTextViewDate.setText(dateTextMain + ", " + dateTextTime);
                 }
-            }else {
+            } else {
                 versionViewHolder.mTextViewDate.setText(dateTextMain);
             }
 
@@ -92,11 +92,16 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
 
         if (i == 0) {
             versionViewHolder.mTextViewTitle.setText("From: " + listEntities.get(i).getName());
-            versionViewHolder.mTextViewTo.setText("To: " + listEntities.get(1).getName());
+
+            if (listEntities.size()>1) {
+                versionViewHolder.mTextViewTo.setText("To: " + listEntities.get(1).getName());
+            }
+
         } else if (i == 1) {
             versionViewHolder.mTextViewTitle.setText("From: " + listEntities.get(i).getName());
             versionViewHolder.mTextViewTo.setText("To: " + listEntities.get(0).getName());
         }
+
 
         String OpenSpot = listEntities.get(i).getVolunteerStatus();
 
@@ -114,17 +119,17 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                     long val = 0;
                     int position = (int) view.getTag();
                     val = listEntities.get(position).getDateTime();
-                    if(val!=0){
+                    if (val != 0) {
                         Date date = new Date(val);
                         SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
                         SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
                         df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                         dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-                        dateText = df2.format(date)  ;
-                        TimeText=dfTime.format(date);
-                        if(!TimeText.equalsIgnoreCase("1:00AM") &&
-                                !TimeText.equalsIgnoreCase("1:00 AM")){
-                            dateText = dateText +", "+ TimeText;
+                        dateText = df2.format(date);
+                        TimeText = dfTime.format(date);
+                        if (!TimeText.equalsIgnoreCase("1:00AM") &&
+                                !TimeText.equalsIgnoreCase("1:00 AM")) {
+                            dateText = dateText + ", " + TimeText;
                             if (listEntities.get(position).getEndTime() != null && !listEntities.get(position).getEndTime().equalsIgnoreCase("")) {
                                 if (!listEntities.get(position).getEndTime().equalsIgnoreCase("1:00AM") &&
                                         !listEntities.get(position).getEndTime().equalsIgnoreCase("1:00 AM")) {
@@ -133,8 +138,8 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                                     dateText = df2.format(date) + ", " + dfTime.format(date);
                                 }
                             }
-                        }else {
-                            dateText = df2.format(date)  ;
+                        } else {
+                            dateText = df2.format(date);
                         }
 
                     }
@@ -169,17 +174,17 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                         long val = 0;
                         int position = (int) view.getTag();
                         val = listEntities.get(position).getDateTime();
-                        if(val!=0){
+                        if (val != 0) {
                             Date date = new Date(val);
                             SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
                             SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
                             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-                            dateText = df2.format(date)  ;
-                            TimeText=dfTime.format(date);
-                            if(!TimeText.equalsIgnoreCase("1:00AM") &&
-                                    !TimeText.equalsIgnoreCase("1:00 AM")){
-                                dateText = dateText +", "+ TimeText;
+                            dateText = df2.format(date);
+                            TimeText = dfTime.format(date);
+                            if (!TimeText.equalsIgnoreCase("1:00AM") &&
+                                    !TimeText.equalsIgnoreCase("1:00 AM")) {
+                                dateText = dateText + ", " + TimeText;
                                 if (listEntities.get(position).getEndTime() != null && !listEntities.get(position).getEndTime().equalsIgnoreCase("")) {
                                     if (!listEntities.get(position).getEndTime().equalsIgnoreCase("1:00AM") &&
                                             !listEntities.get(position).getEndTime().equalsIgnoreCase("1:00 AM")) {
@@ -188,8 +193,8 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                                         dateText = df2.format(date) + ", " + dfTime.format(date);
                                     }
                                 }
-                            }else {
-                                dateText = df2.format(date)  ;
+                            } else {
+                                dateText = df2.format(date);
                             }
 
                         }
@@ -212,7 +217,7 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                     }
                 });
 
-                versionViewHolder.imageViewSignUpType.setImageResource(R.mipmap.fav_icon);
+                versionViewHolder.imageViewSignUpType.setGifImageResource(R.mipmap.fav_icon);
                 versionViewHolder.linearLayoutOpenSpot.setVisibility(View.GONE);
                 versionViewHolder.linearLayoutVolunteered.setVisibility(View.VISIBLE);
                 versionViewHolder.mTextViewVolunteered.setText(listEntities.get(i).getVolunteerStatus());
@@ -228,17 +233,17 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                         long val = 0;
                         int position = (int) view.getTag();
                         val = listEntities.get(position).getDateTime();
-                        if(val!=0){
+                        if (val != 0) {
                             Date date = new Date(val);
                             SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
                             SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
                             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-                            dateText = df2.format(date)  ;
-                            TimeText=dfTime.format(date);
-                            if(!TimeText.equalsIgnoreCase("1:00AM") &&
-                                    !TimeText.equalsIgnoreCase("1:00 AM")){
-                                dateText = dateText +", "+ TimeText;
+                            dateText = df2.format(date);
+                            TimeText = dfTime.format(date);
+                            if (!TimeText.equalsIgnoreCase("1:00AM") &&
+                                    !TimeText.equalsIgnoreCase("1:00 AM")) {
+                                dateText = dateText + ", " + TimeText;
                                 if (listEntities.get(position).getEndTime() != null && !listEntities.get(position).getEndTime().equalsIgnoreCase("")) {
                                     if (!listEntities.get(position).getEndTime().equalsIgnoreCase("1:00AM") &&
                                             !listEntities.get(position).getEndTime().equalsIgnoreCase("1:00 AM")) {
@@ -247,8 +252,8 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                                         dateText = df2.format(date) + ", " + dfTime.format(date);
                                     }
                                 }
-                            }else {
-                                dateText = df2.format(date)  ;
+                            } else {
+                                dateText = df2.format(date);
                             }
 
                         }
@@ -291,7 +296,7 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
         public View mView;
         TextView mTextViewTo, mTextViewDate, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
         LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot;
-        PlayGifView imageViewSignUpType;
+        GifImageView imageViewSignUpType;
         ImageView imageViewFull;
 
 
@@ -305,7 +310,7 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
             mteTextViewVolunteerCount = (TextView) itemView.findViewById(R.id.text_view_volunteer_count);
             linearLayoutVolunteered = (LinearLayout) itemView.findViewById(R.id.layout_volunteered);
             linearLayoutOpenSpot = (LinearLayout) itemView.findViewById(R.id.layout_open_spot);
-            imageViewSignUpType = (PlayGifView) itemView.findViewById(R.id.image_view_sign_up_type);
+            imageViewSignUpType = (GifImageView) itemView.findViewById(R.id.image_view_sign_up_type);
             imageViewFull = (ImageView) itemView.findViewById(R.id.image_view_full);
             mView = itemView;
 

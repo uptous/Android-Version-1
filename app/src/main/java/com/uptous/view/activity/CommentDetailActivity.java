@@ -18,6 +18,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 import com.uptous.MyApplication;
 import com.uptous.R;
@@ -197,7 +198,10 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
             mImageViewNewsItem.setVisibility(View.VISIBLE);
             mTextViewNewsDetail.setVisibility(View.GONE);
             mScrollView.setVisibility(View.GONE);
-            Picasso.with(CommentDetailActivity.this).load(mNewsItemImage).into(mImageViewNewsItem);
+//            Picasso.with(CommentDetailActivity.this).load(mNewsItemImage).into(mImageViewNewsItem);
+
+            Glide.with(CommentDetailActivity.this).load(mNewsItemImage)
+                    .into(mImageViewNewsItem);
         } else {
             mImageViewNewsItem.setVisibility(View.GONE);
 
@@ -233,7 +237,10 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
         String result1 = mOwnerImage.substring(mOwnerImage.lastIndexOf(".") + 1);
         if (mOwnerImage != null && !result1.equalsIgnoreCase("gif")) {
             mViewImageView.setVisibility(View.VISIBLE);
-            Picasso.with(CommentDetailActivity.this).load(mOwnerImage).into(mViewImageView);
+//            Picasso.with(CommentDetailActivity.this).load(mOwnerImage).into(mViewImageView);
+
+            Glide.with(CommentDetailActivity.this).load(mOwnerImage)
+                    .into(mViewImageView);
         } else {
             String BackgroundColor = MyApplication.mSharedPreferences.getString("OwnerBackground", null);
             String TextColor = MyApplication.mSharedPreferences.getString("OwnerTextColor", null);

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -21,12 +22,15 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.squareup.picasso.Picasso;
 import com.uptous.MyApplication;
 import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.ContactListResponseModel;
 import com.uptous.R;
+import com.uptous.view.activity.ProfileActivity;
 
 import java.util.List;
 
@@ -256,10 +260,22 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
                 versionViewHolder.linearLayoutNameDetail.setVisibility(View.GONE);
                 versionViewHolder.imageView.setVisibility(View.VISIBLE);
                 versionViewHolder.mImageViewContactDetailImage.setVisibility(View.VISIBLE);
-                Picasso.with(activity).load(listEntities.get(i).getPhoto())
+
+
+                Glide.with(activity).load(listEntities.get(i).getPhoto())
                         .into(versionViewHolder.imageView);
-                Picasso.with(activity).load(listEntities.get(i).getPhoto())
+
+                Glide.with(activity).load(listEntities.get(i).getPhoto())
                         .into(versionViewHolder.mImageViewContactDetailImage);
+
+
+
+
+
+//                Picasso.with(activity).load(listEntities.get(i).getPhoto())
+//                        .into(versionViewHolder.imageView);
+//                Picasso.with(activity).load(listEntities.get(i).getPhoto())
+//                        .into(versionViewHolder.mImageViewContactDetailImage);
 
             }
 
@@ -356,8 +372,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         public View mView;
         TextView mTextViewProductName, mTextViewContactDetailName, mTextViewContactDetailAbout,
                 TextViewEmail, TextViewPhone, TextViewKidsDetail, mTextViewKids;
-        ImageView mImageViewContactDetailImage, mImageViewExpand, mImageViewCollapsd;
-        private RoundedImageView imageView;
+        ImageView mImageViewContactDetailImage, mImageViewExpand, mImageViewCollapsd,imageView;
         private TextView mTextViewFirstName, mTextViewLastName, mTextViewDetailFirstName, mTextViewDetailLastName;
         private boolean mIsSelected = false;
         LinearLayout linearLayoutNameDetail, linearLayoutNameBackground;
@@ -381,7 +396,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             TextViewPhone = (TextView) itemView.findViewById(R.id.text_view_phone);
             TextViewKidsDetail = (TextView) itemView.findViewById(R.id.text_view_detail_kids);
             mTextViewKids = (TextView) itemView.findViewById(R.id.text_view_kids);
-            imageView = (RoundedImageView) itemView.findViewById(R.id.image_view_contact);
+            imageView = (ImageView) itemView.findViewById(R.id.image_view_contact);
             mImageViewExpand = (ImageView) itemView.findViewById(R.id.image_view_contact_expand);
             mImageViewCollapsd = (ImageView) itemView.findViewById(R.id.image_view_contact_collpsd);
             mImageViewContactDetailImage = (ImageView) itemView.findViewById(R.id.image_view_contact_detail);

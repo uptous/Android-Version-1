@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.uptous.MyApplication;
 import com.uptous.R;
-import com.uptous.controller.utils.PlayGifView;
+import com.uptous.controller.utils.GifImageView;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.view.activity.RSPVDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
@@ -134,7 +134,7 @@ String dateTextMain,dateTextTime;
                     }
                 });
 
-                versionViewHolder.imageViewSignUpType.setImageResource(R.mipmap.volunteer_two);
+                versionViewHolder.imageViewSignUpType.setGifImageResource(R.mipmap.volunteer_two);
                 versionViewHolder.linearLayoutOpenSpot.setVisibility(View.GONE);
                 versionViewHolder.linearLayoutVolunteered.setVisibility(View.VISIBLE);
                 versionViewHolder.mTextViewVolunteered.setText(listEntities.get(i).getVolunteerStatus());
@@ -178,7 +178,7 @@ String dateTextMain,dateTextTime;
         public View mView;
         TextView mTextViewDate, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
         LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot;
-        PlayGifView imageViewSignUpType;
+        GifImageView imageViewSignUpType;
         ImageView imageViewFull;
 
 
@@ -191,7 +191,7 @@ String dateTextMain,dateTextTime;
             mteTextViewVolunteerCount = (TextView) itemView.findViewById(R.id.text_view_volunteer_count);
             linearLayoutVolunteered = (LinearLayout) itemView.findViewById(R.id.layout_volunteered);
             linearLayoutOpenSpot = (LinearLayout) itemView.findViewById(R.id.layout_open);
-            imageViewSignUpType = (PlayGifView) itemView.findViewById(R.id.image_view_sign_up_type);
+            imageViewSignUpType = (GifImageView) itemView.findViewById(R.id.image_view_sign_up_type);
             imageViewFull=(ImageView)itemView.findViewById(R.id.image_view_full);
             mView = itemView;
 

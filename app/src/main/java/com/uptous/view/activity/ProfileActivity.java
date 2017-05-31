@@ -4,9 +4,10 @@ import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
+
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
@@ -18,7 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
 import com.uptous.MyApplication;
@@ -29,7 +30,6 @@ import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.RoundedImageView;
-import com.uptous.controller.utils.UserPicture;
 import com.uptous.controller.utils.Validation;
 import com.uptous.model.ProfileResponseModel;
 
@@ -48,7 +48,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private ImageView mImageViewBack, mViewEditImageView;
 
-    private RoundedImageView mViewProfileRoundedImageView;
+    private ImageView mViewProfileRoundedImageView;
 
     private EditText mTextFirstNameEditText, mTextLastNameEditText, mTextEmailEditText, mTextPhoneEditText;
 
@@ -64,7 +64,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     private CustomizeDialog mCustomizeDialog;
 
-    public static final int LOAD_IMAGE_RESULTS = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -101,7 +100,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         }
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -109,26 +107,31 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
             CropImage.ActivityResult result = CropImage.getActivityResult(data);
             if (resultCode == RESULT_OK) {
-                mViewProfileRoundedImageView.setImageURI(result.getUri());
-                Bitmap yourImage;
                 Uri selectedImageUri = result.getUri();
                 try {
 
-                    yourImage = new UserPicture(selectedImageUri, getContentResolver()).getBitmap();
 
-                    // convert bitmap to byte
+                    BitmapFactory.Options options = null;
+                    options = new BitmapFactory.Options();
+                    options.inSampleSize = 1;
+                  Bitmap  bitmap = BitmapFactory.decodeFile(selectedImageUri.getPath(), options);
+
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
-                    if (yourImage != null) {
-                        yourImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
-                    }
-                    byte imageInByte[] = stream.toByteArray();
 
-                    mImagePath = Base64.encodeToString(imageInByte, Base64.DEFAULT);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 50, stream);
+                    byte[] byte_arr = stream.toByteArray();
+
+                    mImagePath = Base64.encodeToString(byte_arr, 0);
+
+                    byte[]  imageBytes = Base64.decode(mImagePath, Base64.DEFAULT);
+                    Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+                    mViewProfileRoundedImageView.setImageBitmap(decodedImage);
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+
             }
         }
     }
@@ -142,44 +145,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         app.startActivity(intent);
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//
-//
-//        if (requestCode == LOAD_IMAGE_RESULTS && resultCode == RESULT_OK && null != data) {
-//
-//            Bitmap yourImage;
-//            Uri selectedImageUri = data.getData();
-//            try {
-//                if (selectedImageUri == null) {
-//                    Bundle extra2 = data.getExtras();
-//                    yourImage = extra2.getParcelable("data");
-//                } else {
-//                    yourImage = new UserPicture(selectedImageUri, getContentResolver()).getBitmap();
-//                }
-//
-//                // convert bitmap to byte
-//                ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//                if (yourImage != null) {
-//                    yourImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
-//                }
-//                byte imageInByte[] = stream.toByteArray();
-//
-//                mImagePath = Base64.encodeToString(imageInByte, Base64.DEFAULT);
-//                try {
-//                    mViewProfileRoundedImageView.setImageBitmap(yourImage);
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//
-//
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
 
     //method to initialize view
@@ -198,7 +163,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         mViewEditImageView = (ImageView) findViewById(R.id.image_view_edit);
         mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
-        mViewProfileRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_profile);
+        mViewProfileRoundedImageView = (ImageView) findViewById(R.id.image_view_profile);
         mViewEditImageView = (ImageView) findViewById(R.id.image_view_edit);
 
         mTextFirstNameEditText = (EditText) findViewById(R.id.edit_text_first_name);
@@ -271,38 +236,13 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                             e.printStackTrace();
                         }
 
+                        String Url=response.body().getPhoto();
 
-                        Picasso.with(ProfileActivity.this).load(response .body().getPhoto()).into(mViewProfileRoundedImageView);
 
-//                        mViewProfileRoundedImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                        Glide.with(ProfileActivity.this).load(Url)
+                                .into(mViewProfileRoundedImageView);
 
-//                        Picasso.with(ProfileActivity.this).load(response.body().getPhoto()).into(new Target() {
-//                            @Override
-//                            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-//                                int width = bitmap.getWidth();
-//                                int height = bitmap.getHeight();
-//
-//                                mViewProfileRoundedImageView.setImageBitmap(bitmap);
-////                                mViewProfileRoundedImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-//
-////                                if (width == 100) {
-////                                    versionViewHolder.mImageViewUploaded.setScaleType(ImageView.ScaleType.FIT_XY);
-////
-////                                }
-//
-//                            }
-//
-//                            @Override
-//
-//                            public void onBitmapFailed(Drawable errorDrawable) {
-//
-//                            }
-//
-//                            @Override
-//                            public void onPrepareLoad(Drawable placeHolderDrawable) {
-//
-//                            }
-//                        });
+//                        Picasso.with(ProfileActivity.this).load("https://d12h6ivzrhy8zy.cloudfront.net/873fc4d7-3f7c-4d30-bc1c-142dd8ffdc81dXNlcklkPTI=").into(mViewProfileRoundedImageView);
 
 
                     }
@@ -412,44 +352,6 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    //Method to show dialog for pick image from camera and gallery
-    private void dialogForCameraGallery() {
-//        final CustomizeDialog customizeDialog = new CustomizeDialog(ProfileActivity.this);
-//        customizeDialog.show();
-//        customizeDialog.setContentView(R.layout.dialog_phone_message);
-//        TextView buttonCamera = (TextView) customizeDialog.findViewById(R.id.button_camera);
-//        TextView buttonAlbum = (TextView) customizeDialog.findViewById(R.id.button_album);
-//        TextView buttonCancel = (TextView) customizeDialog.findViewById(R.id.button_cancel);
-//        buttonCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                customizeDialog.dismiss();
-//            }
-//        });
-//
-//        buttonCamera.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                startActivityForResult(takePicture, LOAD_IMAGE_RESULTS);
-//                customizeDialog.dismiss();
-//            }
-//        });
-//
-//        buttonAlbum.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//
-//                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                startActivityForResult(i, LOAD_IMAGE_RESULTS);
-//
-//                customizeDialog.dismiss();
-//            }
-//        });
-//
-
-    }
 
 }
 

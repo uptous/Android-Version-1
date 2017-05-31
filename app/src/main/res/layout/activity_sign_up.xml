@@ -33,25 +33,26 @@
                 android:padding="@dimen/_10sdp">
 
 
-
                 <ScrollView
                     android:id="@+id/scroll_view_des"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_55sdp">
+
                     <LinearLayout
-                        android:layout_height="wrap_content"
                         android:layout_width="match_parent"
-                        >
-                <TextView
-                    android:id="@+id/text_view_event_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:scrollbars = "vertical"
-                    android:text=""
-                    android:textColor="#000"
-                    android:textSize="@dimen/_12sdp" />
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/text_view_event_description"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:scrollbars="vertical"
+                            android:text=""
+                            android:textColor="#000"
+                            android:textSize="@dimen/_12sdp" />
                     </LinearLayout>
                 </ScrollView>
+
                 <TextView
                     android:id="@+id/text_view_title_organizers"
                     android:layout_width="match_parent"
@@ -81,8 +82,9 @@
                         android:visibility="gone">
 
 
-                        <com.uptous.controller.utils.RoundedImageView
+                        <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/image_view_contact_one"
+                            android:scaleType="centerCrop"
                             android:layout_width="@dimen/_40sdp"
                             android:layout_height="@dimen/_40sdp"
                             android:visibility="gone" />
@@ -134,10 +136,11 @@
                         android:orientation="horizontal"
                         android:visibility="gone">
 
-                        <com.uptous.controller.utils.RoundedImageView
+                        <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/image_view_contact_two"
                             android:layout_width="@dimen/_40sdp"
                             android:layout_height="@dimen/_40sdp"
+                            android:scaleType="centerCrop"
                             android:visibility="gone" />
 
                         <LinearLayout

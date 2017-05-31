@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 import com.uptous.MyApplication;
 import com.uptous.R;
@@ -54,7 +55,7 @@ public class SignUpOngoingActivity extends AppCompatActivity implements View.OnC
             mTextViewFirstNameContactOne, mTextViewSecondNameContactOne, mTextViewOrgnizer, mTextViewTitle,
             mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewEventDateSignUp,mTextViewCutOffDateSignUp;
 
-    private RoundedImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
+    private ImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
 
     private SignUpOngoingAdapter mSignUpOngoingAdapter;
 
@@ -124,8 +125,8 @@ public class SignUpOngoingActivity extends AppCompatActivity implements View.OnC
         mTextViewFirstNameContactTwo = (TextView) findViewById(R.id.textview_first_name_second_contact);
         mTextViewSecondNameContactTwo = (TextView) findViewById(R.id.textview_last_name_second_contact);
 
-        mViewOrganizerOneRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_one);
-        mViewOrganizerSecondRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_two);
+        mViewOrganizerOneRoundedImageView = (ImageView) findViewById(R.id.image_view_contact_one);
+        mViewOrganizerSecondRoundedImageView = (ImageView) findViewById(R.id.image_view_contact_two);
 
         linearLayoutNavigation.setVisibility(View.GONE);
         mImageViewBack.setVisibility(View.VISIBLE);
@@ -255,9 +256,10 @@ public class SignUpOngoingActivity extends AppCompatActivity implements View.OnC
 
 
                                 mViewOrganizerOneRoundedImageView.setVisibility(View.VISIBLE);
-                                Picasso.with(SignUpOngoingActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
+//                                Picasso.with(SignUpOngoingActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
+//                                        .into(mViewOrganizerOneRoundedImageView);
+                                Glide.with(SignUpOngoingActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
                                         .into(mViewOrganizerOneRoundedImageView);
-
 
                             }
 
@@ -345,7 +347,10 @@ public class SignUpOngoingActivity extends AppCompatActivity implements View.OnC
 
                             } else {
                                 mViewOrganizerSecondRoundedImageView.setVisibility(View.VISIBLE);
-                                Picasso.with(SignUpOngoingActivity.this).load(eventResponseModels.get(0).getOrganizer2PhotoUrl())
+//                                Picasso.with(SignUpOngoingActivity.this).load(eventResponseModels.get(0).getOrganizer2PhotoUrl())
+//                                        .into(mViewOrganizerSecondRoundedImageView);
+
+                                Glide.with(SignUpOngoingActivity.this).load(eventResponseModels.get(0).getOrganizer2PhotoUrl())
                                         .into(mViewOrganizerSecondRoundedImageView);
                             }
 

@@ -87,7 +87,7 @@ android:visibility="gone"
                     android:src="@mipmap/smile"
                     android:visibility="gone" />
 
-                <com.uptous.controller.utils.PlayGifView
+                <com.uptous.controller.utils.GifImageView
                     android:id="@+id/image_view_sign_up_type"
                     android:layout_width="@dimen/_19sdp"
                     android:layout_height="@dimen/_19sdp"

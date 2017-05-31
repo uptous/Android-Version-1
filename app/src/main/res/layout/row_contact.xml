@@ -18,8 +18,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <com.uptous.controller.utils.RoundedImageView
+            <de.hdodenhof.circleimageview.CircleImageView
 
+                android:scaleType="centerCrop"
                 android:id="@+id/image_view_contact"
                 android:layout_width="@dimen/_40sdp"
                 android:layout_height="@dimen/_40sdp" />
@@ -115,7 +116,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
 
-            <com.uptous.controller.utils.RoundedImageView
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:scaleType="centerCrop"
                 android:id="@+id/image_view_contact_detail"
                 android:layout_width="@dimen/_40sdp"
                 android:layout_height="@dimen/_40sdp" />

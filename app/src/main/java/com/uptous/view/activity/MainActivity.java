@@ -16,7 +16,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -227,7 +226,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (contactListResponseModels != null) {
                             contactListResponseModels.clear();
                         }
-                        getApiContactList();
+                        if(ConnectionDetector.isConnectingToInternet(MainActivity.this)){
+                            getApiContactList();
+                        }else {
+                            Toast.makeText(MainActivity.this,R.string.network_error,Toast.LENGTH_SHORT).show();
+                        }
+
                     }
 
 //
@@ -441,7 +445,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     if (contactListResponseModels != null) {
                                         contactListResponseModels.clear();
                                     }
-                                    getApiContactList();
+
+
+                                    if(ConnectionDetector.isConnectingToInternet(MainActivity.this)){
+                                        getApiContactList();
+                                    }else {
+                                        Toast.makeText(MainActivity.this,R.string.network_error,Toast.LENGTH_SHORT).show();
+                                    }
                                 }
 
 

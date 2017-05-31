@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 import com.uptous.MyApplication;
 import com.uptous.R;
@@ -70,7 +71,11 @@ public class CommentListAdapter extends RecyclerView.Adapter<CommentListAdapter.
         if (CommentUserImage != null && !result1.equalsIgnoreCase("gif")) {
             versionViewHolder.imageView.setVisibility(View.VISIBLE);
             versionViewHolder.mLinearLayoutRoundedBackGround.setVisibility(View.GONE);
-            Picasso.with(activity).load(listEntities.get(i).getOwnerPhotoUrl()).into(versionViewHolder.imageView);
+//            Picasso.with(activity).load(listEntities.get(i).getOwnerPhotoUrl()).into(versionViewHolder.imageView);
+
+
+            Glide.with(activity).load(listEntities.get(i).getOwnerPhotoUrl())
+                    .into(versionViewHolder.imageView);
         } else {
             String BackgroundColor = listEntities.get(i).getOwnerBackgroundColor();
 

@@ -18,6 +18,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 import com.uptous.MyApplication;
 import com.uptous.R;
@@ -49,7 +50,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
 
     private ImageView mImageViewBack;
 
-    private RoundedImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
+    private ImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
 
     private TextView mViewOrganizerOneTextView, mViewOrganizerSecondTextView, mViewEventDescriptionTextView,
             mTextViewTitle, mTextViewEventDateSignUp, mTextViewOrganizer,
@@ -119,8 +120,8 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
         mTextViewSecondNameContactTwo = (TextView) findViewById(R.id.textview_last_name_second_contact);
         mTextViewCutOffDateSignUp = (TextView) findViewById(R.id.text_view_cutoff_date);
         mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
-        mViewOrganizerOneRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_one);
-        mViewOrganizerSecondRoundedImageView = (RoundedImageView) findViewById(R.id.image_view_contact_two);
+        mViewOrganizerOneRoundedImageView = (ImageView) findViewById(R.id.image_view_contact_one);
+        mViewOrganizerSecondRoundedImageView = (ImageView) findViewById(R.id.image_view_contact_two);
 
         LinearLayoutManager layoutManager
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -239,7 +240,10 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                 }
                             } else {
                                 mViewOrganizerOneRoundedImageView.setVisibility(View.VISIBLE);
-                                Picasso.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
+//                                Picasso.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
+//                                        .into(mViewOrganizerOneRoundedImageView);
+
+                                Glide.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
                                         .into(mViewOrganizerOneRoundedImageView);
                             }
 
@@ -291,7 +295,10 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
 
                             } else {
                                 mViewOrganizerSecondRoundedImageView.setVisibility(View.VISIBLE);
-                                Picasso.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer2PhotoUrl())
+//                                Picasso.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer2PhotoUrl())
+//                                        .into(mViewOrganizerSecondRoundedImageView);
+
+                                Glide.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer2PhotoUrl())
                                         .into(mViewOrganizerSecondRoundedImageView);
                             }
 
