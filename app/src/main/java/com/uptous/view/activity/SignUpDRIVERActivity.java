@@ -1,14 +1,11 @@
 package com.uptous.view.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,18 +13,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.CustomizeDialog;
-import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.SignUpDriverAdapter;
 
 import java.text.SimpleDateFormat;
@@ -39,12 +32,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.uptous.controller.utils.Utilities.isLastAppActivity;
+
 /**
  * FileName : SignUpDRIVERActivity
  * Description :show all DRIVER sign_up open spots, volunteer, full.
  * Dependencies : SignUpDRIVERActivity
  */
-public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignUpDRIVERActivity extends BaseActivity implements View.OnClickListener {
 
     private RecyclerView mRecyclerViewOpenSpot;
 
@@ -55,7 +50,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
     private TextView mViewOrganizerOneTextView, mViewOrganizerSecondTextView, mViewEventDescriptionTextView,
             mTextViewTitle, mTextViewEventDateSignUp, mTextViewOrganizer,
             mTextViewFirstNameContactOne, mTextViewSecondNameContactOne, mTextViewSecondNameContactTwo,
-            mTextViewFirstNameContactTwo,mTextViewCutOffDateSignUp;
+            mTextViewFirstNameContactTwo, mTextViewCutOffDateSignUp;
 
     private SignUpDriverAdapter mSignUpDriverAdapter;
 
@@ -89,7 +84,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
         if (ConnectionDetector.isConnectingToInternet(this)) {
             getApiSignUpDetail();
         } else {
-            Toast.makeText(SignUpDRIVERActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            showToast(getString(R.string.network_error));
         }
 
     }
@@ -109,7 +104,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
         mLinearLayoutBackgroundSecondContact = (LinearLayout) findViewById(R.id.layout_contact_image_second);
 
         mTextViewOrganizer = (TextView) findViewById(R.id.text_view_title_organizers);
-        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_toolbar);
+        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_title);
         mViewEventDescriptionTextView = (TextView) findViewById(R.id.text_view_event_description);
         mViewOrganizerOneTextView = (TextView) findViewById(R.id.text_view_organizer_one);
         mViewOrganizerSecondTextView = (TextView) findViewById(R.id.text_view_organizer_second);
@@ -139,35 +134,24 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
         clickListenerOnViews();
 
 
-//        if (ConnectionDetector.isConnectingToInternet(this)) {
-//            getApiSignUpDetail();
-//        } else {
-//            Toast.makeText(SignUpDRIVERActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-//        }
-
-
     }
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
     }
 
     //Method to set on clickListener on views
     private void clickListenerOnViews() {
-//        mLinearLayoutOpenSpot.setOnClickListener(this);
         mImageViewBack.setOnClickListener(this);
     }
 
     // Get webservice to show Driver sign_up open spots, volunteer, full
     private void getApiSignUpDetail() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(SignUpDRIVERActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
+        showProgressDialog();
+        int OpId =Prefs.getOpportunityId(this);
 
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
@@ -178,12 +162,12 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void onResponse(Call<List<SignUpDetailResponseModel>> call, Response<List<SignUpDetailResponseModel>> response) {
                 try {
-                    mProgressDialog.dismiss();
+                    hideProgressDialog();
 
                     if (response.body() != null) {
                         final List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
-                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n"," "));
+                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n", " "));
                         mTextViewTitle.setVisibility(View.VISIBLE);
 
                         String Name = eventResponseModels.get(0).getName();
@@ -225,7 +209,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                 if (BackgroundColor != null) {
 
                                     int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer1TextColor());
-                                    String OwnerN=eventResponseModels.get(0).getContact();
+                                    String OwnerN = eventResponseModels.get(0).getContact();
                                     String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
                                     mTextViewFirstNameContactOne.setText(OwnerN);
                                     mTextViewFirstNameContactOne.setTextColor(colorTextView);
@@ -240,8 +224,6 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                 }
                             } else {
                                 mViewOrganizerOneRoundedImageView.setVisibility(View.VISIBLE);
-//                                Picasso.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
-//                                        .into(mViewOrganizerOneRoundedImageView);
 
                                 Glide.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
                                         .into(mViewOrganizerOneRoundedImageView);
@@ -256,7 +238,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                 int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer1TextColor());
 
 
-                                String OwnerN=eventResponseModels.get(0).getContact();
+                                String OwnerN = eventResponseModels.get(0).getContact();
                                 String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
                                 mTextViewFirstNameContactOne.setText(OwnerN);
                                 mTextViewFirstNameContactOne.setTextColor(colorTextView);
@@ -284,7 +266,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                     gd.setColor(color);
                                     gd.setCornerRadii(new float[]{30, 30, 30, 30, 0, 0, 30, 30});
                                     int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer2TextColor());
-                                    String OwnerN=eventResponseModels.get(0).getContact2();
+                                    String OwnerN = eventResponseModels.get(0).getContact2();
                                     String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
 
                                     mTextViewFirstNameContactTwo.setText(OwnerN);
@@ -295,8 +277,6 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
 
                             } else {
                                 mViewOrganizerSecondRoundedImageView.setVisibility(View.VISIBLE);
-//                                Picasso.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer2PhotoUrl())
-//                                        .into(mViewOrganizerSecondRoundedImageView);
 
                                 Glide.with(SignUpDRIVERActivity.this).load(eventResponseModels.get(0).getOrganizer2PhotoUrl())
                                         .into(mViewOrganizerSecondRoundedImageView);
@@ -316,7 +296,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                                 int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer2TextColor());
 
 
-                                String OwnerN=eventResponseModels.get(0).getContact2();
+                                String OwnerN = eventResponseModels.get(0).getContact2();
                                 String resultLastName = OwnerN.substring(OwnerN.lastIndexOf(' ') + 1).trim();
 
                                 mTextViewFirstNameContactTwo.setText(OwnerN);
@@ -366,7 +346,6 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
                             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                             dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                             String dateText = df2.format(date);
-//                            String dateTime = dfTime.format(date);
 
                             String EndTime = response.body().get(0).getEndTime();
                             if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM") && !EndTime.equalsIgnoreCase("1:00 AM")) {
@@ -374,12 +353,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
 
                             } else {
 
-//                                    if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
                                 mTextViewCutOffDateSignUp.setText(dateText);
-//                                    } else {
-//                                        mTextViewCutOffDateSignUp.setText(dateText);
-//                                    }
-//                                }
 
                             }
                         }
@@ -388,19 +362,7 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
 
 
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(SignUpDRIVERActivity.this);
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                               logout();
-
-                            }
-                        });
+                        showLogOutDialog();
                     }
 
 
@@ -413,23 +375,19 @@ public class SignUpDRIVERActivity extends AppCompatActivity implements View.OnCl
 
             @Override
             public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                mProgressDialog.dismiss();
-                Toast.makeText(SignUpDRIVERActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+               hideProgressDialog();
+                showToast(getString(R.string.error));
                 Log.d("onFailure", t.toString());
             }
 
         });
     }
-
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(isLastAppActivity(this))
+            startActivity(new Intent(this,MainActivity.class));
+        finish();
     }
 
 }

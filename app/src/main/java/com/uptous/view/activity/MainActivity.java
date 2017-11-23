@@ -1,7 +1,6 @@
 package com.uptous.view.activity;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -13,9 +12,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -24,13 +23,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.Helper;
 import com.uptous.model.ContactListResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.ContactListAdapter;
 import com.uptous.view.adapter.CustomComparator;
 import com.uptous.view.fragment.LibraryFragment;
@@ -53,7 +52,7 @@ import retrofit2.Response;
  * Description : Show Tabs that open  different fragments like : feed, contacts, sign_ups, albums, event.
  * Dependencies : ViewPagerAdapter
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, SearchView.OnQueryTextListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener, SearchView.OnQueryTextListener {
 
     private TabLayout mTabLayout;
 
@@ -78,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ContactListAdapter mContactListAdapter;
 
     public SearchView mSearchView;
+    private long differenceTime;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -124,9 +124,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.text_view_title:
 
-                MyApplication.editor.putString("CommunityFilter", "community");
-                MyApplication.editor.putString("Message", null);
-                MyApplication.editor.commit();
+
+                Prefs.setCommunityFilter(this,"community");
+                Prefs.setMessage(this,null);
                 Intent intentCommunity = new Intent(MainActivity.this, CommunityActivity.class);
                 startActivity(intentCommunity);
             case R.id.text_view_cancel:
@@ -149,9 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onResume() {
         super.onResume();
-        int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
-        int CommunityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
-        String communityName = MyApplication.mSharedPreferences.getString("CommunityName", null);
+        int Position = Prefs.getPosition(this);
+        int CommunityId = Prefs.getCommunityId(this);
+        String communityName = Prefs.getCommunityNAme(this);
 
         if (CommunityId != 0) {
             if (Position == 0) {
@@ -179,8 +179,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 mTextViewTitle.setText("Sign-Ups - " + communityName);
             } else if (Position == 3) {
-                String Album = MyApplication.mSharedPreferences.getString("Album", null);
-                String Attachment = MyApplication.mSharedPreferences.getString("Attachment", null);
+                String Album = Prefs.getAlbum(this);
+                String Attachment =Prefs.getAttachment(this);
 
                 if (Album != null) {
                     if (LibraryFragment.photoAlbumResponseModelList.size() == 0) {
@@ -217,19 +217,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
                 mTextViewTitle.setText(R.string.contacts_all_communities);
 
-                String Message = MyApplication.mSharedPreferences.getString("Message", null);
-                String Close = MyApplication.mSharedPreferences.getString("Close", null);
+                String Message =Prefs.getMessage(this);
+                String Close = Prefs.getClose(this);
                 if (Message == null) {
 
 
                     if (Close == null) {
                         if (contactListResponseModels != null) {
-                            contactListResponseModels.clear();
+                           // contactListResponseModels.clear();
                         }
-                        if(ConnectionDetector.isConnectingToInternet(MainActivity.this)){
+                        if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
                             getApiContactList();
-                        }else {
-                            Toast.makeText(MainActivity.this,R.string.network_error,Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                         }
 
                     }
@@ -254,23 +254,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        MyApplication.editor.putString("CommunityFilter", null);
-        MyApplication.editor.putString("CommunityName", null);
-        MyApplication.editor.putInt("CommunityId", 0);
-        MyApplication.editor.putString("Attachment", null);
-        MyApplication.editor.putString("Album", null);
-        MyApplication.editor.putString("Message", null);
-        MyApplication.editor.putString("Detail", null);
-        MyApplication.editor.putString("FeedDetail", null);
-        MyApplication.editor.putString("SignUpDetail", null);
-        MyApplication.editor.putString("Close", null);
-        MyApplication.editor.commit();
+       Prefs.setCommunityFilter(this,null);
+       Prefs.setCommunityNAme(this,null);
+        Prefs.setCommunityId(this,0);
+        Prefs.setDetail(this,null);
+        Prefs.setFeedDetail(this,null);
+        Prefs.setClose(this, null);
+        Prefs.setAttachment(this,null);
+        Prefs.setMessage(this,null);
+        Prefs.setSignUpDetail(this,null);
+        Prefs.setAlbum(this,null);
 
 
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         mSearchView.onActionViewCollapsed();
         mSearchView.clearFocus();
@@ -278,12 +277,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+   public static ViewPager viewPager;
     // method to initialization of views
     private void initView() {
         mHelper = new Helper();
 
         //Local Variables Initialization
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager = (ViewPager) findViewById(R.id.pager);
 
         RelativeLayout relativeLayout =
                 (RelativeLayout) findViewById(R.id.relative);
@@ -344,12 +344,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     // method to set tab icons
     private void setupTabIcons() {
-
-        mTabLayout.getTabAt(0).setIcon(ICON_RES_OVER[0]);
-        mTabLayout.getTabAt(1).setIcon(ICON_RES_OVER[1]);
-        mTabLayout.getTabAt(2).setIcon(ICON_RES_OVER[2]);
-        mTabLayout.getTabAt(3).setIcon(ICON_RES_OVER[3]);
-        mTabLayout.getTabAt(4).setIcon(ICON_RES_OVER[4]);
+        if(mTabLayout!=null){
+            mTabLayout.getTabAt(0).setIcon(ICON_RES_OVER[0]);
+            mTabLayout.getTabAt(1).setIcon(ICON_RES_OVER[1]);
+            mTabLayout.getTabAt(2).setIcon(ICON_RES_OVER[2]);
+            mTabLayout.getTabAt(3).setIcon(ICON_RES_OVER[3]);
+            mTabLayout.getTabAt(4).setIcon(ICON_RES_OVER[4]);
+        }
     }
 
 
@@ -362,11 +363,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mViewPagerAdapter.addFrag(new LibraryFragment(), "");
         mViewPagerAdapter.addFrag(new EventsFragment(), "");
         viewPager.setAdapter(mViewPagerAdapter);
-        int mCommunityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+        int mCommunityId =Prefs.getCommunityId(this);
         if (mCommunityId == 0) {
             mTextViewTitle.setText(R.string.feed_all_communities);
-            MyApplication.editor.putInt("Position", 0);
-            MyApplication.editor.commit();
+            Prefs.setPosition(this,0);
             mTextViewSignOut.setVisibility(View.GONE);
             mImageViewInvitation.setVisibility(View.VISIBLE);
         }
@@ -401,16 +401,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (EventsFragment.mViewEventsRecyclerView != null)
                     EventsFragment.mViewEventsRecyclerView.setVisibility(View.GONE);
 
-                MyApplication.editor.putString("Message", null);
-                MyApplication.editor.putString("AlbumDetail", null);
-                MyApplication.editor.putString("SignUpDetail", null);
-                MyApplication.editor.putString("Detail", null);
-                MyApplication.editor.putString("FeedDetail", null);
-                MyApplication.editor.commit();
+
+
+
+                Prefs.setDetail(MainActivity.this,null);
+                Prefs.setFeedDetail(MainActivity.this,null);
+                Prefs.setAlbumDetail(MainActivity.this,null);
+                Prefs.setMessage(MainActivity.this,null);
+                Prefs.setSignUpDetail(MainActivity.this,null);
                 mHelper.keyBoardHidden(MainActivity.this);
 
-                int mCommunityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
-                String communityName = MyApplication.mSharedPreferences.getString("CommunityName", null);
+                int mCommunityId = Prefs.getCommunityId(MainActivity.this);
+                String communityName = Prefs.getCommunityNAme(MainActivity.this);
                 int position = tab.getPosition();
                 if (mCommunityId == 0) {
                     if (position == 0) {
@@ -418,16 +420,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mImageViewInvitation.setVisibility(View.VISIBLE);
                         mTextViewSignOut.setVisibility(View.GONE);
                         mTextViewTitle.setText(R.string.feed_all_communities);
-                        MyApplication.editor.putInt("Position", 0);
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,0);
                         HomeFragment.mViewHomeRecyclerView.setVisibility(View.VISIBLE);
                     } else if (position == 1) {
 
                         mTextViewTitle.setText(R.string.contacts_all_communities);
                         mTextViewSignOut.setVisibility(View.VISIBLE);
                         mTextViewSignOut.setText("Top");
-                        MyApplication.editor.putInt("Position", 1);
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,1);
                         mImageViewInvitation.setVisibility(View.GONE);
 
                         if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
@@ -437,20 +437,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 ContactFragment.mViewContactRecyclerView.setVisibility(View.VISIBLE);
 
 
-                                String CommunityFilter = MyApplication.mSharedPreferences.getString("CommunityFilter", null);
+                                String CommunityFilter = Prefs.getCommunityFilter(MainActivity.this);
 
                                 if (CommunityFilter != null) {
-                                    MyApplication.editor.putString("CommunityFilter", null);
-                                    MyApplication.editor.commit();
+                                  Prefs.setCommunityFilter(MainActivity.this,null);
                                     if (contactListResponseModels != null) {
-                                        contactListResponseModels.clear();
+                                      //e  contactListResponseModels.clear();
                                     }
 
 
-                                    if(ConnectionDetector.isConnectingToInternet(MainActivity.this)){
+                                    if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
                                         getApiContactList();
-                                    }else {
-                                        Toast.makeText(MainActivity.this,R.string.network_error,Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                                     }
                                 }
 
@@ -465,24 +464,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         mTextViewTitle.setText(R.string.sign_ups_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        MyApplication.editor.putInt("Position", 2);
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,2);
                         mImageViewInvitation.setVisibility(View.GONE);
                         SignUpFragment.mViewSignUpRecyclerView.setVisibility(View.VISIBLE);
                     } else if (position == 3) {
 
                         mTextViewTitle.setText(R.string.library_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        MyApplication.editor.putInt("Position", 3);
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,3);
                         mImageViewInvitation.setVisibility(View.GONE);
                         LibraryFragment.mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
                         LibraryFragment.mLinearLayoutAlbumFile.setVisibility(View.VISIBLE);
                     } else if (position == 4) {
                         mTextViewTitle.setText(R.string.event_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        MyApplication.editor.putInt("Position", 4);
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,4);
                         mImageViewInvitation.setVisibility(View.GONE);
                         EventsFragment.mViewEventsRecyclerView.setVisibility(View.VISIBLE);
 
@@ -501,8 +497,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mImageViewInvitation.setVisibility(View.VISIBLE);
                         mTextViewTitle.setText("Feed - " + communityName);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        MyApplication.editor.putInt("Position", 0);
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,0);
                     } else if (position == 1) {
 
                         if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
@@ -524,9 +519,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mTextViewTitle.setText("Contacts - " + communityName);
                         mTextViewSignOut.setVisibility(View.VISIBLE);
                         mTextViewSignOut.setText("Top");
-                        MyApplication.editor.putInt("Position", 1);
-
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,1);
                         mImageViewInvitation.setVisibility(View.GONE);
                     } else if (position == 2) {
                         SignUpFragment.mViewSignUpRecyclerView.setVisibility(View.VISIBLE);
@@ -538,14 +531,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         mTextViewTitle.setText("Sign-Ups - " + communityName);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        MyApplication.editor.putInt("Position", 2);
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,2);
                         mImageViewInvitation.setVisibility(View.GONE);
                     } else if (position == 3) {
                         LibraryFragment.mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
                         LibraryFragment.mLinearLayoutAlbumFile.setVisibility(View.VISIBLE);
-                        String Album = MyApplication.mSharedPreferences.getString("Album", null);
-                        String Attachment = MyApplication.mSharedPreferences.getString("Attachment", null);
+                        String Album = Prefs.getAlbum(MainActivity.this);
+                        String Attachment = Prefs.getAttachment(MainActivity.this);
                         if (Album != null) {
                             if (LibraryFragment.photoAlbumResponseModelList.size() == 0) {
                                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
@@ -564,9 +556,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         mTextViewTitle.setText("Library - " + communityName);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        MyApplication.editor.putInt("Position", 3);
+                        Prefs.setPosition(MainActivity.this,3);
                         mImageViewInvitation.setVisibility(View.GONE);
-                        MyApplication.editor.commit();
                     } else if (position == 4) {
 
                         if (EventsFragment.eventList.size() == 0) {
@@ -578,8 +569,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         mTextViewTitle.setText("Calendar - " + communityName);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        MyApplication.editor.putInt("Position", 4);
-                        MyApplication.editor.commit();
+                        Prefs.setPosition(MainActivity.this,4);
                         mImageViewInvitation.setVisibility(View.GONE);
                         EventsFragment.mViewEventsRecyclerView.setVisibility(View.VISIBLE);
                     }
@@ -613,8 +603,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
-        int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
-        String CommunityFilter = MyApplication.mSharedPreferences.getString("CommunityFilter", null);
+        int Position =Prefs.getPosition(this);
+        String CommunityFilter = Prefs.getCommunityFilter(this);
         if (Position == 0) {
 
 
@@ -622,15 +612,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 HomeFragment homeFragment = (HomeFragment) mViewPagerAdapter.getItem(0);
                 homeFragment.SearchFilterForFeed(HomeFragment.feedResponseModelList, newText);
             } else {
-                MyApplication.editor.putString("CommunityFilter", null);
-                MyApplication.editor.commit();
+              Prefs.setCommunityFilter(this,null);
             }
         } else if (Position == 1) {
 
 
             if (CommunityFilter == null) {
 
-                int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+                int communityId = Prefs.getCommunityId(this);
                 if (communityId != 0) {
                     ContactFragment contactFragment = (ContactFragment) mViewPagerAdapter.getItem(1);
                     contactFragment.SearchFilterForContact(ContactFragment.contactListResponseModels, newText);
@@ -641,8 +630,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             } else {
-                MyApplication.editor.putString("CommunityFilter", null);
-                MyApplication.editor.commit();
+               Prefs.setCommunityFilter(this,null);
             }
 
 
@@ -651,8 +639,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 SignUpFragment signUpFragment = (SignUpFragment) mViewPagerAdapter.getItem(2);
                 signUpFragment.SearchFilterForSignUp(SignUpFragment.signUpResponseModelList, newText);
             } else {
-                MyApplication.editor.putString("CommunityFilter", null);
-                MyApplication.editor.commit();
+                Prefs.setCommunityFilter(this,null);
             }
 
 
@@ -662,8 +649,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 libraryFragment.SearchFilterForAlbum(LibraryFragment.photoAlbumResponseModelList, newText);
                 libraryFragment.SearchFilterForAttachment(LibraryFragment.attachmentFileResponseModels, newText);
             } else {
-                MyApplication.editor.putString("CommunityFilter", null);
-                MyApplication.editor.commit();
+                Prefs.setCommunityFilter(this,null);
             }
 
 
@@ -672,12 +658,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 EventsFragment eventsFragment = (EventsFragment) mViewPagerAdapter.getItem(4);
                 eventsFragment.SearchFilterForEvent(EventsFragment.eventList, newText);
             } else {
-                MyApplication.editor.putString("CommunityFilter", null);
-                MyApplication.editor.commit();
+                Prefs.setCommunityFilter(this,null);
             }
 
         }
         return true;
+    }
+
+    public long getDifferenceTime() {
+        return differenceTime;
     }
 
 
@@ -719,77 +708,62 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    //Method to logout from app
-    public void logOut() {
-        if (contactListResponseModels != null) {
-            contactListResponseModels.clear();
-        }
-        MyApplication.editor.putString("CommunityName", null);
-        MyApplication.editor.putInt("CommunityId", 0);
-        MyApplication.editor.putString("Attachment", null);
-        MyApplication.editor.putString("Album", null);
-        MyApplication.editor.putString("Detail", null);
-        MyApplication.editor.putString("AuthenticationId", null);
-        MyApplication.editor.putString("AuthenticationPassword", null);
-        MyApplication.editor.putString("CommunityFilter", null);
-        MyApplication.editor.putString("Close", null);
-        MyApplication.editor.putBoolean(MyApplication.ISLOGIN, false);
-        MyApplication.editor.commit();
-
-
-    }
-
+    static Boolean LoadOnce;
     // Get webservice to show all UpToUs member
     public void getApiContactList() {
 
+        Log.i("MainActivity", "Requesting .... contact ");
+        //Check if model is not empty and last update must once  in a while default 45411ms
+//        int contactLastUpdated = Prefs.getContactLastUpdated(this);
+//        long difference = getDifferenceTime();
+        if (contactListResponseModels==null||contactListResponseModels.size() == 0 || !LoadOnce) {
+            showProgressDialog();
+            String mAuthenticationId = Prefs.getAuthenticationId(this);
+            String mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
+            APIServices service =
+                    ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+            Call<List<ContactListResponseModel>> call = service.GetContactList();
 
-        final ProgressDialog progressDialog = new ProgressDialog(MainActivity.this);
-        progressDialog.setMessage("Please wait..");
+            call.enqueue(new Callback<List<ContactListResponseModel>>() {
+                @Override
+                public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
+                    try {
+                        Log.i("MainActivity", "Got Request .... contact ");
 
-        if (contactListResponseModels.size() == 0)
-            progressDialog.show();
-        progressDialog.setCancelable(false);
-        String mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        String mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
-        APIServices service =
-                ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
-        Call<List<ContactListResponseModel>> call = service.GetContactList();
+                        ContactFragment.mViewContactRecyclerView.setVisibility(View.VISIBLE);
+                        hideProgressDialog();
+                        if (response.body() != null) {
 
-        call.enqueue(new Callback<List<ContactListResponseModel>>() {
-            @Override
-            public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
-                try {
-                    ContactFragment.mViewContactRecyclerView.setVisibility(View.VISIBLE);
-                    progressDialog.dismiss();
-                    if (response.body() != null) {
+                            contactListResponseModels = response.body();
+                            Prefs.setContactList(MainActivity.this, contactListResponseModels.toString());
+                            LoadOnce=true;
+                            mContactListAdapter = new ContactListAdapter(MainActivity.this, contactListResponseModels);
+                            ContactFragment.mViewContactRecyclerView.setAdapter(mContactListAdapter);
+                            ContactFragment.mTextViewSearchResult.setVisibility(View.GONE);
+                            Collections.sort(contactListResponseModels, new CustomComparator());
+                            int communityId = Prefs.getCommunityId(MainActivity.this);
+                            if (communityId != 0) {
 
-                        contactListResponseModels = response.body();
-                        mContactListAdapter = new ContactListAdapter(MainActivity.this, contactListResponseModels);
-                        ContactFragment.mViewContactRecyclerView.setAdapter(mContactListAdapter);
-                        ContactFragment.mTextViewSearchResult.setVisibility(View.GONE);
-                        Collections.sort(contactListResponseModels, new CustomComparator());
-                        int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
-                        if (communityId != 0) {
-
-                            FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
+                                FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
+                            }
                         }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
-
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
-            }
+                @Override
+                public void onFailure(Call<List<ContactListResponseModel>> call, Throwable t) {
+                    Toast.makeText(MainActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
 
-            @Override
-            public void onFailure(Call<List<ContactListResponseModel>> call, Throwable t) {
-                Toast.makeText(MainActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                    hideProgressDialog();
+                }
 
-                progressDialog.dismiss();
-            }
-
-        });
+            });
+        }
     }
 
 
@@ -816,7 +790,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
             }
-            int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
+            int Position =Prefs.getPosition(this);
 
             if (Position == 1) {
                 if (MainActivity.contactListResponseModels.size() == 0) {

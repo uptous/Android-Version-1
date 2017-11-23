@@ -1,25 +1,23 @@
 package com.uptous.view.activity;
 
-import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.ItemClickSupport;
 import com.uptous.model.AlbumDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.AlbumDetailAdapter;
 import com.uptous.view.adapter.ViewPagerAdapter;
 
@@ -32,12 +30,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.uptous.controller.utils.Utilities.isLastAppActivity;
+
 /**
  * FileName : AlbumDetailActivity
  * Description :show all photos of album
  * Dependencies : AlbumDetailActivity, AlbumDetailAdapter
  */
-public class AlbumDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class AlbumDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private RecyclerView mRecyclerViewPicture;
 
@@ -63,7 +63,7 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
         if (ConnectionDetector.isConnectingToInternet(AlbumDetailActivity.this)) {
             getApiAlbumDetail();
         } else {
-            Toast.makeText(AlbumDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            showToast(getString(R.string.network_error));
         }
 
     }
@@ -72,9 +72,18 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image_view_back:
-                finish();
+                onBackPressed();
                 break;
         }
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (isLastAppActivity(this))
+            startActivity(new Intent(this, MainActivity.class));
+        finish();
     }
 
     //Method to initialize view
@@ -108,8 +117,8 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
     }
 
     //Method to set on clickListener on views
@@ -120,11 +129,8 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
     // Get webservice to get all photos of album
     private void getApiAlbumDetail() {
 
-        int NewsItemId = MyApplication.mSharedPreferences.getInt("NewsItemID", 0);
-        final ProgressDialog mProgressDialog = new ProgressDialog(AlbumDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        int NewsItemId = Prefs.getNewsItemId(this);
+        showProgressDialog();
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<List<AlbumDetailResponseModel>> call = service.GetAlbum(NewsItemId);
@@ -132,11 +138,11 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
         call.enqueue(new Callback<List<AlbumDetailResponseModel>>() {
             @Override
             public void onResponse(Call<List<AlbumDetailResponseModel>> call, Response<List<AlbumDetailResponseModel>> response) {
-                mProgressDialog.dismiss();
+                hideProgressDialog();
                 try {
 
                     final List<AlbumDetailResponseModel> eventResponseModels = response.body();
-                    String ImageName = eventResponseModels.get(0).getCaption().replace("\n"," ");
+                    String ImageName = eventResponseModels.get(0).getCaption().replace("\n", " ");
 
 
                     long val = eventResponseModels.get(0).getCreateTime();
@@ -151,7 +157,7 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
                     }
                     mAlbumDetailAdapter = new AlbumDetailAdapter(AlbumDetailActivity.this, eventResponseModels);
                     mRecyclerViewPicture.setAdapter(mAlbumDetailAdapter);
-                    mProgressDialog.dismiss();
+                    hideProgressDialog();
                     // Pass results to ViewPagerAdapter Class
                     mViewPagerAdapter = new ViewPagerAdapter(AlbumDetailActivity.this, eventResponseModels);
                     // Binds the Adapter to the ViewPager
@@ -182,7 +188,7 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
 
                             mRecyclerViewPicture.getLayoutManager().scrollToPosition(position);
                             mRecyclerViewPicture.smoothScrollToPosition(position);
-                            mTextViewPictureName.setText(eventResponseModels.get(position).getCaption().replace("\n"," "));
+                            mTextViewPictureName.setText(eventResponseModels.get(position).getCaption().replace("\n", " "));
 
                         }
 
@@ -198,7 +204,7 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
                     });
 
                 } catch (Exception e) {
-                    mProgressDialog.dismiss();
+                    hideProgressDialog();
                     e.printStackTrace();
                 }
 
@@ -206,8 +212,8 @@ public class AlbumDetailActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onFailure(Call<List<AlbumDetailResponseModel>> call, Throwable t) {
-                mProgressDialog.dismiss();
-                Toast.makeText(AlbumDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+               hideProgressDialog();
+               showToast(getString(R.string.error));
             }
 
         });

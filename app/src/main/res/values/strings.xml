@@ -7,7 +7,6 @@
     <string name="AuthenticationId">AuthenticationId</string>
     <string name="AuthenticationPassword">AuthenticationPassword</string>
     <string name="sing_up_not_allow">We\'re sorry but for now, this type of sign-up is not accessible with the app</string>
-
     <string name="feed_all_communities">Feed - All Communities</string>
     <string name="contacts_all_communities">Contacts - All Communities</string>
     <string name="sign_ups_all_communities">Sign-Ups - All Communities</string>
@@ -20,7 +19,20 @@
     <string name="my_profile">My profile</string>
     <string name="message_post">Message Post</string>
     <string name="picture_post">Picture Post</string>
+    <string name="spinner_hint">SELECT ALBUM</string>
+
 
     <string name="fill_all_field">Please fill all field</string>
+    <string name="login_error">Please enter email and password</string>
+    <string name="invalid_cred">Invalid Credentials</string>
+    <string name="text_login">Sign in</string>
+    <string name="text_forgot_psw">Forgot password?</string>
+    <string name="text_signup">Sign up</string>
+    <string name="hint_email">Email...</string>
+    <string name="hint_password">Password...</string>
+    <string name="no_app">No default is associated</string>
+    <string name="invitation_accepted">You have accepted the invitation</string>
+
+    <string name="website_content">website</string>
 
 </resources>

@@ -53,8 +53,6 @@ public class AlbumDetailAdapter extends RecyclerView.Adapter<AlbumDetailAdapter.
         Picasso.with(activity).load(listEntities.get(i).getPhoto()).placeholder(R.drawable.loader)
                 .into(versionViewHolder.imageView);
 
-//        Glide.with(activity).load(listEntities.get(i).getPhoto()).placeholder(R.drawable.loader).
-//                into(versionViewHolder.imageView);
 
 
     }

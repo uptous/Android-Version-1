@@ -10,10 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.utils.GifImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.DriverDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
 
@@ -146,17 +146,16 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
 
 
                     int ItemID = listEntities.get(position).getId();
-                    MyApplication.editor.putInt("ItemId", ItemID);
+                    Prefs.setItemId(activity,ItemID);
                     if (position == 0) {
-                        MyApplication.editor.putString("FromName", listEntities.get(0).getName());
-                        MyApplication.editor.putString("ToName", listEntities.get(1).getName());
+                        Prefs.setFromName(activity,listEntities.get(0).getName());
+                        Prefs.setToName(activity,listEntities.get(1).getName());
                     } else {
-                        MyApplication.editor.putString("FromName", listEntities.get(1).getName());
-                        MyApplication.editor.putString("ToName", listEntities.get(0).getName());
+                        Prefs.setFromName(activity,listEntities.get(1).getName());
+                        Prefs.setToName(activity,listEntities.get(0).getName());
                     }
 
-                    MyApplication.editor.putString("Date", dateText);
-                    MyApplication.editor.commit();
+                    Prefs.setDate(activity,dateText);
                     Intent intent = new Intent(activity, DriverDetailActivity.class);
                     activity.startActivity(intent);
                 }
@@ -199,19 +198,19 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
 
                         }
                         int ItemID = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Date", dateText);
 
-                        MyApplication.editor.putString("Type", "Driver");
-                        MyApplication.editor.putInt("ItemId", ItemID);
 
+                        Prefs.setSignUpType(activity,"Driver");
+                        Prefs.setItemId(activity,ItemID);
+
+                        Prefs.setDate(activity,dateText);
                         if (position == 0) {
-                            MyApplication.editor.putString("FromName", listEntities.get(0).getName());
-                            MyApplication.editor.putString("ToName", listEntities.get(1).getName());
+                            Prefs.setFromName(activity,listEntities.get(0).getName());
+                            Prefs.setToName(activity,listEntities.get(1).getName());
                         } else {
-                            MyApplication.editor.putString("FromName", listEntities.get(1).getName());
-                            MyApplication.editor.putString("ToName", listEntities.get(0).getName());
+                            Prefs.setFromName(activity,listEntities.get(1).getName());
+                            Prefs.setToName(activity,listEntities.get(0).getName());
                         }
-                        MyApplication.editor.commit();
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }
@@ -258,18 +257,17 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
 
                         }
                         int ItemID = listEntities.get(position).getId();
-                        MyApplication.editor.putInt("ItemId", ItemID);
-                        MyApplication.editor.putString("Type", "Driver");
-                        MyApplication.editor.putString("Date", dateText);
+                        Prefs.setItemId(activity,ItemID);
+                        Prefs.setSignUpType(activity,"Driver");
+                       Prefs.setDate(activity,dateText);
 
                         if (position == 0) {
-                            MyApplication.editor.putString("FromName", listEntities.get(0).getName());
-                            MyApplication.editor.putString("ToName", listEntities.get(1).getName());
+                            Prefs.setFromName(activity,listEntities.get(0).getName());
+                            Prefs.setToName(activity,listEntities.get(1).getName());
                         } else {
-                            MyApplication.editor.putString("FromName", listEntities.get(1).getName());
-                            MyApplication.editor.putString("ToName", listEntities.get(0).getName());
+                            Prefs.setFromName(activity,listEntities.get(1).getName());
+                            Prefs.setToName(activity,listEntities.get(0).getName());
                         }
-                        MyApplication.editor.commit();
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }

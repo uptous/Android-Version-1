@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
@@ -22,6 +21,7 @@ import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.ShiftsDetailAdapter;
 
 import java.util.List;
@@ -35,7 +35,7 @@ import retrofit2.Response;
  * Description :show all Shifts sign_up comment and also user can comment it.
  * Dependencies : ShiftDetailActivity
  */
-public class ShiftDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class ShiftDetailActivity extends BaseActivity implements View.OnClickListener {
 
 
     private ImageView mImageViewBack;
@@ -130,13 +130,13 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
 
-        String openSpot = MyApplication.mSharedPreferences.getString("Total Spot", null);
-        String totalSpot = MyApplication.mSharedPreferences.getString("Number of volunteer", null);
-        String name = MyApplication.mSharedPreferences.getString("Name", null);
-        String date = MyApplication.mSharedPreferences.getString("Date", null);
+        String openSpot = Prefs.getTotalSpot(this);
+        String totalSpot = Prefs.getNumberofvolunteer(this);
+        String name = Prefs.getName(this);
+        String date =Prefs.getDate(this);
 
         mTextViewEventName.setText(name);
 
@@ -161,12 +161,9 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
     // Get webservice to get Shifts sign_up comments
     private void getApiShiftDetail() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(ShiftDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        mItemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+       showProgressDialog();
+        int OpId = Prefs.getOpportunityId(this);
+        mItemID = Prefs.getItemId(this);
 
 
         APIServices service =
@@ -178,7 +175,7 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
                          public void onResponse(Call<List<SignUpDetailResponseModel>> call,
                                                 Response<List<SignUpDetailResponseModel>> response) {
                              try {
-                                 mProgressDialog.dismiss();
+                               hideProgressDialog();
                                  if (response.isSuccessful()) {
 
                                      List<SignUpDetailResponseModel> eventResponseModels = response.body();
@@ -215,7 +212,7 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
 
                          @Override
                          public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                             mProgressDialog.dismiss();
+                            hideProgressDialog();
                              Toast.makeText(ShiftDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
                              Log.d("onFailure", t.toString());
                          }
@@ -227,14 +224,11 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
 
     // Post webservice to post Shifts sign_up comments
     private void postApiComment() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(ShiftDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+       showProgressDialog();
 
 
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        int itemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+        int OpId = Prefs.getOpportunityId(this);
+        int itemID = Prefs.getItemId(this);
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
@@ -243,7 +237,7 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-                mProgressDialog.dismiss();
+                hideProgressDialog();
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
@@ -264,7 +258,7 @@ public class ShiftDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
                 Toast.makeText(ShiftDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                mProgressDialog.dismiss();
+               hideProgressDialog();
 
 
             }

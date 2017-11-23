@@ -1,8 +1,10 @@
 package com.uptous.controller.apiservices;
 
 
+import com.google.gson.JsonElement;
 import com.uptous.model.AlbumDetailResponseModel;
 import com.uptous.model.CommnunitiesResponseModel;
+import com.uptous.model.CommunityTitleModel;
 import com.uptous.model.ContactListResponseModel;
 import com.uptous.model.EventResponseModel;
 import com.uptous.model.FeedResponseModel;
@@ -78,6 +80,10 @@ public interface APIServices {
     @GET("api/profile")
     Call<ProfileResponseModel> ProfileDetail();
 
+    @GET("api/photoalbums/community/{communityId}")
+    Call<List<CommunityTitleModel>> GetTitleInCommunity(@Path("communityId") int id);
+
+
     @FormUrlEncoded
     @POST("api/profile/update")
     Call<ProfileResponseModel> UpdateProfile(@Field("firstname") String firstname, @Field("lastname") String lastname,
@@ -90,7 +96,7 @@ public interface APIServices {
 
     @FormUrlEncoded
     @POST("api/invites/{invitationId}/accept")
-    Call<PostCommentResponseModel> PostInvite(@Path("invitationId") int invitationId,@Field("contents") String contents);
+    Call<JsonElement> PostInvite(@Path("invitationId") int invitationId, @Field("contents") String contents);
 
 
     @FormUrlEncoded
@@ -102,12 +108,19 @@ public interface APIServices {
     @POST("api/posts/announcement/{newsItemId}")
     Call<PostCommentResponseModel> PostReplyAll(@Path("newsItemId") int newsItemId, @Field("contents") String contents);
 
+    //https://www.uptous.com/api/photoalbums/community/351/title/myNewAlbum
     @FormUrlEncoded
     @POST("api/photoalbums/community/{communityId}/title/{title}")
-    Call<PostCommentResponseModel> PostPicture(@Path("title") String title, @Path("communityId") int communityId,
+    Call<PostCommentResponseModel> PostNewPicture(@Path("title") String title, @Path("communityId") int communityId,
                                                @Field("caption") String caption, @Field("filename") String filename,
                                                @Field("photo") String photo);
 
+    //sample url https://www.uptous.com/api/photoalbums/community/351/album/26605
+    @FormUrlEncoded
+    @POST("api/photoalbums/community/{communityId}/album/{album}")
+    Call<PostCommentResponseModel> PostPictureinAlbum(@Path("album") int album, @Path("communityId") int communityId,
+                                               @Field("caption") String caption, @Field("filename") String filename,
+                                               @Field("photo") String photo);
 
     @FormUrlEncoded
     @POST("api/signupsheets/opportunity/{opportunityId}/item/{item_id}/Add")

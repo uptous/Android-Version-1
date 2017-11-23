@@ -18,12 +18,13 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.FeedResponseModel;
+import com.uptous.sharedpreference.Prefs;
+import com.uptous.view.activity.BaseActivity;
 import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.activity.MessagePostActivity;
@@ -112,8 +113,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     FAB_Status = false;
 
                 }
-                MyApplication.editor.putString("FeedDetail", "feed");
-                MyApplication.editor.commit();
+
+                Prefs.setFeedDetail(getActivity(), "feed");
 
                 Intent intent2 = new Intent(getActivity(), MessagePostActivity.class);
                 startActivity(intent2);
@@ -130,8 +131,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                     hideFAB();
                     FAB_Status = false;
                 }
-                MyApplication.editor.putString("FeedDetail", "feed");
-                MyApplication.editor.commit();
+
+                Prefs.setFeedDetail(getActivity(), "feed");
                 Intent intent1 = new Intent(getActivity(), PicturePostActivity.class);
                 startActivity(intent1);
 
@@ -146,27 +147,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onResume() {
         super.onResume();
 
-        String messagePost = MyApplication.mSharedPreferences.getString("MessagePost", null);
-        String picturePost = MyApplication.mSharedPreferences.getString("PicturePost", null);
-        String Feed = MyApplication.mSharedPreferences.getString("FeedDetail", null);
+        String messagePost = Prefs.getMessagePost(getActivity());
+        String picturePost = Prefs.getPicturePost(getActivity());
+        String Feed = Prefs.getFeedDetail(getActivity());
 
         if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-            if (messagePost != null) {
+            if (messagePost != null||picturePost != null||Feed == null) {
                 getApiFeed();
             }
-            if (picturePost != null) {
-                getApiFeed();
-            }
-            if (Feed == null) {
-                if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-                    getApiFeed();
-                } else {
+            else {
                     Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
                 }
             }
-
-
-        } else {
+      else {
             Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
         }
 
@@ -174,9 +167,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     //Method to clear SharedPreference
     private void clearData() {
-        MyApplication.editor.putString("MessagePost", null);
-        MyApplication.editor.putString("PicturePost", null);
-        MyApplication.editor.commit();
+        Prefs.setMessagePost(getActivity(), null);
+        Prefs.setPicturePost(getActivity(), null);
     }
 
     //Method to initialize view
@@ -209,8 +201,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     // Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(getActivity());
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
     }
 
     //Method to setClickListener On views
@@ -266,10 +258,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     // Get webservice to show all news feed like : message, picture ,file etc.
     private void getApiFeed() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(getActivity());
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        ((MainActivity)getActivity()).showProgressDialog();
 
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -278,7 +267,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         call.enqueue(new Callback<List<FeedResponseModel>>() {
             @Override
             public void onResponse(Call<List<FeedResponseModel>> call, Response<List<FeedResponseModel>> response) {
-                mProgressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 try {
 
                     if (response.body() != null) {
@@ -287,24 +276,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         mHomeListAdapter = new HomeListAdapter(getActivity(), feedResponseModelList);
                         mViewHomeRecyclerView.setAdapter(mHomeListAdapter);
 
-                        int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+                        int communityId = Prefs.getCommunityId(getActivity());
                         if (communityId != 0) {
                             FilterCommunityForFeed(feedResponseModelList, communityId);
                         }
 
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
+
+                        BaseActivity baseActivity = (BaseActivity)getActivity();
+                        baseActivity.showLogOutDialog();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -314,7 +294,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onFailure(Call<List<FeedResponseModel>> call, Throwable t) {
-                mProgressDialog.dismiss();
+                 ((MainActivity)getActivity()).hideProgressDialog();
                 Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
             }
 
@@ -378,7 +358,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             }
 
-            int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
+            int Position = Prefs.getPosition(getActivity());
 
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 0) {
@@ -397,15 +377,5 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getActivity().getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
 
 }

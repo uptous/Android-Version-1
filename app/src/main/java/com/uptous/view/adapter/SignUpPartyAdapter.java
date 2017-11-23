@@ -11,10 +11,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.utils.GifImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.PartyDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
 
@@ -144,19 +144,17 @@ public class SignUpPartyAdapter extends RecyclerView.Adapter<SignUpPartyAdapter.
                     VolunteerCount = listEntities.get(position).getVolunteerCount();
                     Total = NumberOfVolunteer - VolunteerCount;
                     if (Total <= 0) {
-                        MyApplication.editor.putString("Number of volunteer", "null");
+                        Prefs.setTotalSpot(activity,"0");
                     } else {
-                        MyApplication.editor.putString("Total Spot", "" + Total);
-                        MyApplication.editor.putString("Number of volunteer", "" + NumberOfVolunteer);
+                        Prefs.setTotalSpot(activity,""+Total);
+                        Prefs.setNumberofvolunteer(activity,""+NumberOfVolunteer);
                     }
 
 
-                    MyApplication.editor.putInt("ItemId", ItemID);
-                    MyApplication.editor.putString("Type", null);
-                    MyApplication.editor.putString("Name",  listEntities.get(position).getName());
-                    MyApplication.editor.putString("Date", dateText);
-//                    MyApplication.editor.putString("EndDate", Time);
-                    MyApplication.editor.commit();
+                    Prefs.setItemId(activity,ItemID);
+                    Prefs.setSignUpType(activity,null);
+                    Prefs.setName(activity,listEntities.get(position).getName());
+                    Prefs.setDate(activity,dateText);
                     Intent intent = new Intent(activity, PartyDetailActivity.class);
                     activity.startActivity(intent);
                 }
@@ -212,13 +210,11 @@ public class SignUpPartyAdapter extends RecyclerView.Adapter<SignUpPartyAdapter.
                         }
 
                         int ItemID = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Number of volunteer", null);
-                        MyApplication.editor.putInt("ItemId", ItemID);
-                        MyApplication.editor.putString("Name",  listEntities.get(position).getName());
-                        MyApplication.editor.putString("Date", dateText);
-                        MyApplication.editor.putString("Type", "Party");
-//                        MyApplication.editor.putString("EndDate", Time);
-                        MyApplication.editor.commit();
+                        Prefs.setNumberofvolunteer(activity,null);
+                        Prefs.setSignUpType(activity,"Party");
+                        Prefs.setItemId(activity,ItemID);
+                        Prefs.setName(activity,listEntities.get(position).getName());
+                        Prefs.setDate(activity,dateText);
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }
@@ -289,18 +285,16 @@ public class SignUpPartyAdapter extends RecyclerView.Adapter<SignUpPartyAdapter.
                         VolunteerCount = listEntities.get(position).getVolunteerCount();
                         Total = NumberOfVolunteer - VolunteerCount;
                         if (Total <= 0) {
-                            MyApplication.editor.putString("Number of volunteer", "null");
+                            Prefs.setNumberofvolunteer(activity,"0");
                         } else {
-                            MyApplication.editor.putString("Total Spot", "" + Total);
-                            MyApplication.editor.putString("Number of volunteer", "" + NumberOfVolunteer);
+                            Prefs.setNumberofvolunteer(activity,""+Total);
+                            Prefs.setNumberofvolunteer(activity,""+NumberOfVolunteer);
                         }
-                        MyApplication.editor.putString("Number of volunteer", null);
-                        MyApplication.editor.putInt("ItemId", ItemID);
-                        MyApplication.editor.putString("Name",  listEntities.get(position).getName());
-                        MyApplication.editor.putString("Date", dateText);
-                        MyApplication.editor.putString("Type", "Party");
-//                        MyApplication.editor.putString("EndDate", Time);
-                        MyApplication.editor.commit();
+                       Prefs.setNumberofvolunteer(activity,null);
+                        Prefs.setSignUpType(activity,"Party");
+                        Prefs.setItemId(activity,ItemID);
+                        Prefs.setName(activity,listEntities.get(position).getName());
+                        Prefs.setDate(activity,dateText);
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }

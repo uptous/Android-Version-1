@@ -1,14 +1,11 @@
 package com.uptous.view.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,18 +13,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.CustomizeDialog;
-import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.SignUpShiftAdapter;
 
 import java.text.SimpleDateFormat;
@@ -39,12 +32,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.uptous.controller.utils.Utilities.isLastAppActivity;
+
 /**
  * FileName : SignUpShiftsActivity
  * Description :show all Shifts sign_up open spots, volunteer, full.
  * Dependencies : SignUpShiftsActivity
  */
-public class SignUpShiftsActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignUpShiftsActivity extends BaseActivity implements View.OnClickListener {
 
     private RecyclerView mRecyclerViewOpenSpot;
 
@@ -89,7 +84,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
         if (ConnectionDetector.isConnectingToInternet(this)) {
             getApiSignUpDetail();
         } else {
-            Toast.makeText(SignUpShiftsActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            showToast(getString(R.string.network_error));
         }
     }
 
@@ -113,7 +108,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
         mLinearLayoutBackgroundSecondContact = (LinearLayout) findViewById(R.id.layout_contact_image_second);
 
         mTextViewOrgnizer = (TextView) findViewById(R.id.text_view_title_organizers);
-        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_toolbar);
+        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_title);
         mTextViewEventDateSignUp = (TextView) findViewById(R.id.text_view_event_date_sign_up);
         mViewEventDescriptionTextView = (TextView) findViewById(R.id.text_view_event_description);
         mViewOrganizerOneTextView = (TextView) findViewById(R.id.text_view_organizer_one);
@@ -138,10 +133,6 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
 
         clickListenerOnViews();
 
-//        if (ConnectionDetector.isConnectingToInternet(this)) {
-//            getApiSignUpDetail();
-//        } else {
-//            Toast.makeText(SignUpShiftsActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
 //        }
 
 
@@ -149,19 +140,16 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
 
     // Method to Get data from SharedPreference
     private void getData() {
-        AuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        AuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        AuthenticationId = Prefs.getAuthenticationId(this);
+        AuthenticationPassword =Prefs.getAuthenticationPassword(this);
 
     }
 
     // Get webservice to show Ongoing sign_up open spots, volunteer, full
     private void getApiSignUpDetail() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(SignUpShiftsActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
+        showProgressDialog();
+        int OpId = Prefs.getOpportunityId(this);
 
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
@@ -172,7 +160,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
             @Override
             public void onResponse(Call<List<SignUpDetailResponseModel>> call, Response<List<SignUpDetailResponseModel>> response) {
                 try {
-                    mProgressDialog.dismiss();
+                 hideProgressDialog();
 
                     if (response.body()!=null) {
                         final List<SignUpDetailResponseModel> eventResponseModels = response.body();
@@ -459,18 +447,7 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
 
 
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(SignUpShiftsActivity.this);
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                               logout();
-                            }
-                        });
+                       showLogOutDialog();
                     }
 
 
@@ -483,9 +460,9 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
 
             @Override
             public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                mProgressDialog.dismiss();
-                Toast.makeText(SignUpShiftsActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+              hideProgressDialog();
                 Log.d("onFailure", t.toString());
+                showToast(getString(R.string.error));
             }
 
         });
@@ -496,15 +473,12 @@ public class SignUpShiftsActivity extends AppCompatActivity implements View.OnCl
         mImageViewBack.setOnClickListener(this);
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(isLastAppActivity(this))
+            startActivity(new Intent(this,MainActivity.class));
+        finish();
+    }
 }

@@ -11,10 +11,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.utils.GifImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.ShiftDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
 
@@ -146,16 +146,14 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
                     VolunteerCount = listEntities.get(position).getVolunteerCount();
                     Total = NumberOfVolunteer - VolunteerCount;
                     if (Total <= 0) {
-                        MyApplication.editor.putString("Number of volunteer", "null");
+                        Prefs.setNumberofvolunteer(activity,"null");
                     } else {
-                        MyApplication.editor.putString("Total Spot", "" + Total);
-                        MyApplication.editor.putString("Number of volunteer", "" + NumberOfVolunteer);
+                        Prefs.setTotalSpot(activity,""+Total);
+                        Prefs.setNumberofvolunteer(activity,""+NumberOfVolunteer);
                     }
-                    MyApplication.editor.putInt("ItemId", ItemID);
-                    MyApplication.editor.putString("Name",  listEntities.get(position).getName());
-                    MyApplication.editor.putString("Date", dateText);
-//                    MyApplication.editor.putString("EndDate", Time);
-                    MyApplication.editor.commit();
+                    Prefs.setItemId(activity,ItemID);
+                    Prefs.setName(activity,listEntities.get(position).getName());
+                    Prefs.setDate(activity,dateText);
                     Intent intent = new Intent(activity, ShiftDetailActivity.class);
                     activity.startActivity(intent);
                 }
@@ -208,12 +206,10 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
 
                         }
                         int ItemID = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Type", null);
-                        MyApplication.editor.putInt("ItemId", ItemID);
-                        MyApplication.editor.putString("Name",  listEntities.get(position).getName());
-                        MyApplication.editor.putString("Date", dateText);
-                        MyApplication.editor.putString("Type", null);
-                        MyApplication.editor.commit();
+                        Prefs.setItemId(activity,ItemID);
+                        Prefs.setName(activity,listEntities.get(position).getName());
+                        Prefs.setDate(activity,dateText);
+                        Prefs.setSignUpType(activity,null);
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }
@@ -262,12 +258,10 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
 
                         }
                         int ItemID = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Type", null);
-                        MyApplication.editor.putInt("ItemId", ItemID);
-                        MyApplication.editor.putString("Name", listEntities.get(position).getName());
-                        MyApplication.editor.putString("Date", dateText);
-//                        MyApplication.editor.putString("EndDate", Time);
-                        MyApplication.editor.commit();
+                        Prefs.setItemId(activity,ItemID);
+                        Prefs.setName(activity,listEntities.get(position).getName());
+                        Prefs.setDate(activity,dateText);
+                        Prefs.setSignUpType(activity,null);
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }

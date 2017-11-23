@@ -7,13 +7,13 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
@@ -21,6 +21,8 @@ import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.CommnunitiesResponseModel;
 import com.uptous.model.EventResponseModel;
+import com.uptous.sharedpreference.Prefs;
+import com.uptous.view.activity.BaseActivity;
 import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.adapter.EventListAdapter;
@@ -68,7 +70,7 @@ public class EventsFragment extends Fragment {
 
             getApiCommunityList();
 
-                getApiEventList();
+            getApiEventList();
 
 
         } else {
@@ -80,8 +82,8 @@ public class EventsFragment extends Fragment {
 
     // Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(getActivity());
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
     }
 
     //Method to initialize view
@@ -98,10 +100,7 @@ public class EventsFragment extends Fragment {
 
     // Get webservice to show all EventList
     private void getApiEventList() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(getActivity());
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        ((MainActivity)getActivity()).showProgressDialog();
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<List<EventResponseModel>> call = service.GetEvent();
@@ -109,32 +108,35 @@ public class EventsFragment extends Fragment {
         call.enqueue(new Callback<List<EventResponseModel>>() {
             @Override
             public void onResponse(Call<List<EventResponseModel>> call, Response<List<EventResponseModel>> response) {
-                mProgressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 try {
 
 
                     if (response.body() != null) {
                         mTextViewSearchResult.setVisibility(View.GONE);
                         eventList = response.body();
+                        Log.i("EventsFragment","val "+eventList.toString());
                         mEventListAdapter = new EventListAdapter(getActivity(), eventList, mCommunityList);
                         mViewEventsRecyclerView.setAdapter(mEventListAdapter);
-                        int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+                        int communityId = Prefs.getCommunityId(getActivity());
                         if (communityId != 0) {
                             FilterCommunityForSignUp(eventList, communityId);
                         }
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
+//                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
+//                        customizeDialog.setCancelable(false);
+//                        customizeDialog.setContentView(R.layout.dialog_password_change);
+//                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
+//                        customizeDialog.show();
+//                        textViewOk.setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View view) {
+//                                customizeDialog.dismiss();
+//                                logout();
+//                            }
+//                        });
+                        BaseActivity baseActivity = new BaseActivity();
+                        baseActivity.logOut();
 
                     }
 
@@ -146,7 +148,7 @@ public class EventsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<EventResponseModel>> call, Throwable t) {
-                mProgressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
             }
 
@@ -207,7 +209,7 @@ public class EventsFragment extends Fragment {
                 mEventListAdapter.notifyDataSetChanged();
             }
 
-            int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
+            int Position = Prefs.getPosition(getActivity());
 
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 4) {
@@ -226,11 +228,8 @@ public class EventsFragment extends Fragment {
 
     // Get webservice to show communities
     private void getApiCommunityList() {
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
 
+        ((MainActivity)getActivity()).showProgressDialog();
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<List<CommnunitiesResponseModel>> call = service.GetCommunity();
@@ -239,23 +238,14 @@ public class EventsFragment extends Fragment {
             @Override
             public void onResponse(Call<List<CommnunitiesResponseModel>> call, Response<List<CommnunitiesResponseModel>> response) {
                 try {
-                    progressDialog.dismiss();
+                    ((MainActivity)getActivity()).hideProgressDialog();
 
                     if (response.body() != null) {
                         mCommunityList = response.body();
+                        Log.i("EventsFragment","val "+mCommunityList.toString());
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
+                        BaseActivity baseActivity = (BaseActivity)getActivity();
+                        baseActivity.showLogOutDialog();
 
                     }
 
@@ -268,7 +258,7 @@ public class EventsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<CommnunitiesResponseModel>> call, Throwable t) {
-                progressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
 
             }
@@ -276,16 +266,6 @@ public class EventsFragment extends Fragment {
         });
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getActivity().getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
 }
 
 

@@ -1,9 +1,7 @@
 package com.uptous.view.activity;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
@@ -23,6 +20,7 @@ import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.RSPVDetailAdapter;
 
 import java.util.List;
@@ -36,7 +34,7 @@ import retrofit2.Response;
  * Description :show all Vote sign_up comment and also user can comment it.
  * Dependencies : VoteDetailActivity
  */
-public class VoteDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class VoteDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView mImageViewBack;
     private TextView mTextViewTitle, mViewDateTimeTextView, mTextViewSignUpSend;
@@ -125,11 +123,11 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
 
     // Method to Get data from SharedPreference
     private void getData() {
-        String mTitle = MyApplication.mSharedPreferences.getString("Name", null);
-        String mEndTime = MyApplication.mSharedPreferences.getString("EndTime", null);
-        String mDate = MyApplication.mSharedPreferences.getString("Date", null);
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        String mTitle = Prefs.getName(this);
+        String mEndTime = "";
+        String mDate = Prefs.getDate(this);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
 
         mTextViewTitle.setText("Join the " + mTitle);
 
@@ -149,12 +147,9 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
     // Get webservice to get Vote sign_up comments
     private void getApiVoteDetail() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(VoteDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        mItemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+       showProgressDialog();
+        int OpId = Prefs.getOpportunityId(this);
+        mItemID = Prefs.getItemId(this);
 
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
@@ -166,7 +161,7 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
                          public void onResponse(Call<List<SignUpDetailResponseModel>> call,
                                                 Response<List<SignUpDetailResponseModel>> response) {
                              try {
-                                 mProgressDialog.dismiss();
+                                hideProgressDialog();
                                  if (response.body() != null) {
 
                                      List<SignUpDetailResponseModel> eventResponseModels = response.body();
@@ -201,7 +196,7 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
 
                          @Override
                          public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                             mProgressDialog.dismiss();
+                            hideProgressDialog();
                              Toast.makeText(VoteDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
                              Log.d("onFailure", t.toString());
                          }
@@ -213,14 +208,11 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
 
     // Post webservice to Post Vote sign_up comments
     private void postApiComment() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(VoteDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+       showProgressDialog();
 
 
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        int itemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+        int OpId = Prefs.getOpportunityId(this);
+        int itemID = Prefs.getItemId(this);
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
@@ -229,7 +221,7 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-                mProgressDialog.dismiss();
+                hideProgressDialog();
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
@@ -250,8 +242,7 @@ public class VoteDetailActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
                 Toast.makeText(VoteDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                mProgressDialog.dismiss();
-
+               hideProgressDialog();
 
             }
         });

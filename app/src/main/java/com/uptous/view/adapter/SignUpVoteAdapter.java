@@ -10,10 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.utils.GifImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.PartyDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
 
@@ -94,12 +94,11 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                 public void onClick(View view) {
                     int position = (int) view.getTag();
                     int ItemId = listEntities.get(position).getId();
-                    MyApplication.editor.putString("Type", null);
-                    MyApplication.editor.putInt("ItemId", ItemId);
-                    MyApplication.editor.putString("Date", "");
-                    MyApplication.editor.putString("Name", listEntities.get(position).getName());
 
-                    MyApplication.editor.commit();
+                    Prefs.setItemId(activity,ItemId);
+                    Prefs.setName(activity, listEntities.get(position).getName());
+                    Prefs.setDate(activity,"");
+                    Prefs.setSignUpType(activity,null);
                     Intent intent = new Intent(activity, PartyDetailActivity.class);
                     activity.startActivity(intent);
                 }
@@ -114,12 +113,12 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                     public void onClick(View view) {
                         int position = (int) view.getTag();
                         int ItemId = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Type", "Party");
-                        MyApplication.editor.putString("Name", listEntities.get(position).getName());
-                        MyApplication.editor.putString("ToName","");
-                        MyApplication.editor.putString("Date", "");
-                        MyApplication.editor.putInt("ItemId", ItemId);
-                        MyApplication.editor.commit();
+
+                        Prefs.setItemId(activity,ItemId);
+                        Prefs.setName(activity, listEntities.get(position).getName());
+                        Prefs.setDate(activity,"");
+                        Prefs.setSignUpType(activity,"Party");
+                        Prefs.setToName(activity,"");
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }
@@ -138,11 +137,11 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                     public void onClick(View view) {
                         int position = (int) view.getTag();
                         int ItemId = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Type", "Party");
-                        MyApplication.editor.putInt("ItemId", ItemId);
-                        MyApplication.editor.putString("Name", listEntities.get(position).getName());
-                        MyApplication.editor.putString("Date", "");
-                        MyApplication.editor.commit();
+                        Prefs.setItemId(activity,ItemId);
+                        Prefs.setName(activity, listEntities.get(position).getName());
+                        Prefs.setDate(activity,"");
+                        Prefs.setSignUpType(activity,"Party");
+                        Prefs.setToName(activity,"");
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }

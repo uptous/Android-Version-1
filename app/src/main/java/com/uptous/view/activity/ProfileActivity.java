@@ -1,7 +1,5 @@
 package com.uptous.view.activity;
 
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,7 +7,6 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -22,16 +19,15 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.theartofdev.edmodo.cropper.CropImage;
 import com.theartofdev.edmodo.cropper.CropImageView;
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.CustomizeDialog;
-import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.controller.utils.Validation;
 import com.uptous.model.ProfileResponseModel;
+import com.uptous.sharedpreference.Prefs;
 
 import java.io.ByteArrayOutputStream;
 
@@ -44,7 +40,7 @@ import retrofit2.Response;
  * Description :Show user profile detail,also user signout from uptous
  * Dependencies :ProfileActivity
  */
-public class ProfileActivity extends AppCompatActivity implements View.OnClickListener {
+public class ProfileActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView mImageViewBack, mViewEditImageView;
 
@@ -100,6 +96,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
         }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -114,7 +111,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                     BitmapFactory.Options options = null;
                     options = new BitmapFactory.Options();
                     options.inSampleSize = 1;
-                  Bitmap  bitmap = BitmapFactory.decodeFile(selectedImageUri.getPath(), options);
+                    Bitmap bitmap = BitmapFactory.decodeFile(selectedImageUri.getPath(), options);
 
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
 
@@ -123,28 +120,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                     mImagePath = Base64.encodeToString(byte_arr, 0);
 
-                    byte[]  imageBytes = Base64.decode(mImagePath, Base64.DEFAULT);
+                    byte[] imageBytes = Base64.decode(mImagePath, Base64.DEFAULT);
                     Bitmap decodedImage = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
                     mViewProfileRoundedImageView.setImageBitmap(decodedImage);
 
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
-
             }
         }
     }
 
-    public void logOut() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
+
 
 
     //method to initialize view
@@ -193,8 +180,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
     }
 
     //Method to set on clickListener on views
@@ -208,13 +195,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     // Get webservice to get profile detail
     private void getApiProfile() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(ProfileActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+
+        showProgressDialog();
 
 
-        APIServices service =/* = retrofit.create(APIServices.class,"","");*/
+        APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
         Call<ProfileResponseModel> call = service.ProfileDetail();
@@ -222,7 +207,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onResponse(Call<ProfileResponseModel> call, Response<ProfileResponseModel> response) {
 
-                mProgressDialog.dismiss();
+                hideProgressDialog();
                 if (response.body() != null) {
 
                     if (response.isSuccessful()) {
@@ -236,13 +221,11 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                             e.printStackTrace();
                         }
 
-                        String Url=response.body().getPhoto();
+                        String Url = response.body().getPhoto();
 
 
                         Glide.with(ProfileActivity.this).load(Url)
                                 .into(mViewProfileRoundedImageView);
-
-//                        Picasso.with(ProfileActivity.this).load("https://d12h6ivzrhy8zy.cloudfront.net/873fc4d7-3f7c-4d30-bc1c-142dd8ffdc81dXNlcklkPTI=").into(mViewProfileRoundedImageView);
 
 
                     }
@@ -257,8 +240,8 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onFailure(Call<ProfileResponseModel> call, Throwable t) {
 
-                mProgressDialog.dismiss();
-                Toast.makeText(ProfileActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                hideProgressDialog();
+                showToast(t.getMessage());
 
 
             }
@@ -278,10 +261,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
     // Post webservice to update profile
     private void postApiUpdateProfile() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(ProfileActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        showProgressDialog();
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -291,7 +271,7 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onResponse(Call<ProfileResponseModel> call, Response<ProfileResponseModel> response) {
 
-                mProgressDialog.dismiss();
+                hideProgressDialog();
                 if (response.body() != null) {
 
                     if (response.isSuccessful()) {
@@ -300,15 +280,16 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
 
                     }
                 } else {
-                    Toast.makeText(ProfileActivity.this, response.raw().code() + " " + response.raw().message(), Toast.LENGTH_SHORT).show();
+
+                    showToast(response.raw().code() + " " + response.raw().message());
                 }
             }
 
             @Override
             public void onFailure(Call<ProfileResponseModel> call, Throwable t) {
 
-                mProgressDialog.dismiss();
-                Toast.makeText(ProfileActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                hideProgressDialog();
+                showToast(getString(R.string.error));
 
 
             }
@@ -321,18 +302,18 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 || !Validation.isFieldEmpty(mTextEmailEditText)
                 || !Validation.isFieldEmpty(mTextPhoneEditText)) {
             if (mTextFirstNameEditText.getText().toString().trim().length() <= 0) {
-                Toast.makeText(this, "Please Enter FirstName", Toast.LENGTH_SHORT).show();
+                showToast("Please Enter FirstName");
                 mTextFirstNameEditText.requestFocus();
             } else if (mTextLastNameEditText.getText().toString().trim().length() <= 0) {
-                Toast.makeText(this, "Please Enter LastName", Toast.LENGTH_SHORT).show();
+                showToast("Please Enter LastName");
                 mTextLastNameEditText.requestFocus();
             } else if (mTextEmailEditText.getText().toString().trim().length() <= 0) {
-                Toast.makeText(this, "Please Enter Email", Toast.LENGTH_SHORT).show();
+                showToast("Please Enter Email");
                 mTextEmailEditText.requestFocus();
             } else if (!Validation.isEmailValid(mTextEmailEditText.getText().toString())) {
-                mTextEmailEditText.setError("Invalid Email");
+                showToast("Invalid Email");
             } else if (mTextPhoneEditText.getText().toString().trim().length() <= 0) {
-                Toast.makeText(this, "Please Enter Phone Number", Toast.LENGTH_SHORT).show();
+                showToast("Please Enter Phone Number");
                 mTextPhoneEditText.requestFocus();
             } else {
                 mFirstName = mTextFirstNameEditText.getText().toString();
@@ -343,12 +324,12 @@ public class ProfileActivity extends AppCompatActivity implements View.OnClickLi
                 if (ConnectionDetector.isConnectingToInternet(this)) {
                     postApiUpdateProfile();
                 } else {
-                    Toast.makeText(this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                    showToast(getString(R.string.network_error));
                 }
             }
         } else {
             mTextFirstNameEditText.requestFocus();
-            Toast.makeText(this, "Enter All Field", Toast.LENGTH_SHORT).show();
+            showToast("Enter All Field");
         }
     }
 

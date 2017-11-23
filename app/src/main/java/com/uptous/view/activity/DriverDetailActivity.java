@@ -14,17 +14,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
-import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.DriverDetailAdapter;
 
 import java.util.List;
@@ -40,7 +37,7 @@ import retrofit2.Response;
  */
 
 
-public class DriverDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class DriverDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView mImageViewBack;
 
@@ -83,7 +80,7 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
                 if (ConnectionDetector.isConnectingToInternet(this)) {
                     postApiComment();
                 } else {
-                    Toast.makeText(DriverDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                    showToast(getString(R.string.network_error));
                 }
                 break;
         }
@@ -120,7 +117,7 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
         if (ConnectionDetector.isConnectingToInternet(DriverDetailActivity.this)) {
             getApiDriverDetail();
         } else {
-            Toast.makeText(DriverDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            showToast(getString(R.string.network_error));
         }
 
 
@@ -137,12 +134,12 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword =Prefs.getAuthenticationPassword(this);
 
-        String FromName = MyApplication.mSharedPreferences.getString("FromName", null);
-        String ToName = MyApplication.mSharedPreferences.getString("ToName", null);
-        String Date = MyApplication.mSharedPreferences.getString("Date", null);
+        String FromName = Prefs.getFromName(this);
+        String ToName = Prefs.getToName(this);
+        String Date =Prefs.getDate(this);
 
         mViewDrivingFromTextView.setText("Driving from: " + FromName);
         mViewDrivingToTextView.setText("To: " + ToName);
@@ -154,13 +151,10 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
     // Get webservice to get all driver comments
     private void getApiDriverDetail() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(DriverDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+       showProgressDialog();
 
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        mItemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+        int OpId = Prefs.getOpportunityId(this);
+        mItemID = Prefs.getItemId(this);
 
 
         APIServices service =
@@ -172,7 +166,7 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
                          public void onResponse(Call<List<SignUpDetailResponseModel>> call,
                                                 Response<List<SignUpDetailResponseModel>> response) {
                              try {
-                                 mProgressDialog.dismiss();
+                                 hideProgressDialog();
                                  if (response.body() != null) {
                                      List<SignUpDetailResponseModel> eventResponseModels = response.body();
                                      for (int i = 0; eventResponseModels.size() >= i; i++) {
@@ -192,32 +186,9 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
                                      }
 
                                  } else {
-                                     final CustomizeDialog customizeDialog = new CustomizeDialog(DriverDetailActivity.this);
-                                     customizeDialog.setCancelable(false);
-                                     customizeDialog.setContentView(R.layout.dialog_password_change);
-                                     TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                                     customizeDialog.show();
-                                     textViewOk.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View view) {
-                                             customizeDialog.dismiss();
-                                             MyApplication.editor.putString("CommunityName", null);
-                                             MyApplication.editor.putInt("CommunityId", 0);
-                                             MyApplication.editor.putString("Attachment", null);
-                                             MyApplication.editor.putString("Album", null);
-                                             MyApplication.editor.putString("Feed", null);
-                                             MyApplication.editor.putString("AuthenticationId", null);
-                                             MyApplication.editor.putString("AuthenticationPassword", null);
-                                             MyApplication.editor.putBoolean(MyApplication.ISLOGIN, false);
-                                             MyApplication.editor.commit();
+                                    showLogOutDialog();
 
-                                             Application app = getApplication();
-                                             Intent intent = new Intent(app, LogInActivity.class);
-                                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                             app.startActivity(intent);
-                                         }
-                                     });
+
                                  }
 
 
@@ -229,8 +200,8 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
 
                          @Override
                          public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                             mProgressDialog.dismiss();
-                             Toast.makeText(DriverDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                            hideProgressDialog();
+                            showToast(getString(R.string.error));
                              Log.d("onFailure", t.toString());
                          }
 
@@ -241,23 +212,20 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
 
     // Post webservice to post comments
     private void postApiComment() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(DriverDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+      showProgressDialog();
 
 
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        int itemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+        int OpId =Prefs.getOpportunityId(this);
+        mItemID = Prefs.getItemId(this);
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
-        Call<PostCommentResponseModel> call = service.SignUp_Send(OpId, itemID, mComment, mPhone);
+        Call<PostCommentResponseModel> call = service.SignUp_Send(OpId, mItemID, mComment, mPhone);
         call.enqueue(new retrofit2.Callback<PostCommentResponseModel>() {
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-                mProgressDialog.dismiss();
+               hideProgressDialog();
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
@@ -267,18 +235,18 @@ public class DriverDetailActivity extends AppCompatActivity implements View.OnCl
 
                         }
                     } else {
-                        Toast.makeText(DriverDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                        showToast(getString(R.string.error));
                     }
                 } else {
-                    Toast.makeText(DriverDetailActivity.this, "Couldn't comment", Toast.LENGTH_SHORT).show();
+                    showToast("Couldn't comment");
                 }
 
             }
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-                Toast.makeText(DriverDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                mProgressDialog.dismiss();
+               showToast(getString(R.string.error));
+               hideProgressDialog();
 
 
             }

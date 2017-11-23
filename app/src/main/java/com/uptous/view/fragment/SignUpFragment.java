@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
@@ -21,6 +20,8 @@ import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.CommnunitiesResponseModel;
 import com.uptous.model.SignUpResponseModel;
+import com.uptous.sharedpreference.Prefs;
+import com.uptous.view.activity.BaseActivity;
 import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.activity.ProfileActivity;
@@ -70,7 +71,7 @@ public class SignUpFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        String Detail = MyApplication.mSharedPreferences.getString("SignUpDetail", null);
+        String Detail = Prefs.getSignUpDetail(getActivity());
 
 
         if (Detail == null) {
@@ -102,17 +103,14 @@ public class SignUpFragment extends Fragment {
 
     // Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString(String.valueOf(R.string.AuthenticationId), null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString(String.valueOf(R.string.AuthenticationPassword), null);
+        mAuthenticationId = Prefs.getAuthenticationId(getActivity());
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
     }
 
     // Get webservice to show all sign_up_types
     private void getApiSignUp() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(getActivity());
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        ((MainActivity)getActivity()).showProgressDialog();
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<List<SignUpResponseModel>> call = service.GetSignUp();
@@ -120,7 +118,7 @@ public class SignUpFragment extends Fragment {
         call.enqueue(new Callback<List<SignUpResponseModel>>() {
             @Override
             public void onResponse(Call<List<SignUpResponseModel>> call, Response<List<SignUpResponseModel>> response) {
-                mProgressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 try {
 
                     if (response.body() != null) {
@@ -129,23 +127,13 @@ public class SignUpFragment extends Fragment {
                         signUpResponseModelList = response.body();
                         mSignUpSheetsListAdapter = new SignUpSheetsListAdapter(getActivity(), signUpResponseModelList, mCommunityList);
                         mViewSignUpRecyclerView.setAdapter(mSignUpSheetsListAdapter);
-                        int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+                        int communityId = Prefs.getCommunityId(getActivity());
                         if (communityId != 0) {
                             FilterCommunityForSignUp(signUpResponseModelList, communityId);
                         }
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
+                        BaseActivity baseActivity = (BaseActivity)getActivity();
+                        baseActivity.showLogOutDialog();
 
                     }
 
@@ -157,7 +145,7 @@ public class SignUpFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<SignUpResponseModel>> call, Throwable t) {
-                mProgressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
             }
 
@@ -204,10 +192,7 @@ public class SignUpFragment extends Fragment {
 
     // Get webservice to show communities
     private void getApiCommunityList() {
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
+        ((MainActivity)getActivity()).showProgressDialog();
 
 
         APIServices service =
@@ -217,27 +202,16 @@ public class SignUpFragment extends Fragment {
         call.enqueue(new Callback<List<CommnunitiesResponseModel>>() {
             @Override
             public void onResponse(Call<List<CommnunitiesResponseModel>> call, Response<List<CommnunitiesResponseModel>> response) {
-                progressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 try {
 
                     if (response.body() != null) {
                         mCommunityList = response.body();
                     } else {
 
-                        ProfileActivity profileActivity = new ProfileActivity();
-                        profileActivity.logOut();
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
+
+                        BaseActivity baseActivity = (BaseActivity)getActivity();
+                        baseActivity.showLogOutDialog();
 
                     }
 
@@ -250,7 +224,7 @@ public class SignUpFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<CommnunitiesResponseModel>> call, Throwable t) {
-                progressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
 
             }
@@ -273,7 +247,7 @@ public class SignUpFragment extends Fragment {
                 mSignUpSheetsListAdapter.notifyDataSetChanged();
 
             }
-            int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
+            int Position = Prefs.getPosition(getActivity());
 
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 2) {
@@ -291,14 +265,4 @@ public class SignUpFragment extends Fragment {
         return signUpResponseModelList;
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getActivity().getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
 }

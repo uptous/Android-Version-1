@@ -1,11 +1,8 @@
 package com.uptous.view.activity;
 
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,16 +10,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.ItemClickSupport;
 import com.uptous.model.CommnunitiesResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.CommunityListFilterAdapter;
 
 import java.util.List;
@@ -36,7 +31,7 @@ import retrofit2.Response;
  * Description :show community list user can filter feed, contacts, sign-ups, library, event according to selected community.
  * Dependencies : CommunityActivity
  */
-public class CommunityActivity extends AppCompatActivity implements View.OnClickListener {
+public class CommunityActivity extends BaseActivity implements View.OnClickListener {
 
     private CommunityListFilterAdapter mCommunityListFilterAdapter;
 
@@ -68,29 +63,30 @@ public class CommunityActivity extends AppCompatActivity implements View.OnClick
                 finish();
                 break;
             case R.id.text_view_all:
-                MyApplication.editor.putInt("CommunityId", 0);
-                MyApplication.editor.putString("CommunityName", null);
-                MyApplication.editor.putString("Close", null);
-                MyApplication.editor.putString("CommunityFilter", null);
-                MyApplication.editor.commit();
+                Prefs.setCommunityNAme(this,null);
+                Prefs.setCommunityId(this,0);
+               Prefs.setClose(this,null);
+               Prefs.setCommunityFilter(this,null);
                 finish();
+
+                break;
+            case R.id.layout_community_filter: finish();
+                break;
+            case R.id.text_view_title: finish();
                 break;
             case R.id.layout_close:
                 finish();
-                MyApplication.editor.putString("Close", "close");
-                MyApplication.editor.putString("CommunityFilter", null);
-                MyApplication.editor.commit();
+                Prefs.setClose(this,"close");
+                Prefs.setCommunityFilter(this,null);
                 break;
 
         }
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
-        MyApplication.editor.putString("Close", "close");
-
-        MyApplication.editor.commit();
+        Prefs.setClose(this,"close");
     }
 
     private void initView() {
@@ -125,7 +121,7 @@ public class CommunityActivity extends AppCompatActivity implements View.OnClick
         if (ConnectionDetector.isConnectingToInternet(CommunityActivity.this)) {
             getApiCommunityList();
         } else {
-            Toast.makeText(CommunityActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+           showToast(getString(R.string.network_error));
         }
     }
 
@@ -134,12 +130,13 @@ public class CommunityActivity extends AppCompatActivity implements View.OnClick
         mTextViewAll.setOnClickListener(this);
         mLinearLayoutClose.setOnClickListener(this);
         mImageViewBack.setOnClickListener(this);
+        findViewById(R.id.layout_community_filter).setOnClickListener(this);
     }
 
     //Method to get data from SharedPreferences
     private void getData() {
-        int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
-        String communityName = MyApplication.mSharedPreferences.getString("CommunityName", null);
+        int Position = Prefs.getPosition(this);
+        String communityName = Prefs.getCommunityNAme(this);
 
         if (communityName != null) {
             if (Position == 0) {
@@ -167,26 +164,24 @@ public class CommunityActivity extends AppCompatActivity implements View.OnClick
             }
         }
 
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword =Prefs.getAuthenticationPassword(this);
     }
 
     //Get web service to get communities
     private void getApiCommunityList() {
-        final ProgressDialog progressDialog = new ProgressDialog(CommunityActivity.this);
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
+        showProgressDialog();
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+
         Call<List<CommnunitiesResponseModel>> call = service.GetCommunity();
 
         call.enqueue(new Callback<List<CommnunitiesResponseModel>>() {
             @Override
             public void onResponse(Call<List<CommnunitiesResponseModel>> call, Response<List<CommnunitiesResponseModel>> response) {
                 try {
-                    progressDialog.dismiss();
+                    hideProgressDialog();
 
                     if (response.body() != null) {
 
@@ -203,25 +198,13 @@ public class CommunityActivity extends AppCompatActivity implements View.OnClick
 
                                 String CommunityName = eventResponseModels.get(position).getName();
                                 int CommunityId = eventResponseModels.get(position).getId();
-                                MyApplication.editor.putString("CommunityName", CommunityName);
-                                MyApplication.editor.putInt("CommunityId", CommunityId);
-                                MyApplication.editor.commit();
+                               Prefs.setCommunityNAme(CommunityActivity.this,CommunityName);
+                                Prefs.setCommunityId(CommunityActivity.this,CommunityId);
                                 finish();
                             }
                         });
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(CommunityActivity.this);
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
+                        showLogOutDialog();
                     }
                 } catch (Exception e) {
                     Log.d("onResponse", "There is an error");
@@ -232,22 +215,12 @@ public class CommunityActivity extends AppCompatActivity implements View.OnClick
 
             @Override
             public void onFailure(Call<List<CommnunitiesResponseModel>> call, Throwable t) {
-                Log.d("onFailure", t.toString());
-                Toast.makeText(CommunityActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                progressDialog.dismiss();
+                hideProgressDialog();
+                showToast(getString(R.string.error));
             }
 
         });
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
+
 }

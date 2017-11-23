@@ -1,11 +1,9 @@
 package com.uptous.view.activity;
 
-import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -19,8 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
@@ -30,6 +26,7 @@ import com.uptous.controller.utils.ItemClickSupport;
 import com.uptous.model.GetAllAnnouncementResponseModel;
 import com.uptous.model.GetAllCommentResponseModel;
 import com.uptous.model.PostCommentResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.AnnouncementsListAdapter;
 import com.uptous.view.adapter.CommentListAdapter;
 
@@ -45,7 +42,7 @@ import retrofit2.Response;
  * Dependencies : CommentListAdapter, AnnouncementsListAdapter
  */
 
-public class CommentDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class CommentDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView mImageViewBack, mViewImageView, mImageViewNewsItem;
 
@@ -99,11 +96,11 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
                         }
 
                     } else {
-                        Toast.makeText(CommentDetailActivity.this, "Please enter comment", Toast.LENGTH_SHORT).show();
+                        showToast("Please enter comment");
                     }
 
                 } else {
-                    Toast.makeText(CommentDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                    showToast(getString(R.string.network_error));
                 }
 
                 break;
@@ -113,8 +110,7 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
     @Override
     protected void onPause() {
         super.onPause();
-        MyApplication.editor.putInt("CommunityId", 0);
-        MyApplication.editor.commit();
+        Prefs.setCommunityId(this, 0);
     }
 
     //Method to initialize view
@@ -133,7 +129,7 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
         mRecyclerViewComment.setLayoutManager(layoutManager);
 
         mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
-        mScrollView=(ScrollView)findViewById(R.id.scroll_view_des);
+        mScrollView = (ScrollView) findViewById(R.id.scroll_view_des);
         mLinearLayoutRoundedBackGround = (LinearLayout) findViewById(R.id.layout_contact);
 
         mImageViewNewsItem = (ImageView) findViewById(R.id.image_view_news_item);
@@ -178,16 +174,17 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
-        mNewsType = MyApplication.mSharedPreferences.getString("NewsType", null);
-        mOwnerImage = MyApplication.mSharedPreferences.getString("Image", null);
-        mNewsItemImage = MyApplication.mSharedPreferences.getString("ImageNewsItem", null);
-        mDate = MyApplication.mSharedPreferences.getString("Date", null);
-        mNewsName = MyApplication.mSharedPreferences.getString("NewsItemName", null);
-        mOwnerName = MyApplication.mSharedPreferences.getString("OwnerName", null);
-        mCommunityName = MyApplication.mSharedPreferences.getString("FeedCommunityName", null);
-        mNewsItemDescription = MyApplication.mSharedPreferences.getString("NewsItemDescription", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
+
+        mNewsType = Prefs.getNewsType(this);
+        mOwnerImage = Prefs.getImage(this);
+        mNewsItemImage = Prefs.getimageNewsItem(this);
+        mDate = Prefs.getDate(this);
+        mNewsName = Prefs.getNewsItemName(this);
+        mOwnerName = Prefs.getOwnerName(this);
+        mCommunityName = Prefs.getFeedCommunityName(this);
+        mNewsItemDescription = Prefs.getNewsItemDescription(this);
 
         setData();
     }
@@ -198,7 +195,6 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
             mImageViewNewsItem.setVisibility(View.VISIBLE);
             mTextViewNewsDetail.setVisibility(View.GONE);
             mScrollView.setVisibility(View.GONE);
-//            Picasso.with(CommentDetailActivity.this).load(mNewsItemImage).into(mImageViewNewsItem);
 
             Glide.with(CommentDetailActivity.this).load(mNewsItemImage)
                     .into(mImageViewNewsItem);
@@ -237,13 +233,12 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
         String result1 = mOwnerImage.substring(mOwnerImage.lastIndexOf(".") + 1);
         if (mOwnerImage != null && !result1.equalsIgnoreCase("gif")) {
             mViewImageView.setVisibility(View.VISIBLE);
-//            Picasso.with(CommentDetailActivity.this).load(mOwnerImage).into(mViewImageView);
 
             Glide.with(CommentDetailActivity.this).load(mOwnerImage)
                     .into(mViewImageView);
         } else {
-            String BackgroundColor = MyApplication.mSharedPreferences.getString("OwnerBackground", null);
-            String TextColor = MyApplication.mSharedPreferences.getString("OwnerTextColor", null);
+            String BackgroundColor = Prefs.getOwnerBackground(this);
+            String TextColor = Prefs.getOwnerTextColor(this);
             if (BackgroundColor != null) {
                 int color = Color.parseColor(BackgroundColor);
                 mLinearLayoutRoundedBackGround.setVisibility(View.VISIBLE);
@@ -278,12 +273,9 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
     // Get webservice to get all comments
     private void getApiAllComment() {
         mEditTextComment.setHint("Type comments here..");
-        final ProgressDialog progressDialog = new ProgressDialog(CommentDetailActivity.this);
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
+        showProgressDialog();
 
-        int OpId = MyApplication.mSharedPreferences.getInt("FeedId", 0);
+        int OpId = Prefs.getFeedId(this);
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -292,7 +284,7 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
         call.enqueue(new Callback<List<GetAllCommentResponseModel>>() {
             @Override
             public void onResponse(Call<List<GetAllCommentResponseModel>> call, Response<List<GetAllCommentResponseModel>> response) {
-                progressDialog.dismiss();
+                hideProgressDialog();
                 try {
 
                     final List<GetAllCommentResponseModel> eventResponseModels = response.body();
@@ -318,8 +310,8 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
 
             @Override
             public void onFailure(Call<List<GetAllCommentResponseModel>> call, Throwable t) {
-                progressDialog.dismiss();
-                Toast.makeText(CommentDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                hideProgressDialog();
+                showToast(getString(R.string.error));
             }
 
         });
@@ -328,12 +320,9 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
     // Get webservice to get all Announcement comments
     private void getApiAllAnnouncementComment() {
         mEditTextComment.setHint("Reply all...");
-        final ProgressDialog progressDialog = new ProgressDialog(CommentDetailActivity.this);
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
+        showProgressDialog();
 
-        int OpId = MyApplication.mSharedPreferences.getInt("NewsItemID", 0);
+        int OpId = Prefs.getNewsItemId(this);
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -342,7 +331,7 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
         call.enqueue(new Callback<List<GetAllAnnouncementResponseModel>>() {
             @Override
             public void onResponse(Call<List<GetAllAnnouncementResponseModel>> call, Response<List<GetAllAnnouncementResponseModel>> response) {
-                progressDialog.dismiss();
+                hideProgressDialog();
                 try {
 
                     final List<GetAllAnnouncementResponseModel> eventResponseModels = response.body();
@@ -358,8 +347,8 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
 
             @Override
             public void onFailure(Call<List<GetAllAnnouncementResponseModel>> call, Throwable t) {
-                progressDialog.dismiss();
-                Toast.makeText(CommentDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                hideProgressDialog();
+                showToast(getString(R.string.error));
             }
 
         });
@@ -367,13 +356,10 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
 
     // Post webservice to post all  comments
     private void postApiComment() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(CommentDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        showProgressDialog();
 
 
-        int OpId = MyApplication.mSharedPreferences.getInt("FeedId", 0);
+        int OpId = Prefs.getFeedId(this);
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
@@ -382,29 +368,28 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-                mProgressDialog.dismiss();
+                hideProgressDialog();
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
                         if (response.isSuccessful()) {
 
                             getApiAllComment();
-                            MyApplication.editor.putString("MessagePost", "message");
-                            MyApplication.editor.commit();
+                            Prefs.setMessagePost(CommentDetailActivity.this, "message");
                             mEditTextComment.setText("");
                             mEditTextComment.clearFocus();
                         }
                     }
                 } else {
-                    Toast.makeText(CommentDetailActivity.this, "Couldn't comment", Toast.LENGTH_SHORT).show();
+                    showToast("Couldn't comment");
                 }
 
             }
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-                Toast.makeText(CommentDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                mProgressDialog.dismiss();
+                hideProgressDialog();
+                showToast(getString(R.string.error));
 
 
             }
@@ -414,11 +399,8 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
     // Post webservice to post all Announcement reply
     private void postApiAnnouncementReply() {
 
-        int NewsItem = MyApplication.mSharedPreferences.getInt("NewsItemID", 0);
-        final ProgressDialog mProgressDialog = new ProgressDialog(CommentDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        int NewsItem = Prefs.getNewsItemId(this);
+        showProgressDialog();
 
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -428,13 +410,12 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-                mProgressDialog.dismiss();
+                hideProgressDialog();
                 if (response.body() != null) {
 
                     if (response.isSuccessful()) {
                         getApiAllAnnouncementComment();
-                        MyApplication.editor.putString("MessagePost", "message");
-                        MyApplication.editor.commit();
+                       Prefs.setMessagePost(CommentDetailActivity.this,"message");
                         mEditTextComment.setText("");
                         mEditTextComment.clearFocus();
 
@@ -445,8 +426,8 @@ public class CommentDetailActivity extends AppCompatActivity implements View.OnC
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-                Toast.makeText(CommentDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                mProgressDialog.dismiss();
+                showToast(getString(R.string.error));
+                hideProgressDialog();
 
 
             }

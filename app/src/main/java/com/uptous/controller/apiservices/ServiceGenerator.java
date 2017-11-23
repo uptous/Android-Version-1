@@ -28,7 +28,6 @@ public class ServiceGenerator {
     private static Retrofit.Builder builder =
             new Retrofit.Builder()
                     .baseUrl(API_BASE_URL)
-
                     .addConverterFactory(GsonConverterFactory.create());
 
     public static <S> S createService(Class<S> serviceClass) {
@@ -58,6 +57,7 @@ public class ServiceGenerator {
         }
 
         OkHttpClient client = httpClient.build();
+
         httpClient.connectTimeout(10000, TimeUnit.SECONDS);
         httpClient.readTimeout(10000, TimeUnit.SECONDS).build();
         Retrofit retrofit = builder.client(client).build();

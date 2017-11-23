@@ -1,11 +1,7 @@
 package com.uptous.view.activity;
 
-import android.app.Application;
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -15,17 +11,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
-import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.CommnunitiesResponseModel;
 import com.uptous.model.PostCommentResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.CommunityListAdapter;
 
 import java.util.List;
@@ -39,7 +33,7 @@ import retrofit2.Response;
  * Description : User post message show on feed
  * Dependencies : CommunityListAdapter
  */
-public class MessagePostActivity extends AppCompatActivity implements View.OnClickListener {
+public class MessagePostActivity extends BaseActivity implements View.OnClickListener {
 
     private CommunityListAdapter mCommunityListAdapter;
 
@@ -49,13 +43,13 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
     private Button mButtonSend;
 
-    private EditText mEditTextMessage,mEditTextSubject;
+    private EditText mEditTextMessage, mEditTextSubject;
 
     private String mMessage, mSubject, mAuthenticationId, mAuthenticationPassword;
 
     private int mCommunityID;
 
-   private Helper mHelper;
+    private Helper mHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +63,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
         if (ConnectionDetector.isConnectingToInternet(MessagePostActivity.this)) {
             getApiCommunityList();
         } else {
-            Toast.makeText(MessagePostActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            showToast(getString(R.string.network_error));
         }
 
     }
@@ -92,7 +86,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
                 if (mMessage.length() > 0 && mSubject.length() > 0) {
                     postApiMessage();
                 } else {
-                    Toast.makeText(MessagePostActivity.this, "Please fill all field", Toast.LENGTH_SHORT).show();
+                    showToast(getString(R.string.fill_all_field));
                 }
 
 
@@ -102,7 +96,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
     //method to initialize view
     private void initView() {
-        mHelper =new Helper();
+        mHelper = new Helper();
 
         //Local Variables Initialization
         LinearLayout linearLayoutNavigation = (LinearLayout) findViewById(R.id.imgmenuleft);
@@ -130,8 +124,8 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
     }
 
     //Method to set on clickListener on views
@@ -142,10 +136,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
     // Get webservice to get communities
     private void getApiCommunityList() {
-        final ProgressDialog progressDialog = new ProgressDialog(MessagePostActivity.this);
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
+        showProgressDialog();
 
 
         APIServices service =
@@ -156,9 +147,9 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onResponse(Call<List<CommnunitiesResponseModel>> call, Response<List<CommnunitiesResponseModel>> response) {
                 try {
-                    progressDialog.dismiss();
+                    hideProgressDialog();
 
-                    if(response.body()!=null) {
+                    if (response.body() != null) {
 
 
                         final List<CommnunitiesResponseModel> eventResponseModels = response.body();
@@ -181,19 +172,8 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
                             }
                         });
-                    }else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(MessagePostActivity.this);
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
+                    } else {
+                        showLogOutDialog();
                     }
 
                 } catch (Exception e) {
@@ -206,8 +186,8 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onFailure(Call<List<CommnunitiesResponseModel>> call, Throwable t) {
                 Log.d("onFailure", t.toString());
-                Toast.makeText(MessagePostActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                progressDialog.dismiss();
+                showToast(getString(R.string.error));
+                hideProgressDialog();
             }
 
         });
@@ -215,10 +195,7 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
     // Post webservice to post message that show in feed
     private void postApiMessage() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(MessagePostActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+        showProgressDialog();
 
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -228,13 +205,13 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-                mProgressDialog.dismiss();
+                hideProgressDialog();
                 if (response.body() != null) {
 
                     if (response.isSuccessful()) {
-                        MyApplication.editor.putString("MessagePost", "message");
-                        MyApplication.editor.putString("Feed",null);
-                        MyApplication.editor.commit();
+                        Prefs.setMessagePost(MessagePostActivity.this,"message");
+
+                        Prefs.setFeed(MessagePostActivity.this,null);
                         finish();
 
                     }
@@ -243,22 +220,13 @@ public class MessagePostActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-                Toast.makeText(MessagePostActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                mProgressDialog.dismiss();
+                hideProgressDialog();
+                showToast(getString(R.string.error));
 
 
             }
         });
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
+
 }

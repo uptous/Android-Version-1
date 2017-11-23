@@ -6,6 +6,12 @@ package com.uptous.model;
 
 public class PostCommentResponseModel {
 
+    /**
+     * albumId : 28604
+     */
+
+    private String albumId;
+
     public String getStatus() {
         return status;
     }
@@ -15,4 +21,13 @@ public class PostCommentResponseModel {
     }
 
     private String status;
+
+    public int getAlbumId() {
+
+        return Integer.parseInt(albumId);
+    }
+
+    public void setAlbumId(String albumId) {
+        this.albumId = albumId;
+    }
 }
