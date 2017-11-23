@@ -10,8 +10,8 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
+import com.uptous.sharedpreference.Prefs;
 
 /**
  * Created by Prakash.
@@ -24,7 +24,6 @@ public class WebviewActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.webview_activity);
 
 
@@ -51,12 +50,13 @@ public class WebviewActivity extends AppCompatActivity implements View.OnClickLi
         imageViewBack.setVisibility(View.VISIBLE);
 
         imageViewBack.setOnClickListener(this);
+
     }
 
     //Method to get data from SharedPreferences
     private void getData() {
-        path = MyApplication.mSharedPreferences.getString("path", null);
-        ImagePath = MyApplication.mSharedPreferences.getString("Imagepath", null);
+        path = Prefs.getpath(this);
+        ImagePath = Prefs.getImagepath(this);
 
 
         if (ImagePath != null) {
@@ -97,8 +97,7 @@ public class WebviewActivity extends AppCompatActivity implements View.OnClickLi
 
         }
 
-        MyApplication.editor.putString("path", null);
-        MyApplication.editor.commit();
+      Prefs.setpath(this,null);
     }
 
     private void showImage() {
@@ -108,8 +107,7 @@ public class WebviewActivity extends AppCompatActivity implements View.OnClickLi
         mWebView.getSettings().setUseWideViewPort(true);
         mWebView.getSettings().setBuiltInZoomControls(true);
 
-        MyApplication.editor.putString("Imagepath", null);
-        MyApplication.editor.commit();
+       Prefs.setImagepath(this,null);
     }
 
 }

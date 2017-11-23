@@ -1,14 +1,11 @@
 package com.uptous.view.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,18 +13,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.CustomizeDialog;
-import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.SignUpPartyAdapter;
 
 import java.text.SimpleDateFormat;
@@ -39,13 +32,15 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.uptous.controller.utils.Utilities.isLastAppActivity;
+
 /**
  * FileName : SignUpPartyActivity
  * Description :show all Party,Potluck sign_up open spots, volunteer, full.
  * Dependencies : SignUpPartyActivity
  */
 
-public class SignUpPartyActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignUpPartyActivity extends BaseActivity implements View.OnClickListener {
 
     private RecyclerView mRecyclerViewOpenSpot;
 
@@ -53,7 +48,7 @@ public class SignUpPartyActivity extends AppCompatActivity implements View.OnCli
 
     private TextView mTextViewTitle, mViewEventDescriptionTextView, mViewOrganizerOneTextView,
             mViewOrganizerSecondTextView, mTextViewEventDateSignUp, mTextViewOrgnizer, mTextViewFirstNameContactOne,
-            mTextViewSecondNameContactOne, mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo,mTextViewCutOffDateSignUp;
+            mTextViewSecondNameContactOne, mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewCutOffDateSignUp;
 
     private ImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
 
@@ -89,7 +84,7 @@ public class SignUpPartyActivity extends AppCompatActivity implements View.OnCli
         if (ConnectionDetector.isConnectingToInternet(this)) {
             getApiSignUpDetail();
         } else {
-            Toast.makeText(SignUpPartyActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            showToast(getString(R.string.network_error));
         }
 
     }
@@ -114,7 +109,7 @@ public class SignUpPartyActivity extends AppCompatActivity implements View.OnCli
         mLinearLayoutBackgroundSecondContact = (LinearLayout) findViewById(R.id.layout_contact_image_second);
 
         mTextViewOrgnizer = (TextView) findViewById(R.id.text_view_title_organizers);
-        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_toolbar);
+        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_title);
         mViewEventDescriptionTextView = (TextView) findViewById(R.id.text_view_event_description);
         mViewOrganizerOneTextView = (TextView) findViewById(R.id.text_view_organizer_one);
         mViewOrganizerSecondTextView = (TextView) findViewById(R.id.text_view_organizer_second);
@@ -137,28 +132,20 @@ public class SignUpPartyActivity extends AppCompatActivity implements View.OnCli
 
         clickListenerOnViews();
 
-//        if (ConnectionDetector.isConnectingToInternet(this)) {
-//            getApiSignUpDetail();
-//        } else {
-//            Toast.makeText(SignUpPartyActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-//        }
 
     }
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
     }
 
     // Get webservice to show Party/Potluck sign_up open spots, volunteer, full
     private void getApiSignUpDetail() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(SignUpPartyActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
+        showProgressDialog();
+        int OpId = Prefs.getOpportunityId(this);
 
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
@@ -169,12 +156,12 @@ public class SignUpPartyActivity extends AppCompatActivity implements View.OnCli
                          @Override
                          public void onResponse(Call<List<SignUpDetailResponseModel>> call, Response<List<SignUpDetailResponseModel>> response) {
                              try {
-                                 mProgressDialog.dismiss();
+                                 hideProgressDialog();
 
                                  if (response.isSuccessful()) {
                                      final List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
-                                     mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n"," "));
+                                     mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n", " "));
                                      mTextViewTitle.setVisibility(View.VISIBLE);
 
                                      String Name = eventResponseModels.get(0).getName();
@@ -366,31 +353,15 @@ public class SignUpPartyActivity extends AppCompatActivity implements View.OnCli
 
                                          } else {
 
-//                                    if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
                                              mTextViewCutOffDateSignUp.setText(dateText);
-//                                    } else {
-//                                        mTextViewCutOffDateSignUp.setText(dateText);
-//                                    }
-//                                }
 
                                          }
                                      }
-                                         mSignUpPartyAdapter = new SignUpPartyAdapter(SignUpPartyActivity.this, eventResponseModels.get(0).getItems());
+                                     mSignUpPartyAdapter = new SignUpPartyAdapter(SignUpPartyActivity.this, eventResponseModels.get(0).getItems());
                                      mRecyclerViewOpenSpot.setAdapter(mSignUpPartyAdapter);
 
                                  } else {
-                                     final CustomizeDialog customizeDialog = new CustomizeDialog(SignUpPartyActivity.this);
-                                     customizeDialog.setCancelable(false);
-                                     customizeDialog.setContentView(R.layout.dialog_password_change);
-                                     TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                                     customizeDialog.show();
-                                     textViewOk.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View view) {
-                                             customizeDialog.dismiss();
-                                             logout();
-                                         }
-                                     });
+                                   showLogOutDialog();
                                  }
 
 
@@ -403,9 +374,9 @@ public class SignUpPartyActivity extends AppCompatActivity implements View.OnCli
 
                          @Override
                          public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                             mProgressDialog.dismiss();
-                             Toast.makeText(SignUpPartyActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                             hideProgressDialog();
                              Log.d("onFailure", t.toString());
+                             showToast(getString(R.string.error));
                          }
 
                      }
@@ -418,16 +389,12 @@ public class SignUpPartyActivity extends AppCompatActivity implements View.OnCli
     private void clickListenerOnViews() {
         mImageViewBack.setOnClickListener(this);
     }
-
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(isLastAppActivity(this))
+            startActivity(new Intent(this,MainActivity.class));
+        finish();
     }
 
 }

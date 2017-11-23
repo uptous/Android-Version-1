@@ -4,6 +4,8 @@ package com.uptous.controller.utils;
  */
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
@@ -12,6 +14,9 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+
+import static android.content.Context.ACTIVITY_SERVICE;
 
 @SuppressLint("SimpleDateFormat")
 public class Utilities {
@@ -84,6 +89,17 @@ public class Utilities {
         } catch (Throwable e) {
             Log.e("Utilities ", "initializing exception log file", e);
         }
+    }
+
+
+    public static Boolean isLastAppActivity(Context context)
+    {
+        ActivityManager mngr = (ActivityManager) context.getSystemService( ACTIVITY_SERVICE );
+        List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(5);
+        if(taskList.get(0).numActivities == 1 ) {
+            return true;
+        }
+        return false;
     }
 
 

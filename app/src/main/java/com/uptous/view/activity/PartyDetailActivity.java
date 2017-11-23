@@ -1,9 +1,7 @@
 package com.uptous.view.activity;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -12,9 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
@@ -22,6 +18,7 @@ import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.Helper;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.PartyDetailAdapter;
 
 import java.util.List;
@@ -35,7 +32,7 @@ import retrofit2.Response;
  * Description :show all Party/Potluck sign_up comment and also user can comment it.
  * Dependencies : PartyDetailActivity
  */
-public class PartyDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class PartyDetailActivity extends BaseActivity implements View.OnClickListener {
 
 
     private ImageView mImageViewBack;
@@ -81,7 +78,7 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
 
 
                 } else {
-                    Toast.makeText(PartyDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+                    showToast(getString(R.string.network_error));
                 }
                 break;
         }
@@ -123,20 +120,20 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
         if (ConnectionDetector.isConnectingToInternet(PartyDetailActivity.this)) {
             getApiPartyDetail();
         } else {
-            Toast.makeText(PartyDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            showToast(getString(R.string.network_error));
         }
 
     }
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
 
-        String openSpot = MyApplication.mSharedPreferences.getString("Total Spot", null);
-        String totalSpot = MyApplication.mSharedPreferences.getString("Number of volunteer", null);
-        String name = MyApplication.mSharedPreferences.getString("Name", null);
-        String date = MyApplication.mSharedPreferences.getString("Date", null);
+        String openSpot = Prefs.getTotalSpot(this);
+        String totalSpot = Prefs.getNumberofvolunteer(this);
+        String name = Prefs.getName(this);
+        String date = Prefs.getDate(this);
 
         mTextViewEventName.setText(name);
 
@@ -161,12 +158,9 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
     // Get webservice to get Party sign_up comments
     private void getApiPartyDetail() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(PartyDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        mItemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+       showProgressDialog();
+        int OpId =Prefs.getOpportunityId(this);
+        mItemID = Prefs.getItemId(this);
 
 
         APIServices service =
@@ -178,7 +172,7 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
                          public void onResponse(Call<List<SignUpDetailResponseModel>> call,
                                                 Response<List<SignUpDetailResponseModel>> response) {
                              try {
-                                 mProgressDialog.dismiss();
+                                hideProgressDialog();
                                  if (response.isSuccessful()) {
 
                                      List<SignUpDetailResponseModel> eventResponseModels = response.body();
@@ -201,7 +195,7 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
                                      }
 
                                  } else {
-                                     Toast.makeText(PartyDetailActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
+                                     showToast("" + response.raw().code());
                                  }
 
                              } catch (Exception e) {
@@ -212,8 +206,8 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
 
                          @Override
                          public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                             mProgressDialog.dismiss();
-                             Toast.makeText(PartyDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                             hideProgressDialog();
+                            showToast(getString(R.string.error));
                              Log.d("onFailure", t.toString());
                          }
 
@@ -224,15 +218,12 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
 
     // Post webservice to post Shifts sign_up comments
     private void postApiComment() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(PartyDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
 
 
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        int itemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
-        APIServices service =
+
+        int OpId = Prefs.getOpportunityId(this);
+        int itemID = Prefs.getItemId(this);
+        final APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
         Call<PostCommentResponseModel> call = service.SignUp_Send(OpId, itemID, mComment, "");
@@ -240,7 +231,7 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-                mProgressDialog.dismiss();
+               hideProgressDialog();
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
@@ -250,18 +241,18 @@ public class PartyDetailActivity extends AppCompatActivity implements View.OnCli
 
                         }
                     } else {
-                        Toast.makeText(PartyDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                        showToast(getString(R.string.error));
                     }
                 } else {
-                    Toast.makeText(PartyDetailActivity.this, "Couldn't comment", Toast.LENGTH_SHORT).show();
+                    showToast("Couldn't comment");
                 }
 
             }
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-                Toast.makeText(PartyDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                mProgressDialog.dismiss();
+              showToast(getString(R.string.error));
+               hideProgressDialog();
 
 
             }

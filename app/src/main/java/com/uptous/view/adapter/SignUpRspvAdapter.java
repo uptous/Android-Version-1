@@ -10,10 +10,10 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.utils.GifImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.RSPVDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
 
@@ -106,10 +106,9 @@ String dateTextMain,dateTextTime;
                     int position = (int) view.getTag();
                     int ItemId = listEntities.get(position).getId();
 
-                    MyApplication.editor.putInt("ItemId", ItemId);
-                    MyApplication.editor.putString("Name",  listEntities.get(position).getName());
-                    MyApplication.editor.putString("Date", dateTextMain);
-                    MyApplication.editor.commit();
+                    Prefs.setItemId(activity,ItemId);
+                    Prefs.setName(activity,listEntities.get(position).getName());
+                    Prefs.setDate(activity,dateTextMain);
                     Intent intent = new Intent(activity, RSPVDetailActivity.class);
                     activity.startActivity(intent);
                 }
@@ -124,11 +123,10 @@ String dateTextMain,dateTextTime;
                     public void onClick(View view) {
                         int position = (int) view.getTag();
                         int ItemId = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Type", "RSPV");
-                        MyApplication.editor.putString("ToName","");
-                        MyApplication.editor.putString("FromName", listEntities.get(position).getName());
-                        MyApplication.editor.putInt("ItemId", ItemId);
-                        MyApplication.editor.commit();
+                        Prefs.setSignUpType(activity,"RSPV");
+                        Prefs.setItemId(activity,ItemId);
+                        Prefs.setToName(activity,"");
+                        Prefs.setFromName(activity,listEntities.get(position).getName());
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }
@@ -147,11 +145,10 @@ String dateTextMain,dateTextTime;
                     public void onClick(View view) {
                         int position = (int) view.getTag();
                         int ItemId = listEntities.get(position).getId();
-                        MyApplication.editor.putString("Type", "RSPV");
-                        MyApplication.editor.putInt("ItemId", ItemId);
-                        MyApplication.editor.putString("ToName","");
-                        MyApplication.editor.putString("FromName", listEntities.get(position).getName());
-                        MyApplication.editor.commit();
+                        Prefs.setSignUpType(activity,"RSPV");
+                        Prefs.setItemId(activity,ItemId);
+                        Prefs.setToName(activity,"");
+                        Prefs.setFromName(activity,listEntities.get(position).getName());
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
                     }

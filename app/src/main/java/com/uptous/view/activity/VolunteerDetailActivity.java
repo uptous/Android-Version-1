@@ -1,11 +1,8 @@
 package com.uptous.view.activity;
 
-import android.app.Application;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -23,6 +20,7 @@ import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.VolunteeredAdapter;
 import com.uptous.view.adapter.VolunteeredRspvAdapter;
 
@@ -38,7 +36,7 @@ import retrofit2.Response;
  * Dependencies : VolunteerDetailActivity
  */
 
-public class VolunteerDetailActivity extends AppCompatActivity implements View.OnClickListener {
+public class VolunteerDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView mImageViewBack;
     private VolunteeredAdapter mVolunteeredAdapter;
@@ -107,14 +105,14 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
     // Method to Get data from SharedPreference
     private void getData() {
 
-        mFromName = MyApplication.mSharedPreferences.getString("FromName", null);
-        mToName = MyApplication.mSharedPreferences.getString("ToName", null);
-        mStringType = MyApplication.mSharedPreferences.getString("Type", null);
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
-        mEventName = MyApplication.mSharedPreferences.getString("Name", null);
-        mDate = MyApplication.mSharedPreferences.getString("Date", null);
-        mEndTime = MyApplication.mSharedPreferences.getString("EndDate", null);
+        mFromName = Prefs.getFromName(this);
+        mToName = Prefs.getToName(this);
+        mStringType = Prefs.getSignUpType(this);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
+        mEventName =Prefs.getName(this);
+        mDate = Prefs.getDate(this);
+        mEndTime = "";
 
         setData();
 
@@ -166,12 +164,9 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
     // Get webservice to get Volunteer  comments
     private void getApiVolunteer() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(VolunteerDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        mItemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+        showProgressDialog();
+        int OpId = Prefs.getOpportunityId(this);
+        mItemID = Prefs.getItemId(this);
 
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
@@ -183,7 +178,7 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
             public void onResponse(Call<List<SignUpDetailResponseModel>> call,
                                    Response<List<SignUpDetailResponseModel>> response) {
                 try {
-                    mProgressDialog.dismiss();
+                    hideProgressDialog();
 
                     if (response.body() != null) {
 
@@ -197,7 +192,7 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
                             for (int j = 0; eventResponseModelsItem.size() > j; j++) {
                                 int itemid = eventResponseModelsItem.get(j).getId();
                                 if (itemid == mItemID) {
-                                    if (mStringType == null || mStringType.equalsIgnoreCase("Driver")||
+                                    if (mStringType == null || mStringType.equalsIgnoreCase("Driver") ||
                                             mStringType.equalsIgnoreCase("Party")) {
                                         mVolunteeredAdapter = new VolunteeredAdapter(VolunteerDetailActivity.this,
                                                 eventResponseModelsItem.get(j).getVolunteers());
@@ -216,18 +211,7 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
 
 
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(VolunteerDetailActivity.this);
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
+                        showLogOutDialog();
                     }
 
 
@@ -240,8 +224,8 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
 
             @Override
             public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                mProgressDialog.dismiss();
-                Toast.makeText(VolunteerDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                hideProgressDialog();
+                showToast(getString(R.string.error));
                 Log.d("onFailure", t.toString());
             }
 
@@ -275,14 +259,11 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
 
     // Post webservice to cancel volunteer
     private void postApiCancelAssignment() {
-        final ProgressDialog mProgressDialog = new ProgressDialog(VolunteerDetailActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
+       showProgressDialog();
 
 
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
-        int itemID = MyApplication.mSharedPreferences.getInt("ItemId", 0);
+        int OpId =Prefs.getOpportunityId(this);
+        int itemID = Prefs.getItemId(this);
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
@@ -291,7 +272,7 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-                mProgressDialog.dismiss();
+               hideProgressDialog();
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
@@ -308,20 +289,11 @@ public class VolunteerDetailActivity extends AppCompatActivity implements View.O
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-                mProgressDialog.dismiss();
+               hideProgressDialog();
                 Toast.makeText(VolunteerDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
+
 }

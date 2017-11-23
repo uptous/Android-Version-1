@@ -13,11 +13,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.model.GetAllCommentResponseModel;
-import com.uptous.view.activity.CommentDetailActivity;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

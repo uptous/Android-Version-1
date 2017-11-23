@@ -1,28 +1,30 @@
 package com.uptous.view.activity;
 
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
+import com.google.gson.JsonElement;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
-import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.InvitationResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.InvitationAdapter;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,13 +32,16 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.uptous.controller.utils.Utilities.isLastAppActivity;
+
 /**
  * FileName : InvitationsActivity
  * Description :Show invited communities and also user can add communities.
  * Dependencies : InvitationAdapter
  */
-public class InvitationsActivity extends AppCompatActivity implements View.OnClickListener {
+public class InvitationsActivity extends BaseActivity implements View.OnClickListener {
     private ImageView mImageViewBack;
+    public static String INVITATION_ID ="InvitationValue";
     private TextView mTextViewPendingInvitations, mTextViewInvitationcount;
     private RecyclerView mRecyclerViewInvitations;
     private String mAuthenticationId, mAuthenticationPassword;
@@ -53,18 +58,37 @@ public class InvitationsActivity extends AppCompatActivity implements View.OnCli
         initView();
 
         getData();
-
+//        Log.i("Info",isLastAppActivity());
+        if (getIntent().hasExtra(INVITATION_ID)) {
+            //In case of intent extra values
+            Bundle extras = getIntent().getExtras();
+            String invitationid = extras.getString(INVITATION_ID);
+            if (!invitationid.equals(null)) {
+                postApiInvite(Integer.parseInt(invitationid));
+            }
+        }
+        else {
+            getApiInvitation();
+        }
     }
+
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.image_view_back:
-                finish();
+                onBackPressed();
                 break;
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if(isLastAppActivity(this))
+            startActivity(new Intent(this,MainActivity.class));
+        finish();
+    }
 
     //Method to initialize views
     private void initView() {
@@ -92,14 +116,14 @@ public class InvitationsActivity extends AppCompatActivity implements View.OnCli
 
         clickListenerOnViews();
 
-        getApiInvitation();
+
 
     }
 
     // Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
 
     }
 
@@ -110,10 +134,7 @@ public class InvitationsActivity extends AppCompatActivity implements View.OnCli
 
     // Get webservice to show all UpToUs Invitation
     public void getApiInvitation() {
-        final ProgressDialog progressDialog = new ProgressDialog(InvitationsActivity.this);
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
+        showProgressDialog();
 
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -123,9 +144,8 @@ public class InvitationsActivity extends AppCompatActivity implements View.OnCli
             @Override
             public void onResponse(Call<List<InvitationResponseModel>> call, Response<List<InvitationResponseModel>> response) {
                 try {
-                    progressDialog.dismiss();
+                    hideProgressDialog();
                     if (response.body() != null) {
-
                         mSize = response.body().size();
                         mTextViewPendingInvitations.
                                 setText(Html.fromHtml("Pending Invitations: <font color=#ff0000>" + String.valueOf(mSize) + "</font>"));
@@ -134,19 +154,7 @@ public class InvitationsActivity extends AppCompatActivity implements View.OnCli
                         mInvitationAdapter = new InvitationAdapter(InvitationsActivity.this, mInvitationResponseModels);
                         mRecyclerViewInvitations.setAdapter(mInvitationAdapter);
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(InvitationsActivity.this);
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-
-                            }
-                        });
+                        showLogOutDialog();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -156,23 +164,57 @@ public class InvitationsActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onFailure(Call<List<InvitationResponseModel>> call, Throwable t) {
-                Toast.makeText(InvitationsActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                progressDialog.dismiss();
+               showToast(getString(R.string.error));
+                hideProgressDialog();
             }
 
         });
     }
 
-    //Method to logout from app
-    private void logout() {
 
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
+    // Post webservice to post all  comments
+    public void postApiInvite(final int InvitationId) {
+        String mAuthenticationId = Prefs.getAuthenticationId(this);
+        String mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
+        showProgressDialog();
+
+        APIServices service =
+                ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+
+        Call<JsonElement> call = service.PostInvite(InvitationId, "");
+        call.enqueue(new retrofit2.Callback<JsonElement>() {
+            @Override
+            public void onResponse(Call<JsonElement> call, Response<JsonElement> response) {
+                hideProgressDialog();
+                Log.i("Info",""+response.errorBody());
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(InvitationsActivity.this, R.string.invitation_accepted, Toast.LENGTH_SHORT).show();
+                            getApiInvitation();
+                        }
+                    }
+                }
+                else {
+                    JSONObject jObjError = null;
+                    try {
+                        jObjError = new JSONObject(response.errorBody().string());
+                        Toast.makeText(InvitationsActivity.this, jObjError.getString("message"), Toast.LENGTH_LONG).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<JsonElement> call, Throwable t) {
+                Toast.makeText(InvitationsActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+              hideProgressDialog();
+            }
+        });
     }
+
 
 }

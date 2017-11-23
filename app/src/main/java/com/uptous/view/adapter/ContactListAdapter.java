@@ -21,16 +21,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.squareup.picasso.Picasso;
-import com.uptous.MyApplication;
 import com.uptous.controller.utils.CustomizeDialog;
-import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.ContactListResponseModel;
 import com.uptous.R;
-import com.uptous.view.activity.ProfileActivity;
+import com.uptous.sharedpreference.Prefs;
 
 import java.util.List;
 
@@ -134,7 +131,12 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
                     public void onClick(View view) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + PhoneNumber));
                         intent.putExtra("sms_body", "");
-                        activity.startActivity(intent);
+                        if(intent.resolveActivity(activity.getPackageManager())!=null)
+                           activity.startActivity(intent);
+                        else
+                        {
+                            Toast.makeText(activity,activity.getString(R.string.no_app),Toast.LENGTH_SHORT).show();
+                        }
                         customizeDialog.dismiss();
                     }
                 });
@@ -150,7 +152,11 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
                                     new String[]{Manifest.permission.CALL_PHONE},
                                     0);
                         } else {
-                            activity.startActivity(new Intent(Intent.ACTION_CALL).setData(Uri.parse("tel:" + PhoneNumber)));
+                            Intent intent = new Intent(Intent.ACTION_CALL).setData(Uri.parse("tel:" + PhoneNumber));
+                            if(intent.resolveActivity(activity.getPackageManager())!=null)
+                                activity.startActivity(intent);
+                            else
+                                Toast.makeText(activity,activity.getString(R.string.no_app),Toast.LENGTH_SHORT).show();
                         }
                         customizeDialog.dismiss();
                     }
@@ -159,11 +165,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 //
 
 
-//
+//mesage
 
 
-                MyApplication.editor.putString("Message", "mesage");
-                MyApplication.editor.commit();
+                Prefs.setMessage(activity,"mesage");
 
             }
         });
@@ -181,8 +186,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             public void onClick(View view) {
                 int position = (int) view.getTag();
 
-                MyApplication.editor.putString("Message", "mesage");
-                MyApplication.editor.commit();
+                Prefs.setMessage(activity,"mesage");
                 String StrEmain = listEntities.get(position).getEmail();
 
                 Intent emailIntent = new Intent(Intent.ACTION_SEND);

@@ -1,14 +1,10 @@
 package com.uptous.view.activity;
 
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,18 +12,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.squareup.picasso.Picasso;
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.CustomizeDialog;
-import com.uptous.controller.utils.RoundedImageView;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.adapter.SignUpRspvAdapter;
 
 import java.text.SimpleDateFormat;
@@ -45,7 +37,7 @@ import retrofit2.Response;
  * Dependencies : SignUpRSPVActivity
  */
 
-public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClickListener {
+public class SignUpRSPVActivity extends BaseActivity implements View.OnClickListener {
 
     private RecyclerView mRecyclerViewOpenSpot;
 
@@ -90,7 +82,7 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
         if (ConnectionDetector.isConnectingToInternet(this)) {
             getApiSignUpDetail();
         } else {
-            Toast.makeText(SignUpRSPVActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            showToast(getString(R.string.network_error));
         }
 
     }
@@ -115,7 +107,7 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
         mLinearLayoutBackgroundSecondContact = (LinearLayout) findViewById(R.id.layout_contact_image_second);
 
         mTextViewOrgnizer = (TextView) findViewById(R.id.text_view_title_organizers);
-        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_toolbar);
+        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_title);
         mViewEventDescriptionTextView = (TextView) findViewById(R.id.text_view_event_description);
         mViewOrganizerOneTextView = (TextView) findViewById(R.id.text_view_organizer_one);
         mViewOrganizerSecondTextView = (TextView) findViewById(R.id.text_view_organizer_second);
@@ -139,18 +131,12 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
 
         clickListenerOnViews();
 
-//        if (ConnectionDetector.isConnectingToInternet(this)) {
-//            getApiSignUpDetail();
-//        } else {
-//            Toast.makeText(SignUpRSPVActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-//        }
-
     }
 
     // Method to Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(this);
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
     }
 
     //Method to set on clickListener on views
@@ -161,11 +147,8 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
     // Get webservice to show RSPV sign_up open spots, volunteer, full
     private void getApiSignUpDetail() {
 
-        final ProgressDialog mProgressDialog = new ProgressDialog(SignUpRSPVActivity.this);
-        mProgressDialog.setMessage("Please wait...");
-        mProgressDialog.setCancelable(false);
-        mProgressDialog.show();
-        int OpId = MyApplication.mSharedPreferences.getInt("Id", 0);
+       showProgressDialog();
+        int OpId = Prefs.getOpportunityId(this);
 
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
@@ -176,7 +159,7 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onResponse(Call<List<SignUpDetailResponseModel>> call, Response<List<SignUpDetailResponseModel>> response) {
                 try {
-                    mProgressDialog.dismiss();
+                   hideProgressDialog();
 
                     if (response.body()!=null) {
                         final List<SignUpDetailResponseModel> eventResponseModels = response.body();
@@ -222,7 +205,6 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
 
                                 if (BackgroundColor != null) {
 
-                                    int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer1TextColor());
 
 
                                     String resultContact1LastName = eventResponseModels.get(0).getContact().
@@ -252,7 +234,6 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
 
                             if (BackgroundColor != null) {
                                 mLinearLayoutBackgroundFirstContact.setVisibility(View.VISIBLE);
-                                int colorTextView = Color.parseColor(eventResponseModels.get(0).getOrganizer1TextColor());
 
 
                                 String resultContact1LastName = eventResponseModels.get(0).getContact().
@@ -385,18 +366,7 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
 
 
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(SignUpRSPVActivity.this);
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                               logout();
-                            }
-                        });
+                       showLogOutDialog();
                     }
 
 
@@ -409,22 +379,13 @@ public class SignUpRSPVActivity extends AppCompatActivity implements View.OnClic
 
             @Override
             public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                mProgressDialog.dismiss();
-                Toast.makeText(SignUpRSPVActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+               hideProgressDialog();
                 Log.d("onFailure", t.toString());
+                showToast(getString(R.string.network_error));
             }
 
         });
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
+
 }

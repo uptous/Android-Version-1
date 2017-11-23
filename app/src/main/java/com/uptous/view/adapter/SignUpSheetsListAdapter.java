@@ -10,10 +10,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.model.CommnunitiesResponseModel;
 import com.uptous.model.SignUpResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.SignUpDRIVERActivity;
 import com.uptous.view.activity.SignUpOngoingActivity;
 import com.uptous.view.activity.SignUpPartyActivity;
@@ -89,30 +89,27 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
                     int position = (int) view.getTag();
                     if (listEntities.get(position).getType().equalsIgnoreCase("RSVP")) {
                         int OpId = listEntities.get(position).getId();
-                        MyApplication.editor.putInt("Id", OpId);
-                        MyApplication.editor.putString("SignUpDetail", "signupdetail");
-                        MyApplication.editor.commit();
+                        Prefs.setOpportunityId(activity,OpId);
+//                        signupdetail
+                        Prefs.setSignUpDetail(activity,"signupdetail");
                         Intent intent = new Intent(activity, SignUpRSPVActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Vote")) {
                         int OpId = listEntities.get(position).getId();
-                        MyApplication.editor.putInt("Id", OpId);
-                        MyApplication.editor.putString("SignUpDetail", "signupdetail");
-                        MyApplication.editor.commit();
+                        Prefs.setOpportunityId(activity,OpId);
+                        Prefs.setSignUpDetail(activity,"signupdetail");
                         Intent intent = new Intent(activity, SignUpVoteActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Potluck/Party")) {
                         int OpId = listEntities.get(position).getId();
-                        MyApplication.editor.putInt("Id", OpId);
-                        MyApplication.editor.putString("SignUpDetail", "signupdetail");
-                        MyApplication.editor.commit();
+                        Prefs.setOpportunityId(activity,OpId);
+                        Prefs.setSignUpDetail(activity,"signupdetail");
                         Intent intent = new Intent(activity, SignUpPartyActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Drivers")) {
                         int OpId = listEntities.get(position).getId();
-                        MyApplication.editor.putInt("Id", OpId);
-                        MyApplication.editor.putString("SignUpDetail", "signupdetail");
-                        MyApplication.editor.commit();
+                        Prefs.setOpportunityId(activity,OpId);
+                        Prefs.setSignUpDetail(activity,"signupdetail");
                         Intent intent = new Intent(activity, SignUpDRIVERActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Shifts") ||
@@ -121,26 +118,23 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
                             listEntities.get(position).getType().equalsIgnoreCase("Volunteer") ||
                             listEntities.get(position).getType().equalsIgnoreCase("Multi Game/Event RSVP")) {
                         int OpId = listEntities.get(position).getId();
-                        MyApplication.editor.putInt("Id", OpId);
-                        MyApplication.editor.putString("SignUpDetail", "signupdetail");
-                        MyApplication.editor.putString("Type", listEntities.get(position).getType());
-                        MyApplication.editor.commit();
+                        Prefs.setOpportunityId(activity,OpId);
+                        Prefs.setSignUpType(activity,listEntities.get(position).getType());
+                        Prefs.setSignUpDetail(activity,"signupdetail");
                         Intent intent = new Intent(activity, SignUpShiftsActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Snack Schedule")) {
                         int OpId = listEntities.get(position).getId();
-                        MyApplication.editor.putInt("Id", OpId);
-                        MyApplication.editor.putString("SignUpDetail", "signupdetail");
-                        MyApplication.editor.putString("Type", listEntities.get(position).getType());
-                        MyApplication.editor.commit();
+                        Prefs.setOpportunityId(activity,OpId);
+                        Prefs.setSignUpDetail(activity,"signupdetail");
+                        Prefs.setSignUpType(activity,listEntities.get(position).getType());
                         Intent intent = new Intent(activity, SignUpSnackActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Ongoing Volunteering")) {
                         int OpId = listEntities.get(position).getId();
-                        MyApplication.editor.putInt("Id", OpId);
-                        MyApplication.editor.putString("SignUpDetail", "signupdetail");
-                        MyApplication.editor.putString("Type", listEntities.get(position).getType());
-                        MyApplication.editor.commit();
+                        Prefs.setOpportunityId(activity,OpId);
+                        Prefs.setSignUpDetail(activity,"signupdetail");
+                        Prefs.setSignUpType(activity,listEntities.get(position).getType());
                         Intent intent = new Intent(activity, SignUpOngoingActivity.class);
                         activity.startActivity(intent);
                     } else {

@@ -8,12 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.model.FileResponseModel;
+import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.WebviewActivity;
 
 import java.util.List;
@@ -69,8 +70,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
         }
         versionViewHolder.mTextViewProductName.setText(listEntities.get(i).getTitle().replace("%20", " "));
 
-        versionViewHolder.mImageViewDownload.setTag(i);
-        versionViewHolder.mImageViewDownload.setOnClickListener(new View.OnClickListener() {
+        versionViewHolder.parentRow.setTag(i);
+        versionViewHolder.parentRow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int position = (int) view.getTag();
@@ -79,15 +80,13 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                 String result = path.substring(path.lastIndexOf(".") + 1);
 
                 if (result.equalsIgnoreCase("jpeg")) {
-                    MyApplication.editor.putString("Imagepath", path);
-                    MyApplication.editor.putString("AlbumDetail", "albumdetail");
-                    MyApplication.editor.commit();
+                    Prefs.setImagepath(activity,path);
+                    Prefs.setAlbumDetail(activity,"albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
                     activity.startActivity(intent);
                 } else if (result.equalsIgnoreCase("jpg")) {
-                    MyApplication.editor.putString("Imagepath", path);
-                    MyApplication.editor.putString("AlbumDetail", "albumdetail");
-                    MyApplication.editor.commit();
+                    Prefs.setImagepath(activity,path);
+                    Prefs.setAlbumDetail(activity,"albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
                     activity.startActivity(intent);
                 } else if (result.equalsIgnoreCase("MOV")) {
@@ -101,9 +100,9 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                 } else if (result.equalsIgnoreCase("xlsx") || result.equalsIgnoreCase("xls") ||
                         result.equalsIgnoreCase("pdf") || result.equalsIgnoreCase("docx")||
                         result.equalsIgnoreCase("tif")) {
-                    MyApplication.editor.putString("path", path);
-                    MyApplication.editor.commit();
-                    MyApplication.editor.putString("AlbumDetail", "albumdetail");
+                    Prefs.setpath(activity,path);
+
+                    Prefs.setAlbumDetail(activity,"albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
                     activity.startActivity(intent);
                 } else if (result.equalsIgnoreCase("zip")) {
@@ -134,11 +133,11 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
         public View mView;
         TextView mTextViewProductName;
         ImageView imageView,mImageViewDownload;
-
+        RelativeLayout parentRow;
         public VersionViewHolder(View itemView) {
             super(itemView);
 
-
+            parentRow= (RelativeLayout) itemView.findViewById(R.id.row_parent);
             mTextViewProductName = (TextView) itemView.findViewById(R.id.text_view_file_name);
             imageView = (ImageView) itemView.findViewById(R.id.image_view_files);
             mImageViewDownload= (ImageView) itemView.findViewById(R.id.image_view_down_arrow);

@@ -17,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
@@ -25,6 +24,8 @@ import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.FileResponseModel;
 import com.uptous.model.PhotoAlbumResponseModel;
+import com.uptous.sharedpreference.Prefs;
+import com.uptous.view.activity.BaseActivity;
 import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.adapter.AlbumsAdapter;
@@ -83,9 +84,9 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 mTextViewHeading.setVisibility(View.GONE);
                 mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
                 mRecyclerViewFiles.setVisibility(View.GONE);
-                MyApplication.editor.putString("Attachment", null);
-                MyApplication.editor.putString("Album", "album");
-                MyApplication.editor.commit();
+
+                Prefs.setAttachment(getActivity(),null);
+                Prefs.setAlbum(getActivity(), "album");
                 getApiAlbumList();
                 break;
             case R.id.text_view_files:
@@ -97,9 +98,8 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 mTextViewAlbums.setTextColor(Color.BLACK);
                 mTextViewAlbums.setBackgroundResource(R.drawable.rounded_all_files_empty);
                 mViewAlbumsRecyclerView.setVisibility(View.GONE);
-                MyApplication.editor.putString("Attachment", "attachment");
-                MyApplication.editor.putString("Album", null);
-                MyApplication.editor.commit();
+                Prefs.setAttachment(getActivity(),"attachment");
+                Prefs.setAlbum(getActivity(), null);
                 getApiFileList();
                 break;
         }
@@ -110,9 +110,9 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onResume() {
         super.onResume();
-        String Album = MyApplication.mSharedPreferences.getString("Album", null);
-        String Attachment = MyApplication.mSharedPreferences.getString("Attachment", null);
-        String Detail = MyApplication.mSharedPreferences.getString("AlbumDetail", null);
+        String Album = Prefs.getAlbum(getActivity());
+        String Attachment = Prefs.getAttachment(getActivity());
+        String Detail = Prefs.getAlbumDetail(getActivity());
 
         if (Detail == null) {
             if (Album != null) {
@@ -186,8 +186,8 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
 
     // Get data from SharedPreference
     private void getData() {
-        mAuthenticationId = MyApplication.mSharedPreferences.getString("AuthenticationId", null);
-        mAuthenticationPassword = MyApplication.mSharedPreferences.getString("AuthenticationPassword", null);
+        mAuthenticationId = Prefs.getAuthenticationId(getActivity());
+        mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
     }
 
     //Method to setClickListener On views
@@ -197,15 +197,9 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
     }
 
 
-
-
     // Get webservice to show albums
     private void getApiAlbumList() {
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
-
+        ((MainActivity)getActivity()).showProgressDialog();
 
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -215,10 +209,10 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onResponse(Call<List<PhotoAlbumResponseModel>> call, Response<List<PhotoAlbumResponseModel>> response) {
 
-                progressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
                 try {
-                    MyApplication.editor.putString("Album", "album");
-                    MyApplication.editor.commit();
+
+                    Prefs.setAlbum(getActivity(),"album");
 
 
                     if (response.body() != null) {
@@ -228,26 +222,15 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                         mViewAlbumsRecyclerView.setAdapter(mAlbumsAdapter);
                         mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
                         mRecyclerViewFiles.setVisibility(View.GONE);
-                        int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+                        int communityId = Prefs.getCommunityId(getActivity());
                         if (communityId != 0) {
                             FilterCommunityForAlbum(photoAlbumResponseModelList, communityId);
                         }
 
                     } else {
-                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
-                        customizeDialog.setCancelable(false);
-                        customizeDialog.setContentView(R.layout.dialog_password_change);
-                        TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                        customizeDialog.show();
-                        textViewOk.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                customizeDialog.dismiss();
-                                logout();
-                            }
-                        });
 
-
+                        BaseActivity baseActivity = (BaseActivity)getActivity();
+                        baseActivity.showLogOutDialog();
                     }
 
                 } catch (Exception e) {
@@ -263,7 +246,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
 
                 Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
 
-                progressDialog.dismiss();
+                ((MainActivity)getActivity()).hideProgressDialog();
             }
 
         });
@@ -271,10 +254,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
 
     // Get webservice to show attachment files
     private void getApiFileList() {
-        final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Please wait..");
-        progressDialog.show();
-        progressDialog.setCancelable(false);
+        ((MainActivity)getActivity()).showProgressDialog();
 
 
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
@@ -284,7 +264,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
         call.enqueue(new Callback<List<FileResponseModel>>() {
                          @Override
                          public void onResponse(Call<List<FileResponseModel>> call, Response<List<FileResponseModel>> response) {
-                             progressDialog.dismiss();
+                             ((MainActivity)getActivity()).hideProgressDialog();
 
                              try {
 
@@ -295,23 +275,14 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                                      mAttachmentAdapter = new AttachmentAdapter(getActivity(), attachmentFileResponseModels);
                                      mRecyclerViewFiles.setAdapter(mAttachmentAdapter);
                                      mRecyclerViewFiles.setVisibility(View.VISIBLE);
-                                     int communityId = MyApplication.mSharedPreferences.getInt("CommunityId", 0);
+                                     int communityId = Prefs.getCommunityId(getActivity());
                                      if (communityId != 0) {
                                          FilterCommunityForAttachment(attachmentFileResponseModels, communityId);
                                      }
                                  } else {
-                                     final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
-                                     customizeDialog.setCancelable(false);
-                                     customizeDialog.setContentView(R.layout.dialog_password_change);
-                                     TextView textViewOk = (TextView) customizeDialog.findViewById(R.id.text_view_log_out);
-                                     customizeDialog.show();
-                                     textViewOk.setOnClickListener(new View.OnClickListener() {
-                                         @Override
-                                         public void onClick(View view) {
-                                             customizeDialog.dismiss();
-                                             logout();
-                                         }
-                                     });
+
+                                     BaseActivity baseActivity = (BaseActivity)getActivity();
+                                     baseActivity.showLogOutDialog();
 
                                  }
 
@@ -327,7 +298,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                          @Override
                          public void onFailure(Call<List<FileResponseModel>> call, Throwable t) {
                              Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
-                             progressDialog.dismiss();
+                             ((MainActivity)getActivity()).hideProgressDialog();
                          }
 
                      }
@@ -422,7 +393,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 mViewAlbumsRecyclerView.setAdapter(mAlbumsAdapter);
                 mAlbumsAdapter.notifyDataSetChanged();
             }
-            int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
+            int Position = Prefs.getPosition(getActivity());
 
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 3) {
@@ -452,7 +423,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 mRecyclerViewFiles.setAdapter(mAttachmentAdapter);
                 mAttachmentAdapter.notifyDataSetChanged();
             }
-            int Position = MyApplication.mSharedPreferences.getInt("Position", 0);
+            int Position = Prefs.getPosition(getActivity());
 
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 3) {
@@ -460,7 +431,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
                     Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
                 } else {
-                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
+                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }
             }
 
@@ -470,14 +441,4 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
         return attachmentFileResponseModels;
     }
 
-    //Method to logout from app
-    private void logout() {
-        MainActivity activity = new MainActivity();
-        activity.logOut();
-        Application app = getActivity().getApplication();
-        Intent intent = new Intent(app, LogInActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        app.startActivity(intent);
-    }
 }
