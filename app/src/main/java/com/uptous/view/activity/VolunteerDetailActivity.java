@@ -1,6 +1,6 @@
 package com.uptous.view.activity;
 
-import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,7 +13,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.uptous.MyApplication;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
@@ -38,6 +37,7 @@ import retrofit2.Response;
 
 public class VolunteerDetailActivity extends BaseActivity implements View.OnClickListener {
 
+    public static final String FULL_LIST = "full_list";
     private ImageView mImageViewBack;
     private VolunteeredAdapter mVolunteeredAdapter;
     private VolunteeredRspvAdapter mVolunteeredRspvAdapter;
@@ -48,12 +48,17 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
             mViewDrivingToTextView;
     private int mItemID;
 
-
+    private Boolean isFullList=false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cancel_volunteer);
 
+        Intent intent= getIntent();
+        if (intent.hasExtra(FULL_LIST)) {
+            Bundle extras = getIntent().getExtras();
+                isFullList = extras.getBoolean(FULL_LIST);
+        }
         initView();
     }
 
@@ -90,6 +95,8 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
         mTextViewEventDate = (TextView) findViewById(R.id.text_view_volunteer_event_date);
         mTextViewCancelAssignment = (TextView) findViewById(R.id.text_view_cancel_assignment);
 
+        if(isFullList)
+        mTextViewCancelAssignment.setText("Full");
         mImageViewBack.setVisibility(View.VISIBLE);
         linearLayoutCommunityFilter.setVisibility(View.GONE);
         linearLayoutImageMenuLeft.setVisibility(View.GONE);
@@ -157,6 +164,7 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
     //Method to set on clickListener on views
     private void clickListenerOnViews() {
         mImageViewBack.setOnClickListener(this);
+        if(!isFullList)
         mTextViewCancelAssignment.setOnClickListener(this);
 
     }

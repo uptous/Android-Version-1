@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
@@ -16,7 +15,6 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -24,9 +22,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.uptous.R;
 import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.ContactListResponseModel;
-import com.uptous.R;
 import com.uptous.sharedpreference.Prefs;
 
 import java.util.List;
@@ -68,8 +66,8 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
         if (FirstName != null) {
             if (LastName != null) {
-                versionViewHolder.mTextViewProductName.setText(FirstName + " " + LastName);
-                versionViewHolder.mTextViewContactDetailName.setText(FirstName + " " + LastName);
+                versionViewHolder.mTextViewProductName.setText(LastName + ", " + FirstName);
+                versionViewHolder.mTextViewContactDetailName.setText(LastName + ", " + FirstName);
             } else {
                 versionViewHolder.mTextViewProductName.setText(FirstName);
                 versionViewHolder.mTextViewContactDetailName.setText(FirstName);
@@ -131,11 +129,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
                     public void onClick(View view) {
                         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + PhoneNumber));
                         intent.putExtra("sms_body", "");
-                        if(intent.resolveActivity(activity.getPackageManager())!=null)
-                           activity.startActivity(intent);
-                        else
-                        {
-                            Toast.makeText(activity,activity.getString(R.string.no_app),Toast.LENGTH_SHORT).show();
+                        if (intent.resolveActivity(activity.getPackageManager()) != null)
+                            activity.startActivity(intent);
+                        else {
+                            Toast.makeText(activity, activity.getString(R.string.no_app), Toast.LENGTH_SHORT).show();
                         }
                         customizeDialog.dismiss();
                     }
@@ -153,10 +150,10 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
                                     0);
                         } else {
                             Intent intent = new Intent(Intent.ACTION_CALL).setData(Uri.parse("tel:" + PhoneNumber));
-                            if(intent.resolveActivity(activity.getPackageManager())!=null)
+                            if (intent.resolveActivity(activity.getPackageManager()) != null)
                                 activity.startActivity(intent);
                             else
-                                Toast.makeText(activity,activity.getString(R.string.no_app),Toast.LENGTH_SHORT).show();
+                                Toast.makeText(activity, activity.getString(R.string.no_app), Toast.LENGTH_SHORT).show();
                         }
                         customizeDialog.dismiss();
                     }
@@ -168,7 +165,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 //mesage
 
 
-                Prefs.setMessage(activity,"mesage");
+                Prefs.setMessage(activity, "mesage");
 
             }
         });
@@ -186,7 +183,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             public void onClick(View view) {
                 int position = (int) view.getTag();
 
-                Prefs.setMessage(activity,"mesage");
+                Prefs.setMessage(activity, "mesage");
                 String StrEmain = listEntities.get(position).getEmail();
 
                 Intent emailIntent = new Intent(Intent.ACTION_SEND);
@@ -271,9 +268,6 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
                 Glide.with(activity).load(listEntities.get(i).getPhoto())
                         .into(versionViewHolder.mImageViewContactDetailImage);
-
-
-
 
 
 //                Picasso.with(activity).load(listEntities.get(i).getPhoto())
@@ -376,7 +370,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
         public View mView;
         TextView mTextViewProductName, mTextViewContactDetailName, mTextViewContactDetailAbout,
                 TextViewEmail, TextViewPhone, TextViewKidsDetail, mTextViewKids;
-        ImageView mImageViewContactDetailImage, mImageViewExpand, mImageViewCollapsd,imageView;
+        ImageView mImageViewContactDetailImage, mImageViewExpand, mImageViewCollapsd, imageView;
         private TextView mTextViewFirstName, mTextViewLastName, mTextViewDetailFirstName, mTextViewDetailLastName;
         private boolean mIsSelected = false;
         LinearLayout linearLayoutNameDetail, linearLayoutNameBackground;
@@ -405,7 +399,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             mImageViewCollapsd = (ImageView) itemView.findViewById(R.id.image_view_contact_collpsd);
             mImageViewContactDetailImage = (ImageView) itemView.findViewById(R.id.image_view_contact_detail);
             mView = itemView;
-            mImageViewExpand.setOnClickListener(new View.OnClickListener() {
+            mRelativeLayoutContact.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (mIsSelected == false) {
@@ -422,7 +416,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
 
                 }
             });
-            mImageViewCollapsd.setOnClickListener(new View.OnClickListener() {
+            relativeLayoutContactDetail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (mIsSelected == false) {

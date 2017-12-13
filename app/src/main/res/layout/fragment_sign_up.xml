@@ -23,4 +23,11 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/search_result"></android.support.v7.widget.RecyclerView>
+    <include
+        android:id="@+id/recycler_view_empty"
+        android:layout_width="match_parent"
+        layout="@layout/empty_view"
+        android:visibility="gone"
+        android:layout_height="match_parent">
+    </include>
 </RelativeLayout>

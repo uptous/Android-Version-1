@@ -48,7 +48,7 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
 
     private TextView mTextViewTitle, mViewEventDescriptionTextView, mViewOrganizerOneTextView,
             mViewOrganizerSecondTextView, mTextViewEventDateSignUp, mTextViewOrgnizer, mTextViewFirstNameContactOne,
-            mTextViewSecondNameContactOne, mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo,mTextViewCutOffDateSignUp;
+            mTextViewSecondNameContactOne, mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewCutOffDateSignUp;
 
     private ImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
 
@@ -63,9 +63,7 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-
         initView();
-
     }
 
     @Override
@@ -74,7 +72,6 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
             case R.id.image_view_back:
                 finish();
                 break;
-
         }
     }
 
@@ -143,11 +140,8 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
 
     // Get webservice to show Vote sign_up open spots, volunteer, full
     private void getApiSignUpDetail() {
-
         showProgressDialog();
         int OpId = Prefs.getOpportunityId(this);
-
-
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<List<SignUpDetailResponseModel>> call = service.GetSignUpDetail(OpId);
@@ -161,7 +155,7 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
                                  if (response.isSuccessful()) {
                                      final List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
-                                     mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n"," "));
+                                     mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n", " "));
                                      mTextViewTitle.setVisibility(View.VISIBLE);
 
                                      String Name = eventResponseModels.get(0).getName();
@@ -281,8 +275,6 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
                                          }
 
                                      } else {
-
-
                                          String BackgroundColor = eventResponseModels.get(0).getOrganizer2BackgroundColor();
                                          if (BackgroundColor != null) {
                                              mLinearLayoutBackgroundSecondContact.setVisibility(View.VISIBLE);
@@ -299,7 +291,6 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
                                              mTextViewSecondNameContactTwo.setText(resultContact1LastName);
                                              mTextViewSecondNameContactTwo.setTextColor(colorTextView);
                                          }
-
                                      }
                                      long val = eventResponseModels.get(0).getDateTime();
                                      if (val == 0) {
@@ -312,14 +303,13 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
                                          dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                                          String dateText = df2.format(date);
                                          String dateTime = dfTime.format(date);
-
                                          String EndTime = response.body().get(0).getEndTime();
-                                         if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM")&& !EndTime.equalsIgnoreCase("1:00 AM")) {
+                                         if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM") && !EndTime.equalsIgnoreCase("1:00 AM")) {
                                              mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime + " - " + EndTime);
 
                                          } else {
-                                             if(dateTime!=null){
-                                                 if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
+                                             if (dateTime != null) {
+                                                 if (!dateTime.equalsIgnoreCase("1:00AM") && !dateTime.equalsIgnoreCase("1:00 AM")) {
                                                      mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
                                                  } else {
                                                      mTextViewEventDateSignUp.setText(dateText);
@@ -327,8 +317,7 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
                                              }
 
                                          }
-                                         }
-
+                                     }
                                      long valCutOff = eventResponseModels.get(0).getCutoffDate();
                                      if (valCutOff == 0) {
                                          mTextViewCutOffDateSignUp.setVisibility(View.GONE);
@@ -342,7 +331,6 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
                                          dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                                          String dateText = df2.format(date);
 //                            String dateTime = dfTime.format(date);
-
                                          String EndTime = response.body().get(0).getEndTime();
                                          if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM") && !EndTime.equalsIgnoreCase("1:00 AM")) {
                                              mTextViewCutOffDateSignUp.setText(dateText);
@@ -355,37 +343,30 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
 //                                        mTextViewCutOffDateSignUp.setText(dateText);
 //                                    }
 //                                }
-
                                          }
                                      }
-                                         mSignUpVoteAdapter = new SignUpVoteAdapter(SignUpVoteActivity.this, eventResponseModels.get(0).getItems());
-                                         mRecyclerViewOpenSpot.setAdapter(mSignUpVoteAdapter);
-
-
-                                     }else{
-                                   showLogOutDialog();
-                                     }
-
-
-                                 }catch(Exception e){
-                                     Log.d("onResponse", "There is an error");
-                                     e.printStackTrace();
+                                     mSignUpVoteAdapter = new SignUpVoteAdapter(SignUpVoteActivity.this, eventResponseModels.get(0).getItems());
+                                     mRecyclerViewOpenSpot.setAdapter(mSignUpVoteAdapter);
+                                 } else {
+                                     showLogOutDialog();
                                  }
-
+                             } catch (Exception e) {
+                                 Log.d("onResponse", "There is an error");
+                                 e.printStackTrace();
                              }
-
-                             @Override
-                             public void onFailure (Call < List < SignUpDetailResponseModel >> call, Throwable t)
-                             {
-                               hideProgressDialog();
-                                 showToast(getString(R.string.error));
-                                 Log.d("onFailure", t.toString());
-                             }
-
                          }
 
-                         );
+                         @Override
+                         public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
+                             hideProgressDialog();
+                             showToast(getString(R.string.error));
+                             Log.d("onFailure", t.toString());
+                         }
+
                      }
+
+        );
+    }
 
     //Method to set on clickListener on views
     private void clickListenerOnViews() {
@@ -395,8 +376,8 @@ public class SignUpVoteActivity extends BaseActivity implements View.OnClickList
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(isLastAppActivity(this))
-            startActivity(new Intent(this,MainActivity.class));
+        if (isLastAppActivity(this))
+            startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 

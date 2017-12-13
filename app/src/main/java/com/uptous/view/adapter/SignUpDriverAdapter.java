@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import static com.uptous.view.activity.VolunteerDetailActivity.FULL_LIST;
+
 /**
  * Created by Prakash .
  */
@@ -105,13 +107,14 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
 
         String OpenSpot = listEntities.get(i).getVolunteerStatus();
 
+
         int VolunteerCount = listEntities.get(i).getVolunteerCount();
         versionViewHolder.linearLayoutOpenSpot.setTag(i);
         versionViewHolder.linearLayoutVolunteered.setTag(i);
         final String Name = listEntities.get(i).getName();
         if (OpenSpot.equalsIgnoreCase("Open")) {
 
-            versionViewHolder.linearLayoutOpenSpot.setOnClickListener(new View.OnClickListener() {
+            versionViewHolder.layout_parent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String dateText = null;
@@ -165,7 +168,7 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
         } else {
             if (OpenSpot.equalsIgnoreCase("Volunteered")) {
 
-                versionViewHolder.linearLayoutVolunteered.setOnClickListener(new View.OnClickListener() {
+                versionViewHolder.layout_parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         String dateText = null;
@@ -212,6 +215,7 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                             Prefs.setToName(activity,listEntities.get(0).getName());
                         }
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
+                        intent.putExtra(FULL_LIST,true);
                         activity.startActivity(intent);
                     }
                 });
@@ -269,6 +273,7 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                             Prefs.setToName(activity,listEntities.get(0).getName());
                         }
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
+                        intent.putExtra(FULL_LIST,true);
                         activity.startActivity(intent);
                     }
                 });
@@ -293,14 +298,14 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
         TextView mTextViewTo, mTextViewDate, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
-        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot;
+        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot,ll_row_parent,layout_parent;
         GifImageView imageViewSignUpType;
-        ImageView imageViewFull;
-
+        ImageView imageViewFull,imageSignUp;
+        TextView TextViewSignUp;
 
         public VersionViewHolder(View itemView) {
             super(itemView);
-
+            ll_row_parent = (LinearLayout) itemView.findViewById(R.id.row_parent);
             mTextViewTitle = (TextView) itemView.findViewById(R.id.text_view_name_form);
             mTextViewVolunteered = (TextView) itemView.findViewById(R.id.text_view_volunteered);
             mTextViewTo = (TextView) itemView.findViewById(R.id.text_view_name_to);
@@ -308,6 +313,9 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
             mteTextViewVolunteerCount = (TextView) itemView.findViewById(R.id.text_view_volunteer_count);
             linearLayoutVolunteered = (LinearLayout) itemView.findViewById(R.id.layout_volunteered);
             linearLayoutOpenSpot = (LinearLayout) itemView.findViewById(R.id.layout_open_spot);
+            layout_parent = (LinearLayout) itemView.findViewById(R.id.layout_parent);
+            TextViewSignUp = (TextView) itemView.findViewById(R.id.text_signup);
+            imageSignUp = (ImageView) itemView.findViewById(R.id.img_signup);
             imageViewSignUpType = (GifImageView) itemView.findViewById(R.id.image_view_sign_up_type);
             imageViewFull = (ImageView) itemView.findViewById(R.id.image_view_full);
             mView = itemView;

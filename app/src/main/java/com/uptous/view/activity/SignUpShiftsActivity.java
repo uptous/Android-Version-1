@@ -47,7 +47,7 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
 
     private TextView mViewEventDescriptionTextView, mViewOrganizerOneTextView, mViewOrganizerSecondTextView,
             mTextViewOrgnizer, mTextViewFirstNameContactOne, mTextViewTitle, mTextViewSecondNameContactOne,
-            mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewEventDateSignUp,mTextViewCutOffDateSignUp;
+            mTextViewSecondNameContactTwo, mTextViewFirstNameContactTwo, mTextViewEventDateSignUp, mTextViewCutOffDateSignUp;
 
     private ImageView mViewOrganizerOneRoundedImageView, mViewOrganizerSecondRoundedImageView;
 
@@ -141,17 +141,14 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
     // Method to Get data from SharedPreference
     private void getData() {
         AuthenticationId = Prefs.getAuthenticationId(this);
-        AuthenticationPassword =Prefs.getAuthenticationPassword(this);
+        AuthenticationPassword = Prefs.getAuthenticationPassword(this);
 
     }
 
     // Get webservice to show Ongoing sign_up open spots, volunteer, full
     private void getApiSignUpDetail() {
-
         showProgressDialog();
         int OpId = Prefs.getOpportunityId(this);
-
-
         APIServices service =/* = retrofit.create(APIServices.class,"","");*/
                 ServiceGenerator.createService(APIServices.class, AuthenticationId, AuthenticationPassword);
         Call<List<SignUpDetailResponseModel>> call = service.GetSignUpDetail(OpId);
@@ -160,22 +157,15 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
             @Override
             public void onResponse(Call<List<SignUpDetailResponseModel>> call, Response<List<SignUpDetailResponseModel>> response) {
                 try {
-                 hideProgressDialog();
-
-                    if (response.body()!=null) {
+                    hideProgressDialog();
+                    if (response.body() != null) {
                         final List<SignUpDetailResponseModel> eventResponseModels = response.body();
-
-
-                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n"," "));
+                        mViewEventDescriptionTextView.setText(eventResponseModels.get(0).getNotes().replace("\n", " "));
                         mTextViewTitle.setVisibility(View.VISIBLE);
-
                         String Name = eventResponseModels.get(0).getName();
                         mTextViewTitle.setText(Name);
-
                         String Contactone = eventResponseModels.get(0).getContact();
                         String Contacttwo = eventResponseModels.get(0).getContact2();
-
-
                         if (Contactone != null && !Contactone.equalsIgnoreCase("")) {
                             mViewOrganizerOneTextView.setText(Contactone);
                             mTextViewOrgnizer.setVisibility(View.VISIBLE);
@@ -191,10 +181,8 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
                         } else {
                             mViewOrganizerSecondTextView.setVisibility(View.GONE);
                         }
-
                         String Image1 = eventResponseModels.get(0).getOrganizer1PhotoUrl();
                         String Image2 = eventResponseModels.get(0).getOrganizer2PhotoUrl();
-
                         if (Image1 != null) {
                             mResultOne = Image1.substring(Image1.lastIndexOf(".") + 1);
                             if (mResultOne.equalsIgnoreCase("gif")) {
@@ -234,18 +222,12 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
                                     }
                                 }
                             } else {
-
-
                                 mViewOrganizerOneRoundedImageView.setVisibility(View.VISIBLE);
 //                                Picasso.with(SignUpShiftsActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
 //                                        .into(mViewOrganizerOneRoundedImageView);
-
                                 Glide.with(SignUpShiftsActivity.this).load(eventResponseModels.get(0).getOrganizer1PhotoUrl())
                                         .into(mViewOrganizerOneRoundedImageView);
-
-
                             }
-
                         } else {
                             String BackgroundColor = eventResponseModels.get(0).getOrganizer1BackgroundColor();
 
@@ -396,17 +378,17 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
                             String dateTime = dfTime.format(date);
 
                             String EndTime = response.body().get(0).getEndTime();
-                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM")&& !EndTime.equalsIgnoreCase("1:00 AM")) {
-                                    mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime + " - " + EndTime);
+                            if (EndTime != null && !EndTime.equalsIgnoreCase("1:00AM") && !EndTime.equalsIgnoreCase("1:00 AM")) {
+                                mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime + " - " + EndTime);
 
-                                } else {
-                                    if(dateTime!=null){
-                                        if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
-                                            mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
-                                        } else {
-                                            mTextViewEventDateSignUp.setText(dateText);
-                                        }
+                            } else {
+                                if (dateTime != null) {
+                                    if (!dateTime.equalsIgnoreCase("1:00AM") && !dateTime.equalsIgnoreCase("1:00 AM")) {
+                                        mTextViewEventDateSignUp.setText(dateText + "\n" + dateTime);
+                                    } else {
+                                        mTextViewEventDateSignUp.setText(dateText);
                                     }
+                                }
 
                             }
 
@@ -447,7 +429,7 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
 
 
                     } else {
-                       showLogOutDialog();
+                        showLogOutDialog();
                     }
 
 
@@ -460,7 +442,7 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
 
             @Override
             public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-              hideProgressDialog();
+                hideProgressDialog();
                 Log.d("onFailure", t.toString());
                 showToast(getString(R.string.error));
             }
@@ -477,8 +459,8 @@ public class SignUpShiftsActivity extends BaseActivity implements View.OnClickLi
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if(isLastAppActivity(this))
-            startActivity(new Intent(this,MainActivity.class));
+        if (isLastAppActivity(this))
+            startActivity(new Intent(this, MainActivity.class));
         finish();
     }
 }

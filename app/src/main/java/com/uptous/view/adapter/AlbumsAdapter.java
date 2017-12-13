@@ -26,7 +26,6 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.VersionVie
     Activity activity;
 
 
-
     public AlbumsAdapter(Activity a, List<PhotoAlbumResponseModel> listEntities) {
 
         this.listEntities = listEntities;
@@ -48,19 +47,16 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.VersionVie
     public void onBindViewHolder(final VersionViewHolder versionViewHolder, int i) {
 
         // Set Data in your views comes from CollectionClass
-
-
-
         versionViewHolder.mTextViewProductName.setText(listEntities.get(i).getTitle().replace("%20", " "));
         Picasso.with(activity).load(listEntities.get(i).getThumb()).into(versionViewHolder.imageView);
         versionViewHolder.imageView.setTag(i);
         versionViewHolder.imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int Position=(int) view.getTag();
+                int Position = (int) view.getTag();
                 int AlbumID = listEntities.get(Position).getId();
-                Prefs.setNewsItemId(activity,AlbumID);
-               Prefs.setAlbumDetail(activity,"albumdetail");
+                Prefs.setNewsItemId(activity, AlbumID);
+                Prefs.setAlbumDetail(activity, "albumdetail");
                 Intent intent = new Intent(activity, AlbumDetailActivity.class);
                 activity.startActivity(intent);
             }
@@ -79,7 +75,7 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.VersionVie
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView  mTextViewProductName;
+        TextView mTextViewProductName;
         ImageView imageView;
 
         public VersionViewHolder(View itemView) {
@@ -91,9 +87,9 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.VersionVie
             mView = itemView;
 
 
-
         }
     }
+
     @Override
     public int getItemViewType(int position) {
 

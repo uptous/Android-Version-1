@@ -289,6 +289,14 @@ public class Prefs {
         editor.putInt(CommunityId, str);
         return editor.commit();
     }
+//    public static int getfilterCommunityId(Context context) {
+//        return PreferenceManager.getDefaultSharedPreferences(context).getInt(CommunityId, 0);
+//    }
+//    public static boolean setfilterCommunityId(Context context, int str) {
+//        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+//        editor.putInt(CommunityId, str);
+//        return editor.commit();
+//    }
 
 
     public static String getImagepath(Context context) {

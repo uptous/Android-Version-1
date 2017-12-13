@@ -435,10 +435,6 @@ public class SignUpSnackActivity extends BaseActivity implements View.OnClickLis
 
 //                                    if (!dateTime.equalsIgnoreCase("1:00AM")&&!dateTime.equalsIgnoreCase("1:00 AM")) {
                                 mTextViewCutOffDateSignUp.setText(dateText);
-//                                    } else {
-//                                        mTextViewCutOffDateSignUp.setText(dateText);
-//                                    }
-//                                }
 
                             }
                         }

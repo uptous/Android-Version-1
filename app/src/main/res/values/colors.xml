@@ -9,4 +9,7 @@
     <color name="open_spot_color">#2f7f36</color>
 
     <color name="btn_bck_login">#5c8def</color>
+    <color name="empty_title">#56B31D</color>
+    <color name="empty_title2">#001A26</color>
+    <color name="empty_content">#001A26</color>
 </resources>
