@@ -21,6 +21,8 @@ import com.uptous.R;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.uptous.view.activity.MainActivity.contactListResponseModels;
+
 
 /**
  * FileName : ContactFragment
@@ -33,11 +35,11 @@ public class ContactFragment extends Fragment {
 
     public static RecyclerView mViewContactRecyclerView;
 
-    public static List<ContactListResponseModel> contactListResponseModels = new ArrayList<>();
+   // public static List<ContactListResponseModel> contactListResponseModels = new ArrayList<>();
 
     public static TextView mTextViewSearchResult;
 
-
+    private static View recycler_view_empty1;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact, container, false);
@@ -67,7 +69,7 @@ public class ContactFragment extends Fragment {
           getContactList();
 
         } else {
-            
+
             Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
         }
 
@@ -86,8 +88,23 @@ public class ContactFragment extends Fragment {
         mViewContactRecyclerView.setLayoutManager(layoutManager);
 
         mTextViewSearchResult = (TextView) view.findViewById(R.id.search_result);
+        recycler_view_empty1 = view.findViewById(R.id.recycler_view_empty);
+        ((TextView)view.findViewById(R.id.text_title1)).setText("Hey, where is everybody?");
+        ((TextView)view.findViewById(R.id.text_title2)).setText("There are no contacts to show, most likely because you haven’t joined any communities (yet).");
+        ((TextView)view.findViewById(R.id.text_contain)).setText("Once you create a community (on the website) or join a community to which you’ve been invited, you’ll start to see contact info for yourself and other community members.");
 
+    }
 
+    public static void checkEmptyContact() {
+        if (recycler_view_empty1 != null && mViewContactRecyclerView != null) {
+            if (contactListResponseModels.size() == 0) {
+                recycler_view_empty1.setVisibility(View.VISIBLE);
+                mViewContactRecyclerView.setVisibility(View.GONE);
+            } else {
+                mViewContactRecyclerView.setVisibility(View.VISIBLE);
+                recycler_view_empty1.setVisibility(View.GONE);
+            }
+        }
     }
 
 
@@ -95,12 +112,12 @@ public class ContactFragment extends Fragment {
     public void getContactList() {
 
         try {
-            if (MainActivity.contactListResponseModels.size() != 0) {
+            if (contactListResponseModels.size() != 0) {
                 mTextViewSearchResult.setVisibility(View.GONE);
 
                 String Message =Prefs.getMessage(getActivity());
                 if (Message == null) {
-                    mContactListAdapter = new ContactListAdapter(getActivity(), MainActivity.contactListResponseModels);
+                    mContactListAdapter = new ContactListAdapter(getActivity(), contactListResponseModels);
                     mViewContactRecyclerView.setAdapter(mContactListAdapter);
                     Log.i("ContactFragment","Setting Adapter .... contact ");
                 }
@@ -110,7 +127,7 @@ public class ContactFragment extends Fragment {
                 if (Message == null) {
                     if (communityId != 0) {
                         Log.i("ContactFragment","Filtering  Adapter .... contact ");
-                        FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
+                        FilterCommunityForContact(contactListResponseModels, communityId);
                     }
                 }
 
@@ -208,9 +225,10 @@ public class ContactFragment extends Fragment {
 
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 1) {
+                ContactFragment.checkEmptyContact();
                 if (contactListResponseModels.size() == 0) {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
                 } else {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }

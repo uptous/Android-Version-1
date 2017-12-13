@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:id="@+id/layout_parent"
     android:layout_marginTop="@dimen/_2sdp"
     android:layout_marginBottom="@dimen/_2sdp"
     android:orientation="vertical">
@@ -112,7 +113,7 @@
                     android:orientation="horizontal">
 
                     <TextView
-
+                        android:id="@+id/text_signup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Sign up!"
@@ -120,6 +121,7 @@
                         android:textSize="@dimen/_13sdp" />
 
                     <ImageView
+                        android:id="@+id/img_signup"
                         android:layout_width="@dimen/_15sdp"
                         android:layout_height="@dimen/_15sdp"
                         android:layout_marginLeft="@dimen/_10sdp"

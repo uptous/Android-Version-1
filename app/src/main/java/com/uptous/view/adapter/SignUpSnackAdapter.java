@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import static com.uptous.view.activity.VolunteerDetailActivity.FULL_LIST;
+
 /**
  * Created by Prakash .
  */
@@ -104,12 +106,13 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
 
 
         versionViewHolder.linearLayoutOpenSpot.setTag(i);
+        versionViewHolder.linearLayoutlayout_parent.setTag(i);
         versionViewHolder.linearLayoutVolunteered.setTag(i);
         final String Name = listEntities.get(i).getName();
         final String Time = listEntities.get(i).getEndTime();
         if (OpenSpot.equalsIgnoreCase("Open")) {
 
-            versionViewHolder.linearLayoutOpenSpot.setOnClickListener(new View.OnClickListener() {
+            versionViewHolder.linearLayoutlayout_parent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String dateText = null;
@@ -173,7 +176,7 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
         } else {
             if (OpenSpot.equalsIgnoreCase("Volunteered")) {
 
-                versionViewHolder.linearLayoutVolunteered.setOnClickListener(new View.OnClickListener() {
+                versionViewHolder.linearLayoutlayout_parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         String dateText = null;
@@ -224,7 +227,7 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
 
             if (OpenSpot.equalsIgnoreCase("Full")) {
 
-                versionViewHolder.linearLayoutVolunteered.setOnClickListener(new View.OnClickListener() {
+                versionViewHolder.linearLayoutlayout_parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
@@ -263,6 +266,7 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
                         Prefs.setDate(activity,dateText);
                         Prefs.setSignUpType(activity,null);
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
+                        intent.putExtra(FULL_LIST,true);
                         activity.startActivity(intent);
                     }
                 });
@@ -287,10 +291,10 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewDate, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
-        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot;
+        TextView mTextViewDate,TextViewSignUp, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
+        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot,linearLayoutlayout_parent;
         GifImageView imageViewSignUpType;
-        ImageView imageViewFull;
+        ImageView imageViewFull,imageSignUp;
 
 
         public VersionViewHolder(View itemView) {
@@ -300,8 +304,11 @@ public class SignUpSnackAdapter extends RecyclerView.Adapter<SignUpSnackAdapter.
             mTextViewVolunteered = (TextView) itemView.findViewById(R.id.text_view_volunteered);
             mTextViewDate = (TextView) itemView.findViewById(R.id.text_view_date);
             mteTextViewVolunteerCount = (TextView) itemView.findViewById(R.id.text_view_volunteer_count);
+
+            TextViewSignUp = (TextView) itemView.findViewById(R.id.text_signup);
+            imageSignUp = (ImageView) itemView.findViewById(R.id.img_signup);
             linearLayoutVolunteered = (LinearLayout) itemView.findViewById(R.id.layout_volunteered);
-            linearLayoutOpenSpot = (LinearLayout) itemView.findViewById(R.id.layout_open_spot);
+            linearLayoutOpenSpot = (LinearLayout) itemView.findViewById(R.id.layout_open_spot);    linearLayoutlayout_parent = (LinearLayout) itemView.findViewById(R.id.layout_parent);
             imageViewSignUpType = (GifImageView) itemView.findViewById(R.id.image_view_sign_up_type);
             imageViewFull = (ImageView) itemView.findViewById(R.id.image_view_full);
             mView = itemView;

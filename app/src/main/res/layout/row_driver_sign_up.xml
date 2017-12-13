@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_parent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/_70sdp"
+        android:id="@+id/layout_open_spot"
         android:layout_margin="@dimen/_1sdp"
-
         android:background="@drawable/rounded_all_files"
         android:orientation="horizontal"
         android:weightSum="1">
@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight=".4"
+            android:id="@+id/row_parent"
             android:gravity="center_vertical"
             android:orientation="vertical"
             android:padding="@dimen/_5sdp">
@@ -41,6 +42,7 @@
                 android:textColor="#000"
                 android:textSize="@dimen/_13sdp"
                 android:textStyle="bold" />
+
             <TextView
                 android:id="@+id/text_view_date"
                 android:layout_width="match_parent"
@@ -48,27 +50,24 @@
                 android:layout_marginTop="@dimen/_3sdp"
                 android:text="Feb 15"
                 android:textColor="#000"
-                android:textSize="@dimen/_13sdp"
-                 />
+                android:textSize="@dimen/_13sdp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_1sdp"
             android:layout_weight=".6"
-android:layout_margin="@dimen/_1sdp"
-
             android:orientation="vertical">
 
             <LinearLayout
-android:visibility="gone"
                 android:id="@+id/layout_volunteered"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_70sdp"
                 android:background="@drawable/rounded_all_cleanup"
                 android:gravity="center"
                 android:orientation="vertical"
-              >
+                android:visibility="gone">
 
                 <TextView
                     android:id="@+id/text_view_volunteered"
@@ -95,8 +94,6 @@ android:visibility="gone"
             </LinearLayout>
 
             <LinearLayout
-
-                android:id="@+id/layout_open_spot"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_70sdp"
                 android:background="@drawable/rounded_all_setup_second"
@@ -116,20 +113,20 @@ android:visibility="gone"
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_5sdp"
                     android:gravity="center"
                     android:orientation="horizontal">
 
                     <TextView
-
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Sign up!"
+                        android:id="@+id/text_signup"
                         android:textColor="#fff"
                         android:textSize="@dimen/_13sdp"
                         android:textStyle="bold" />
 
                     <ImageView
+                        android:id="@+id/img_signup"
                         android:layout_width="@dimen/_15sdp"
                         android:layout_height="@dimen/_15sdp"
                         android:layout_marginLeft="@dimen/_10sdp"

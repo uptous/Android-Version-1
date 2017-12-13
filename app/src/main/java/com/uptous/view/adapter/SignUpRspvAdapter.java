@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import static com.uptous.view.activity.VolunteerDetailActivity.FULL_LIST;
+
 /**
  * Created by Prakash .
  */
@@ -94,13 +96,25 @@ String dateTextMain,dateTextTime;
         versionViewHolder.mTextViewTitle.setText(listEntities.get(i).getName());
         String OpenSpot = listEntities.get(i).getVolunteerStatus();
 
+
+//        if (OpenSpot.equalsIgnoreCase("Full")) {
+//            versionViewHolder.imageSignUp.setVisibility(View.GONE);
+//            versionViewHolder.TextViewSignUp.setText("Full");
+//            versionViewHolder.linearLayoutrow_parent.setClickable(false);
+//        } else {
+//            versionViewHolder.imageSignUp.setVisibility(View.VISIBLE);
+//            versionViewHolder.TextViewSignUp.setText("Sign up!");
+//            versionViewHolder.linearLayoutrow_parent.setClickable(true);
+//        }
+
         int VolunteerCount = listEntities.get(i).getVolunteerCount();
         versionViewHolder.linearLayoutOpenSpot.setTag(i);
         versionViewHolder.linearLayoutVolunteered.setTag(i);
+        versionViewHolder.linearLayoutrow_parent.setTag(i);
         final String Name = listEntities.get(i).getName();
         if (OpenSpot.equalsIgnoreCase("Open")) {
 
-            versionViewHolder.linearLayoutOpenSpot.setOnClickListener(new View.OnClickListener() {
+            versionViewHolder.linearLayoutrow_parent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     int position = (int) view.getTag();
@@ -118,7 +132,7 @@ String dateTextMain,dateTextTime;
         } else {
             if (OpenSpot.equalsIgnoreCase("Volunteered")) {
 
-                versionViewHolder.linearLayoutVolunteered.setOnClickListener(new View.OnClickListener() {
+                versionViewHolder.linearLayoutrow_parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         int position = (int) view.getTag();
@@ -140,7 +154,7 @@ String dateTextMain,dateTextTime;
 
             if (OpenSpot.equalsIgnoreCase("Full")) {
 
-                versionViewHolder.linearLayoutVolunteered.setOnClickListener(new View.OnClickListener() {
+                versionViewHolder.linearLayoutrow_parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         int position = (int) view.getTag();
@@ -150,6 +164,7 @@ String dateTextMain,dateTextTime;
                         Prefs.setToName(activity,"");
                         Prefs.setFromName(activity,listEntities.get(position).getName());
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
+                        intent.putExtra(FULL_LIST,true);
                         activity.startActivity(intent);
                     }
                 });
@@ -173,10 +188,10 @@ String dateTextMain,dateTextTime;
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewDate, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
-        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot;
+        TextView mTextViewDate,TextViewSignUp, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
+        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot,linearLayoutrow_parent;
         GifImageView imageViewSignUpType;
-        ImageView imageViewFull;
+        ImageView imageViewFull,imageSignUp;
 
 
         public VersionViewHolder(View itemView) {
@@ -185,9 +200,13 @@ String dateTextMain,dateTextTime;
             mTextViewTitle = (TextView) itemView.findViewById(R.id.text_view__name);
             mTextViewVolunteered = (TextView) itemView.findViewById(R.id.text_view_volunteered);
             mTextViewDate = (TextView) itemView.findViewById(R.id.text_view_date);
+            TextViewSignUp = (TextView) itemView.findViewById(R.id.text_signup);
+            imageSignUp = (ImageView) itemView.findViewById(R.id.img_signup);
+
             mteTextViewVolunteerCount = (TextView) itemView.findViewById(R.id.text_view_volunteer_count);
             linearLayoutVolunteered = (LinearLayout) itemView.findViewById(R.id.layout_volunteered);
             linearLayoutOpenSpot = (LinearLayout) itemView.findViewById(R.id.layout_open);
+            linearLayoutrow_parent = (LinearLayout) itemView.findViewById(R.id.row_parent);
             imageViewSignUpType = (GifImageView) itemView.findViewById(R.id.image_view_sign_up_type);
             imageViewFull=(ImageView)itemView.findViewById(R.id.image_view_full);
             mView = itemView;

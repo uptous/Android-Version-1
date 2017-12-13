@@ -10,8 +10,8 @@ public class CustomComparator implements Comparator<ContactListResponseModel> {
 
     @Override
     public int compare(ContactListResponseModel contactListResponseModel, ContactListResponseModel t1) {
-        String SortName = contactListResponseModel.getFirstName() + " " + contactListResponseModel.getLastName();
-        return SortName.compareToIgnoreCase(t1.getFirstName() + " " + t1.getLastName());
+        String SortName = contactListResponseModel.getLastName() + " " + contactListResponseModel.getFirstName();
+        return SortName.compareToIgnoreCase(t1.getLastName() + " " + t1.getFirstName());
     }
 }
 

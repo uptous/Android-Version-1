@@ -66,7 +66,7 @@ public class PicturePostActivity extends BaseActivity implements View.OnClickLis
     private EditText mEditTextSubject, mEditTextFileName;
     private ImageView RequestImageView;
     private Button mButtonUpload, mButtonaddMore;
-    private Boolean isNewAlbum=false;
+    private Boolean isNewAlbum = false;
     private int mCommunityID, mAlbumID;
 
     public static final int LOAD_IMAGE_RESULTS = 1;
@@ -120,10 +120,10 @@ public class PicturePostActivity extends BaseActivity implements View.OnClickLis
                         if (isNewAlbum) {
 //                            for(String path:ImagePathList){
 //                                postNewPicturePost(path);
-                           // for (int j = 0; j < ImagePathList.size(); j++) {
-                            if(ImagePathList.size()>0){
+                            // for (int j = 0; j < ImagePathList.size(); j++) {
+                            if (ImagePathList.size() > 0) {
                                 String path = ImagePathList.get(0);
-                                postNewPicturePost(path,ImagePathList);
+                                postNewPicturePost(path, ImagePathList);
                             }
                             //}
                         } else {
@@ -367,7 +367,7 @@ public class PicturePostActivity extends BaseActivity implements View.OnClickLis
     int uploadedImageCount = 0;
 
     // Post webservice to post Picture in new Album
-    private void postNewPicturePost(String Image,final List<String> imagePathList) {
+    private void postNewPicturePost(String Image, final List<String> imagePathList) {
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
         Call<PostCommentResponseModel> call = service.PostNewPicture(mImageCaption, mCommunityID, mAlbumTitle, "File", Image);
@@ -378,15 +378,19 @@ public class PicturePostActivity extends BaseActivity implements View.OnClickLis
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
                 PostCommentResponseModel body = response.body();
                 if (body != null) {
-                            if (response.isSuccessful()) {
-                        mAlbumID= body.getAlbumId();
-                        Log.i("PicturePostActivity", "mAlbumID " +mAlbumID);
+                    if (response.isSuccessful()) {
+                        mAlbumID = body.getAlbumId();
+                        Log.i("PicturePostActivity", "mAlbumID " + mAlbumID);
                         Prefs.setPicturePost(PicturePostActivity.this, "picture");
                         Prefs.setFeed(PicturePostActivity.this, null);
                         uploadedImageCount++;
-                        for(int i=1;i<imagePathList.size();i++)
-                        postEditPicturePost(imagePathList.get(i));
-
+                        if (imagePathList.size() > 1) {
+                            for (int i = 1; i < imagePathList.size(); i++)
+                                postEditPicturePost(imagePathList.get(i));
+                        } else {
+                            hideProgressDialog();
+                            finish();
+                        }
                     } else
                         showToast(getString(R.string.error) + response.toString());
                 }
@@ -405,7 +409,7 @@ public class PicturePostActivity extends BaseActivity implements View.OnClickLis
 
     // Post webservice to post Picture in specific album
     private void postEditPicturePost(String ImagePath) {
-       //
+        //
 
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);

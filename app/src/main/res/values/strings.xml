@@ -14,7 +14,7 @@
     <string name="event_all_communities">Calendar - All Communities</string>
     <string name="all_communities">All Communities</string>
     <string name="invitations">Invitations</string>
-    <string name="no_record_found">No Record Found</string>
+    <!--<string name="no_record_found">No Record Found</string>-->
     <string name="sign_out">Sign out</string>
     <string name="my_profile">My profile</string>
     <string name="message_post">Message Post</string>

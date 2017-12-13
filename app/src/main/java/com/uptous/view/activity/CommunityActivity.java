@@ -200,6 +200,7 @@ public class CommunityActivity extends BaseActivity implements View.OnClickListe
                                 int CommunityId = eventResponseModels.get(position).getId();
                                Prefs.setCommunityNAme(CommunityActivity.this,CommunityName);
                                 Prefs.setCommunityId(CommunityActivity.this,CommunityId);
+                                Prefs.setCommunityId(CommunityActivity.this,CommunityId);
                                 finish();
                             }
                         });

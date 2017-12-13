@@ -1,8 +1,5 @@
 package com.uptous.view.fragment;
 
-import android.app.Application;
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,14 +14,11 @@ import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.CommnunitiesResponseModel;
 import com.uptous.model.SignUpResponseModel;
 import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.BaseActivity;
-import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
-import com.uptous.view.activity.ProfileActivity;
 import com.uptous.view.adapter.SignUpSheetsListAdapter;
 
 import java.util.ArrayList;
@@ -49,7 +43,7 @@ public class SignUpFragment extends Fragment {
     private String mAuthenticationId, mAuthenticationPassword;
 
     private TextView mTextViewSearchResult;
-
+    private static View recycler_view_empty;
     public static List<SignUpResponseModel> signUpResponseModelList = new ArrayList<>();
 
     private List<CommnunitiesResponseModel> mCommunityList = new ArrayList<>();
@@ -62,7 +56,7 @@ public class SignUpFragment extends Fragment {
         initView(view);
 
         getData();
-
+        getApiSignUp();
 
         return view;
     }
@@ -89,6 +83,18 @@ public class SignUpFragment extends Fragment {
 
     }
 
+    public static void checkEmptySignUp() {
+        if (recycler_view_empty != null && mViewSignUpRecyclerView != null) {
+            if (signUpResponseModelList.size() == 0) {
+                recycler_view_empty.setVisibility(View.VISIBLE);
+                mViewSignUpRecyclerView.setVisibility(View.GONE);
+            } else {
+                recycler_view_empty.setVisibility(View.GONE);
+                mViewSignUpRecyclerView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
 
     //Method to initialize view
     private void initView(View view) {
@@ -98,6 +104,11 @@ public class SignUpFragment extends Fragment {
         mViewSignUpRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_sign_up);
         mViewSignUpRecyclerView.setLayoutManager(layoutManager);
         mTextViewSearchResult = (TextView) view.findViewById(R.id.search_result);
+        recycler_view_empty = view.findViewById(R.id.recycler_view_empty);
+        ((TextView)view.findViewById(R.id.text_title1)).setText("Just trying to help...");
+        ((TextView)view.findViewById(R.id.text_title2)).setText("No sign-ups have been posted to the selected community.");
+        ((TextView)view.findViewById(R.id.text_contain)).setText("When people post sign-ups you’ll be able to find them here. Looking to organize volunteers yourself? For now, you’ll have to use the UpToUs website to create a new sign-up.");
+
     }
 
 
@@ -136,6 +147,7 @@ public class SignUpFragment extends Fragment {
                         baseActivity.showLogOutDialog();
 
                     }
+                    SignUpFragment.checkEmptySignUp();
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -252,8 +264,9 @@ public class SignUpFragment extends Fragment {
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 2) {
                 if (signUpResponseModelList.size() == 0) {
+                    checkEmptySignUp();
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
                 } else {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }

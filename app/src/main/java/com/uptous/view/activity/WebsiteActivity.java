@@ -136,7 +136,6 @@ public class WebsiteActivity extends BaseActivity {
                 return DeeplinkType.INVITATION;
             }
         }
-        // for signUP get detail from https://www.uptous.com/api/signupsheets/opportunity/22454
         else if (data.toString().contains("/communitysignup/") || data.toString().contains("/communitySignup/")) {
             String[] data_split = data.toString().toLowerCase().split("/communitysignup/");
             if (data_split.length > 1) {

@@ -1,8 +1,5 @@
 package com.uptous.view.fragment;
 
-import android.app.Application;
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,16 +18,13 @@ import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.FileResponseModel;
 import com.uptous.model.PhotoAlbumResponseModel;
 import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.BaseActivity;
-import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.adapter.AlbumsAdapter;
 import com.uptous.view.adapter.AttachmentAdapter;
-import com.uptous.view.adapter.ContactListAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +48,9 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
     private AlbumsAdapter mAlbumsAdapter;
     private AttachmentAdapter mAttachmentAdapter;
 
-    private TextView mTextViewAlbums, mTextViewFiles, mTextViewHeading;
+    private static TextView mTextViewAlbums,mTextViewEmptyTitle1,mTextViewEmptyTitle2,mTextViewEmptyContent, mTextViewFiles, mTextViewHeading;
     public static TextView mTextViewSearchResult;
-
+    private static View recycler_view_empty;
     public static List<PhotoAlbumResponseModel> photoAlbumResponseModelList = new ArrayList<>();
 
     public static List<FileResponseModel> attachmentFileResponseModels = new ArrayList<>();
@@ -167,6 +161,11 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
         mTextViewHeading = (TextView) view.findViewById(R.id.text_view_heading);
         mTextViewHeading.setVisibility(View.GONE);
         mTextViewSearchResult = (TextView) view.findViewById(R.id.search_result);
+
+        mTextViewEmptyTitle1 = (TextView) view.findViewById(R.id.text_title1);
+        mTextViewEmptyTitle2 = (TextView) view.findViewById(R.id.text_title2);
+        mTextViewEmptyContent = (TextView) view.findViewById(R.id.text_contain);
+        recycler_view_empty= view.findViewById(R.id.recycler_view_empty);
         mLinearLayoutAlbumFile = (LinearLayout) view.findViewById(R.id.layout_album_file);
         RecyclerView.LayoutManager layoutManager
                 = new GridLayoutManager(getActivity().getApplicationContext(), 3);
@@ -178,6 +177,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mRecyclerViewFiles = (RecyclerView) view.findViewById(R.id.recycler_view_files);
         mRecyclerViewFiles.setLayoutManager(layoutManagerFiles);
+
 
         clickListenerOnViews();
 
@@ -196,6 +196,38 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
         mTextViewFiles.setOnClickListener(this);
     }
 
+    public static void checkEmptyAlbum() {
+        if (recycler_view_empty != null && mViewAlbumsRecyclerView != null) {
+            if (photoAlbumResponseModelList.size() == 0) {
+                recycler_view_empty.setVisibility(View.VISIBLE);
+                mViewAlbumsRecyclerView.setVisibility(View.GONE);
+            } else {
+                recycler_view_empty.setVisibility(View.GONE);
+                mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
+            }
+        }
+
+        mTextViewEmptyTitle1.setText("Nothing to see here...");
+        mTextViewEmptyTitle2.setText("No photos or albums have been added to the selected community.");
+        mTextViewEmptyContent.setText("When photos are added, you’ll be able to see them here. Keep in mind that some communities don’t allow posting photos.\n" +
+                "Looking to add new photos yourself? Switch to the Feed tab by tapping the leftmost icon below, then tap on “Post” in the lower right.");
+    }
+
+    public static void checkEmptyLib() {
+        if (recycler_view_empty != null && mRecyclerViewFiles != null) {
+            if (attachmentFileResponseModels.size() == 0) {
+                recycler_view_empty.setVisibility(View.VISIBLE);
+                mRecyclerViewFiles.setVisibility(View.GONE);
+            } else {
+                recycler_view_empty.setVisibility(View.GONE);
+                mRecyclerViewFiles.setVisibility(View.VISIBLE);
+            }
+        }
+
+        mTextViewEmptyTitle1.setText("Zero, zilch, nada...");
+        mTextViewEmptyTitle2.setText("No files have been shared in the selected community.");
+        mTextViewEmptyContent.setText("When files are shared, you’ll be able to see them here. Looking to upload a file yourself? For now, you’ll have to use the UpToUs website to upload and share files.");
+    }
 
     // Get webservice to show albums
     private void getApiAlbumList() {
@@ -223,6 +255,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                         mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
                         mRecyclerViewFiles.setVisibility(View.GONE);
                         int communityId = Prefs.getCommunityId(getActivity());
+                        checkEmptyAlbum();
                         if (communityId != 0) {
                             FilterCommunityForAlbum(photoAlbumResponseModelList, communityId);
                         }
@@ -271,6 +304,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                                  mTextViewSearchResult.setVisibility(View.GONE);
 //                                 mTextViewHeading.setVisibility(View.VISIBLE);
                                  if (response.body() != null) {
+                                     checkEmptyLib();
                                      attachmentFileResponseModels = response.body();
                                      mAttachmentAdapter = new AttachmentAdapter(getActivity(), attachmentFileResponseModels);
                                      mRecyclerViewFiles.setAdapter(mAttachmentAdapter);
@@ -331,6 +365,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 mAlbumsAdapter = new AlbumsAdapter(getActivity(), filteredModelList);
                 mViewAlbumsRecyclerView.setAdapter(mAlbumsAdapter);
                 mAlbumsAdapter.notifyDataSetChanged();
+                checkEmptyAlbum();
                 if (query.equalsIgnoreCase("")) {
                     mTextViewSearchResult.setVisibility(View.GONE);
                 } else {
@@ -366,6 +401,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 mAttachmentAdapter = new AttachmentAdapter(getActivity(), filteredModelList);
                 mRecyclerViewFiles.setAdapter(mAttachmentAdapter);
                 mAttachmentAdapter.notifyDataSetChanged();
+                checkEmptyLib();
                 if (query.equalsIgnoreCase("")) {
                     mTextViewSearchResult.setVisibility(View.GONE);
                 } else {
@@ -397,9 +433,10 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
 
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 3) {
+                checkEmptyAlbum();
                 if (photoAlbumResponseModelList.size() == 0) {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
                 } else {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }
@@ -424,12 +461,13 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 mAttachmentAdapter.notifyDataSetChanged();
             }
             int Position = Prefs.getPosition(getActivity());
-
+            checkEmptyLib();
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 3) {
+                checkEmptyLib();
                 if (attachmentFileResponseModels.size() == 0) {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
                 } else {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }

@@ -8,7 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,11 +29,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
 
 
     public AttachmentAdapter(Activity a, List<FileResponseModel> listEntities) {
-
         this.listEntities = listEntities;
         this.activity = a;
-
-
     }
 
     @Override
@@ -47,12 +44,9 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
 
     @Override
     public void onBindViewHolder(final VersionViewHolder versionViewHolder, int i) {
-
         // Set Data in your views comes from CollectionClass
-
         String s = listEntities.get(i).getPath();
         String result = s.substring(s.lastIndexOf(".") + 1);
-
         if (result.equalsIgnoreCase("jpeg")) {
             versionViewHolder.imageView.setImageResource(R.mipmap.imageicon);
         } else if (result.equalsIgnoreCase("pdf")) {
@@ -80,13 +74,13 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                 String result = path.substring(path.lastIndexOf(".") + 1);
 
                 if (result.equalsIgnoreCase("jpeg")) {
-                    Prefs.setImagepath(activity,path);
-                    Prefs.setAlbumDetail(activity,"albumdetail");
+                    Prefs.setImagepath(activity, path);
+                    Prefs.setAlbumDetail(activity, "albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
                     activity.startActivity(intent);
                 } else if (result.equalsIgnoreCase("jpg")) {
-                    Prefs.setImagepath(activity,path);
-                    Prefs.setAlbumDetail(activity,"albumdetail");
+                    Prefs.setImagepath(activity, path);
+                    Prefs.setAlbumDetail(activity, "albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
                     activity.startActivity(intent);
                 } else if (result.equalsIgnoreCase("MOV")) {
@@ -98,11 +92,11 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                     intent.setDataAndType(Uri.parse(path), "audio/*");
                     activity.startActivity(intent);
                 } else if (result.equalsIgnoreCase("xlsx") || result.equalsIgnoreCase("xls") ||
-                        result.equalsIgnoreCase("pdf") || result.equalsIgnoreCase("docx")||
+                        result.equalsIgnoreCase("pdf") || result.equalsIgnoreCase("docx") ||
                         result.equalsIgnoreCase("tif")) {
-                    Prefs.setpath(activity,path);
+                    Prefs.setpath(activity, path);
 
-                    Prefs.setAlbumDetail(activity,"albumdetail");
+                    Prefs.setAlbumDetail(activity, "albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
                     activity.startActivity(intent);
                 } else if (result.equalsIgnoreCase("zip")) {
@@ -117,38 +111,31 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                 }
             }
         });
-
-
     }
-
 
     @Override
     public int getItemCount() {
-
         return listEntities == null ? 0 : listEntities.size();
     }
-
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
         TextView mTextViewProductName;
-        ImageView imageView,mImageViewDownload;
-        RelativeLayout parentRow;
+        ImageView imageView, mImageViewDownload;
+        LinearLayout parentRow;
+
         public VersionViewHolder(View itemView) {
             super(itemView);
-
-            parentRow= (RelativeLayout) itemView.findViewById(R.id.row_parent);
+            parentRow = (LinearLayout) itemView.findViewById(R.id.row);
             mTextViewProductName = (TextView) itemView.findViewById(R.id.text_view_file_name);
             imageView = (ImageView) itemView.findViewById(R.id.image_view_files);
-            mImageViewDownload= (ImageView) itemView.findViewById(R.id.image_view_down_arrow);
+            mImageViewDownload = (ImageView) itemView.findViewById(R.id.image_view_down_arrow);
             mView = itemView;
-
-
         }
     }
+
     @Override
     public int getItemViewType(int position) {
-
         return position;
     }
 }

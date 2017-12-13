@@ -54,6 +54,7 @@ import retrofit2.Response;
  */
 public class MainActivity extends BaseActivity implements View.OnClickListener, SearchView.OnQueryTextListener {
 
+    private static final int TAG_COMMUNITY_CHANGE = 55;
     private TabLayout mTabLayout;
 
     private static final int ICON_RES_OVER[] = {
@@ -78,6 +79,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     public SearchView mSearchView;
     private long differenceTime;
+    private String text;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -125,10 +127,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             case R.id.text_view_title:
 
 
-                Prefs.setCommunityFilter(this,"community");
-                Prefs.setMessage(this,null);
+                Prefs.setCommunityFilter(this, "community");
+                Prefs.setMessage(this, null);
                 Intent intentCommunity = new Intent(MainActivity.this, CommunityActivity.class);
-                startActivity(intentCommunity);
+                startActivityForResult(intentCommunity, TAG_COMMUNITY_CHANGE);
             case R.id.text_view_cancel:
 
                 mSearchView.clearFocus();
@@ -155,9 +157,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         if (CommunityId != 0) {
             if (Position == 0) {
+
+                HomeFragment.checkEmptyView();
+
                 if (HomeFragment.feedResponseModelList.size() == 0) {
                     mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(MainActivity.this, "No Record Found", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(MainActivity.this, "No Record Found2", Toast.LENGTH_SHORT).show();
                 } else {
                     mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }
@@ -165,27 +170,28 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             } else if (Position == 1) {
                 if (contactListResponseModels.size() == 0) {
                     mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(MainActivity.this, "No Record Found", Toast.LENGTH_SHORT).show();
+                    //    Toast.makeText(MainActivity.this, text, Toast.LENGTH_SHORT).show();
                 } else {
                     mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }
                 mTextViewTitle.setText("Contacts - " + communityName);
             } else if (Position == 2) {
+                SignUpFragment.checkEmptySignUp();
                 if (SignUpFragment.signUpResponseModelList.size() == 0) {
                     mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(MainActivity.this, "No Record Found", Toast.LENGTH_SHORT).show();
+                    //   Toast.makeText(MainActivity.this, "No Record Found3", Toast.LENGTH_SHORT).show();
                 } else {
                     mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }
                 mTextViewTitle.setText("Sign-Ups - " + communityName);
             } else if (Position == 3) {
                 String Album = Prefs.getAlbum(this);
-                String Attachment =Prefs.getAttachment(this);
+                String Attachment = Prefs.getAttachment(this);
 
                 if (Album != null) {
                     if (LibraryFragment.photoAlbumResponseModelList.size() == 0) {
                         mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                        Toast.makeText(MainActivity.this, "No Record Found", Toast.LENGTH_SHORT).show();
+                        //      Toast.makeText(MainActivity.this, "No Record Found4", Toast.LENGTH_SHORT).show();
                     } else {
                         mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                     }
@@ -193,7 +199,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 if (Attachment != null) {
                     if (LibraryFragment.attachmentFileResponseModels.size() == 0) {
                         mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                        Toast.makeText(MainActivity.this, "No Record Found", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(MainActivity.this, "No Record Found5", Toast.LENGTH_SHORT).show();
                     } else {
                         mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                     }
@@ -201,9 +207,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
                 mTextViewTitle.setText("Library - " + communityName);
             } else if (Position == 4) {
+                EventsFragment.checkEmptyEvent();
                 if (EventsFragment.eventList.size() == 0) {
                     mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(MainActivity.this, "No Record Found", Toast.LENGTH_SHORT).show();
+                    EventsFragment.checkEmptyEvent();
+//                    Toast.makeText(MainActivity.this, "No Record Found6", Toast.LENGTH_SHORT).show();
                 } else {
                     mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }
@@ -211,20 +219,22 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
         } else {
             if (Position == 0) {
+                if (homeFragment != null)
+                    homeFragment.checkEmptyView();
                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
                 mTextViewTitle.setText(R.string.feed_all_communities);
             } else if (Position == 1) {
                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
                 mTextViewTitle.setText(R.string.contacts_all_communities);
 
-                String Message =Prefs.getMessage(this);
+                String Message = Prefs.getMessage(this);
                 String Close = Prefs.getClose(this);
                 if (Message == null) {
 
 
                     if (Close == null) {
                         if (contactListResponseModels != null) {
-                           // contactListResponseModels.clear();
+                            // contactListResponseModels.clear();
                         }
                         if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
                             getApiContactList();
@@ -254,16 +264,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public void onDestroy() {
         super.onDestroy();
-       Prefs.setCommunityFilter(this,null);
-       Prefs.setCommunityNAme(this,null);
-        Prefs.setCommunityId(this,0);
-        Prefs.setDetail(this,null);
-        Prefs.setFeedDetail(this,null);
+        Prefs.setCommunityFilter(this, null);
+        Prefs.setCommunityNAme(this, null);
+        Prefs.setCommunityId(this, 0);
+        Prefs.setDetail(this, null);
+        Prefs.setFeedDetail(this, null);
         Prefs.setClose(this, null);
-        Prefs.setAttachment(this,null);
-        Prefs.setMessage(this,null);
-        Prefs.setSignUpDetail(this,null);
-        Prefs.setAlbum(this,null);
+        Prefs.setAttachment(this, null);
+        Prefs.setMessage(this, null);
+        Prefs.setSignUpDetail(this, null);
+        Prefs.setAlbum(this, null);
 
 
     }
@@ -277,7 +287,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     }
 
-   public static ViewPager viewPager;
+    public static ViewPager viewPager;
+
     // method to initialization of views
     private void initView() {
         mHelper = new Helper();
@@ -344,7 +355,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     // method to set tab icons
     private void setupTabIcons() {
-        if(mTabLayout!=null){
+        if (mTabLayout != null) {
             mTabLayout.getTabAt(0).setIcon(ICON_RES_OVER[0]);
             mTabLayout.getTabAt(1).setIcon(ICON_RES_OVER[1]);
             mTabLayout.getTabAt(2).setIcon(ICON_RES_OVER[2]);
@@ -353,20 +364,23 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         }
     }
 
+    HomeFragment homeFragment;
 
     // method to add fragment on viewpager
     private void setupViewPager(final ViewPager viewPager) {
         mViewPagerAdapter = new ViewPagerAdapter(getSupportFragmentManager());
-        mViewPagerAdapter.addFrag(new HomeFragment(), "");
+        homeFragment = new HomeFragment();
+
+        mViewPagerAdapter.addFrag(homeFragment, "");
         mViewPagerAdapter.addFrag(new ContactFragment(), "");
         mViewPagerAdapter.addFrag(new SignUpFragment(), "");
         mViewPagerAdapter.addFrag(new LibraryFragment(), "");
         mViewPagerAdapter.addFrag(new EventsFragment(), "");
         viewPager.setAdapter(mViewPagerAdapter);
-        int mCommunityId =Prefs.getCommunityId(this);
+        int mCommunityId = Prefs.getCommunityId(this);
         if (mCommunityId == 0) {
             mTextViewTitle.setText(R.string.feed_all_communities);
-            Prefs.setPosition(this,0);
+            Prefs.setPosition(this, 0);
             mTextViewSignOut.setVisibility(View.GONE);
             mImageViewInvitation.setVisibility(View.VISIBLE);
         }
@@ -402,13 +416,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     EventsFragment.mViewEventsRecyclerView.setVisibility(View.GONE);
 
 
-
-
-                Prefs.setDetail(MainActivity.this,null);
-                Prefs.setFeedDetail(MainActivity.this,null);
-                Prefs.setAlbumDetail(MainActivity.this,null);
-                Prefs.setMessage(MainActivity.this,null);
-                Prefs.setSignUpDetail(MainActivity.this,null);
+                Prefs.setDetail(MainActivity.this, null);
+                Prefs.setFeedDetail(MainActivity.this, null);
+                Prefs.setAlbumDetail(MainActivity.this, null);
+                Prefs.setMessage(MainActivity.this, null);
+                Prefs.setSignUpDetail(MainActivity.this, null);
                 mHelper.keyBoardHidden(MainActivity.this);
 
                 int mCommunityId = Prefs.getCommunityId(MainActivity.this);
@@ -416,18 +428,19 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 int position = tab.getPosition();
                 if (mCommunityId == 0) {
                     if (position == 0) {
+                        HomeFragment.checkEmptyView();
                         HomeFragment.mFabPost.setVisibility(View.VISIBLE);
                         mImageViewInvitation.setVisibility(View.VISIBLE);
                         mTextViewSignOut.setVisibility(View.GONE);
                         mTextViewTitle.setText(R.string.feed_all_communities);
-                        Prefs.setPosition(MainActivity.this,0);
+                        Prefs.setPosition(MainActivity.this, 0);
                         HomeFragment.mViewHomeRecyclerView.setVisibility(View.VISIBLE);
                     } else if (position == 1) {
 
                         mTextViewTitle.setText(R.string.contacts_all_communities);
                         mTextViewSignOut.setVisibility(View.VISIBLE);
                         mTextViewSignOut.setText("Top");
-                        Prefs.setPosition(MainActivity.this,1);
+                        Prefs.setPosition(MainActivity.this, 1);
                         mImageViewInvitation.setVisibility(View.GONE);
 
                         if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
@@ -435,14 +448,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                                 getApiContactList();
                             } else {
                                 ContactFragment.mViewContactRecyclerView.setVisibility(View.VISIBLE);
-
+                                ContactFragment.checkEmptyContact();
 
                                 String CommunityFilter = Prefs.getCommunityFilter(MainActivity.this);
 
                                 if (CommunityFilter != null) {
-                                  Prefs.setCommunityFilter(MainActivity.this,null);
+                                    Prefs.setCommunityFilter(MainActivity.this, null);
                                     if (contactListResponseModels != null) {
-                                      //e  contactListResponseModels.clear();
+                                        //e  contactListResponseModels.clear();
                                     }
 
 
@@ -461,24 +474,25 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
 
                     } else if (position == 2) {
-
+                        SignUpFragment.checkEmptySignUp();
                         mTextViewTitle.setText(R.string.sign_ups_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        Prefs.setPosition(MainActivity.this,2);
+                        Prefs.setPosition(MainActivity.this, 2);
                         mImageViewInvitation.setVisibility(View.GONE);
                         SignUpFragment.mViewSignUpRecyclerView.setVisibility(View.VISIBLE);
                     } else if (position == 3) {
-
+                        LibraryFragment.checkEmptyAlbum();
                         mTextViewTitle.setText(R.string.library_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        Prefs.setPosition(MainActivity.this,3);
+                        Prefs.setPosition(MainActivity.this, 3);
                         mImageViewInvitation.setVisibility(View.GONE);
                         LibraryFragment.mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
                         LibraryFragment.mLinearLayoutAlbumFile.setVisibility(View.VISIBLE);
                     } else if (position == 4) {
                         mTextViewTitle.setText(R.string.event_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        Prefs.setPosition(MainActivity.this,4);
+                        EventsFragment.checkEmptyEvent();
+                        Prefs.setPosition(MainActivity.this, 4);
                         mImageViewInvitation.setVisibility(View.GONE);
                         EventsFragment.mViewEventsRecyclerView.setVisibility(View.VISIBLE);
 
@@ -490,14 +504,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         HomeFragment.mViewHomeRecyclerView.setVisibility(View.VISIBLE);
                         if (HomeFragment.feedResponseModelList.size() == 0) {
                             mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                            Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
                         } else {
                             mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                         }
                         mImageViewInvitation.setVisibility(View.VISIBLE);
                         mTextViewTitle.setText("Feed - " + communityName);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        Prefs.setPosition(MainActivity.this,0);
+                        Prefs.setPosition(MainActivity.this, 0);
                     } else if (position == 1) {
 
                         if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
@@ -512,64 +526,70 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
                         if (contactListResponseModels.size() == 0) {
                             mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                            Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
                         } else {
                             mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                         }
+                        ContactFragment.checkEmptyContact();
                         mTextViewTitle.setText("Contacts - " + communityName);
                         mTextViewSignOut.setVisibility(View.VISIBLE);
                         mTextViewSignOut.setText("Top");
-                        Prefs.setPosition(MainActivity.this,1);
+                        Prefs.setPosition(MainActivity.this, 1);
                         mImageViewInvitation.setVisibility(View.GONE);
                     } else if (position == 2) {
+                        SignUpFragment.checkEmptySignUp();
                         SignUpFragment.mViewSignUpRecyclerView.setVisibility(View.VISIBLE);
                         if (SignUpFragment.signUpResponseModelList.size() == 0) {
                             mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                            Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                            Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
                         } else {
                             mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                         }
                         mTextViewTitle.setText("Sign-Ups - " + communityName);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        Prefs.setPosition(MainActivity.this,2);
+                        Prefs.setPosition(MainActivity.this, 2);
                         mImageViewInvitation.setVisibility(View.GONE);
                     } else if (position == 3) {
+
                         LibraryFragment.mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
                         LibraryFragment.mLinearLayoutAlbumFile.setVisibility(View.VISIBLE);
                         String Album = Prefs.getAlbum(MainActivity.this);
                         String Attachment = Prefs.getAttachment(MainActivity.this);
                         if (Album != null) {
+                            LibraryFragment.checkEmptyAlbum();
                             if (LibraryFragment.photoAlbumResponseModelList.size() == 0) {
                                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                                Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
                             } else {
                                 mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                             }
                         }
                         if (Attachment != null) {
+                            //LibraryFragment
+                            LibraryFragment.checkEmptyLib();
                             if (LibraryFragment.attachmentFileResponseModels.size() == 0) {
                                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                                Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
                             } else {
                                 mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                             }
                         }
                         mTextViewTitle.setText("Library - " + communityName);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        Prefs.setPosition(MainActivity.this,3);
+                        Prefs.setPosition(MainActivity.this, 3);
                         mImageViewInvitation.setVisibility(View.GONE);
                     } else if (position == 4) {
-
+                        EventsFragment.checkEmptyEvent();
                         if (EventsFragment.eventList.size() == 0) {
                             mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                            Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
+                            //   Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
                         } else {
                             mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                         }
 
                         mTextViewTitle.setText("Calendar - " + communityName);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        Prefs.setPosition(MainActivity.this,4);
+                        Prefs.setPosition(MainActivity.this, 4);
                         mImageViewInvitation.setVisibility(View.GONE);
                         EventsFragment.mViewEventsRecyclerView.setVisibility(View.VISIBLE);
                     }
@@ -603,7 +623,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         }
 
-        int Position =Prefs.getPosition(this);
+        int Position = Prefs.getPosition(this);
         String CommunityFilter = Prefs.getCommunityFilter(this);
         if (Position == 0) {
 
@@ -612,7 +632,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 HomeFragment homeFragment = (HomeFragment) mViewPagerAdapter.getItem(0);
                 homeFragment.SearchFilterForFeed(HomeFragment.feedResponseModelList, newText);
             } else {
-              Prefs.setCommunityFilter(this,null);
+                Prefs.setCommunityFilter(this, null);
             }
         } else if (Position == 1) {
 
@@ -622,7 +642,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 int communityId = Prefs.getCommunityId(this);
                 if (communityId != 0) {
                     ContactFragment contactFragment = (ContactFragment) mViewPagerAdapter.getItem(1);
-                    contactFragment.SearchFilterForContact(ContactFragment.contactListResponseModels, newText);
+                    contactFragment.SearchFilterForContact(contactListResponseModels, newText);
 
                 } else {
                     ContactFragment contactFragment = (ContactFragment) mViewPagerAdapter.getItem(1);
@@ -630,7 +650,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 }
 
             } else {
-               Prefs.setCommunityFilter(this,null);
+                Prefs.setCommunityFilter(this, null);
             }
 
 
@@ -639,7 +659,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 SignUpFragment signUpFragment = (SignUpFragment) mViewPagerAdapter.getItem(2);
                 signUpFragment.SearchFilterForSignUp(SignUpFragment.signUpResponseModelList, newText);
             } else {
-                Prefs.setCommunityFilter(this,null);
+                Prefs.setCommunityFilter(this, null);
             }
 
 
@@ -649,7 +669,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 libraryFragment.SearchFilterForAlbum(LibraryFragment.photoAlbumResponseModelList, newText);
                 libraryFragment.SearchFilterForAttachment(LibraryFragment.attachmentFileResponseModels, newText);
             } else {
-                Prefs.setCommunityFilter(this,null);
+                Prefs.setCommunityFilter(this, null);
             }
 
 
@@ -658,7 +678,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 EventsFragment eventsFragment = (EventsFragment) mViewPagerAdapter.getItem(4);
                 eventsFragment.SearchFilterForEvent(EventsFragment.eventList, newText);
             } else {
-                Prefs.setCommunityFilter(this,null);
+                Prefs.setCommunityFilter(this, null);
             }
 
         }
@@ -709,6 +729,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     }
 
     static Boolean LoadOnce;
+
     // Get webservice to show all UpToUs member
     public void getApiContactList() {
 
@@ -716,7 +737,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         //Check if model is not empty and last update must once  in a while default 45411ms
 //        int contactLastUpdated = Prefs.getContactLastUpdated(this);
 //        long difference = getDifferenceTime();
-        if (contactListResponseModels==null||contactListResponseModels.size() == 0 || !LoadOnce) {
+        if (contactListResponseModels == null || contactListResponseModels.size() == 0 || !LoadOnce) {
             showProgressDialog();
             String mAuthenticationId = Prefs.getAuthenticationId(this);
             String mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
@@ -736,7 +757,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
                             contactListResponseModels = response.body();
                             Prefs.setContactList(MainActivity.this, contactListResponseModels.toString());
-                            LoadOnce=true;
+                            LoadOnce = true;
                             mContactListAdapter = new ContactListAdapter(MainActivity.this, contactListResponseModels);
                             ContactFragment.mViewContactRecyclerView.setAdapter(mContactListAdapter);
                             ContactFragment.mTextViewSearchResult.setVisibility(View.GONE);
@@ -746,6 +767,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
                                 FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
                             }
+                            ContactFragment.checkEmptyContact();
                         }
 
 
@@ -790,7 +812,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
 
             }
-            int Position =Prefs.getPosition(this);
+            int Position = Prefs.getPosition(this);
 
             if (Position == 1) {
                 if (MainActivity.contactListResponseModels.size() == 0) {
@@ -806,4 +828,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         return MainActivity.contactListResponseModels;
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == TAG_COMMUNITY_CHANGE) {
+            if (homeFragment != null)
+                homeFragment.refresh();
+            LoadOnce = false;
+            showProgressDialog();
+            getApiContactList();
+        } else if (requestCode == 121) {
+            if (homeFragment != null)
+                homeFragment.refresh();
+            LoadOnce = false;
+            showProgressDialog();
+        }
+
+    }
 }

@@ -1,7 +1,5 @@
 package com.uptous.view.fragment;
 
-import android.app.Application;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,19 +16,17 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
-import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.FeedResponseModel;
 import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.BaseActivity;
-import com.uptous.view.activity.LogInActivity;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.activity.MessagePostActivity;
 import com.uptous.view.activity.PicturePostActivity;
 import com.uptous.view.adapter.HomeListAdapter;
-import com.uptous.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +54,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             mHideAnimationFabPicturePost;
 
     private String mAuthenticationId, mAuthenticationPassword;
-
+    static View recycler_view_empty;
     private TextView mTextViewSearchResult;
 
     @Override
@@ -73,7 +69,19 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         initView(view);
+        String messagePost = Prefs.getMessagePost(getActivity());
+        String picturePost = Prefs.getPicturePost(getActivity());
+        String Feed = Prefs.getFeedDetail(getActivity());
 
+        if (ConnectionDetector.isConnectingToInternet(getActivity())) {
+            if (messagePost != null || picturePost != null || Feed == null) {
+                getApiFeed();
+            } else {
+                Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
+        }
         return view;
     }
 
@@ -134,7 +142,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                 Prefs.setFeedDetail(getActivity(), "feed");
                 Intent intent1 = new Intent(getActivity(), PicturePostActivity.class);
-                startActivity(intent1);
+                startActivityForResult(intent1,122);
 
                 break;
 
@@ -143,26 +151,30 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     }
 
 
-    @Override
-    public void onResume() {
-        super.onResume();
+    public void refresh() {
 
         String messagePost = Prefs.getMessagePost(getActivity());
         String picturePost = Prefs.getPicturePost(getActivity());
         String Feed = Prefs.getFeedDetail(getActivity());
 
         if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-            if (messagePost != null||picturePost != null||Feed == null) {
+            if (messagePost != null || picturePost != null || Feed == null) {
                 getApiFeed();
+            } else {
+                Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
             }
-            else {
-                    Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
-                }
-            }
-      else {
+        } else {
             Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+          if (requestCode == 122) {
+              getApiFeed();
+        }
     }
 
     //Method to clear SharedPreference
@@ -192,6 +204,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mFabMessagePost = (FloatingActionButton) view.findViewById(R.id.fab_2);
         mFabPicturePost = (FloatingActionButton) view.findViewById(R.id.fab_3);
         mTextViewSearchResult = (TextView) view.findViewById(R.id.search_result);
+        recycler_view_empty = view.findViewById(R.id.recycler_view_empty);
+
+        ((TextView)view.findViewById(R.id.text_title1)).setText("No news is... no news?");
+        ((TextView)view.findViewById(R.id.text_title2)).setText("There has been no recent activity in the selected community. Try to click the menu buttons below to view older items.");
+        ((TextView)view.findViewById(R.id.text_contain)).setText("When people post messages, sign-ups, photos or files, updates will appear here. Why don’t you give it a try, and post something? Just tap on “Post” down there in the corner.");
 
         clickListenerOnViews();
 
@@ -256,9 +273,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         mFabPicturePost.setClickable(false);
     }
 
+    public static void checkEmptyView() {
+        if (recycler_view_empty != null && mViewHomeRecyclerView != null) {
+            if (feedResponseModelList.size() == 0) {
+                recycler_view_empty.setVisibility(View.VISIBLE);
+                mViewHomeRecyclerView.setVisibility(View.GONE);
+            } else {
+                recycler_view_empty.setVisibility(View.GONE);
+                mViewHomeRecyclerView.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
     // Get webservice to show all news feed like : message, picture ,file etc.
     private void getApiFeed() {
-        ((MainActivity)getActivity()).showProgressDialog();
+        ((MainActivity) getActivity()).showProgressDialog();
 
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -267,7 +296,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         call.enqueue(new Callback<List<FeedResponseModel>>() {
             @Override
             public void onResponse(Call<List<FeedResponseModel>> call, Response<List<FeedResponseModel>> response) {
-                ((MainActivity)getActivity()).hideProgressDialog();
+                ((MainActivity) getActivity()).hideProgressDialog();
                 try {
 
                     if (response.body() != null) {
@@ -275,7 +304,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         feedResponseModelList = response.body();
                         mHomeListAdapter = new HomeListAdapter(getActivity(), feedResponseModelList);
                         mViewHomeRecyclerView.setAdapter(mHomeListAdapter);
-
+                        checkEmptyView();
                         int communityId = Prefs.getCommunityId(getActivity());
                         if (communityId != 0) {
                             FilterCommunityForFeed(feedResponseModelList, communityId);
@@ -283,7 +312,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
                     } else {
 
-                        BaseActivity baseActivity = (BaseActivity)getActivity();
+                        BaseActivity baseActivity = (BaseActivity) getActivity();
                         baseActivity.showLogOutDialog();
                     }
                 } catch (Exception e) {
@@ -294,7 +323,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public void onFailure(Call<List<FeedResponseModel>> call, Throwable t) {
-                 ((MainActivity)getActivity()).hideProgressDialog();
+                ((MainActivity) getActivity()).hideProgressDialog();
                 Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
             }
 
@@ -364,7 +393,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
             if (Position == 0) {
                 if (feedResponseModelList.size() == 0) {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+                    HomeFragment.checkEmptyView();
                 } else {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }

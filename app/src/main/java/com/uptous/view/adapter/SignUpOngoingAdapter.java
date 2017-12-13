@@ -23,6 +23,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import static com.uptous.view.activity.VolunteerDetailActivity.FULL_LIST;
+
 /**
  * Created by Prakash .
  */
@@ -36,11 +38,8 @@ public class SignUpOngoingAdapter extends RecyclerView.Adapter<SignUpOngoingAdap
     int  NumberOfVolunteer, Total;
 
     public SignUpOngoingAdapter(Activity a, List<SignUpDetailResponseModel.ItemsBean> listEntities) {
-
         this.listEntities = listEntities;
         this.activity = a;
-
-
     }
 
     @Override
@@ -48,7 +47,6 @@ public class SignUpOngoingAdapter extends RecyclerView.Adapter<SignUpOngoingAdap
         View view =
                 LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_individual_sign_up, viewGroup, false);
         VersionViewHolder viewHolder = new VersionViewHolder(view);
-
         return viewHolder;
     }
 
@@ -93,17 +91,30 @@ public class SignUpOngoingAdapter extends RecyclerView.Adapter<SignUpOngoingAdap
         versionViewHolder.mTextViewTitle.setText(listEntities.get(i).getName());
         String OpenSpot = listEntities.get(i).getVolunteerStatus();
 
+
+
+//        if (OpenSpot.equalsIgnoreCase("Full")) {
+//            versionViewHolder.imageSignUp.setVisibility(View.GONE);
+//            versionViewHolder.TextViewSignUp.setText("Full");
+//            versionViewHolder.linearlayout_parent.setClickable(false);
+//        } else {
+//            versionViewHolder.imageSignUp.setVisibility(View.VISIBLE);
+//            versionViewHolder.TextViewSignUp.setText("Sign up!");
+//            versionViewHolder.linearlayout_parent.setClickable(true);
+//        }
+
         int VolunteerCount = listEntities.get(i).getVolunteerCount();
         NumberOfVolunteer = listEntities.get(i).getNumVolunteers();
         Total = NumberOfVolunteer - VolunteerCount;
 
         versionViewHolder.linearLayoutOpenSpot.setTag(i);
+        versionViewHolder.linearlayout_parent.setTag(i);
         versionViewHolder.linearLayoutVolunteered.setTag(i);
         final String Name = listEntities.get(i).getName();
         final String Time = listEntities.get(i).getEndTime();
         if (OpenSpot.equalsIgnoreCase("Open")) {
 
-            versionViewHolder.linearLayoutOpenSpot.setOnClickListener(new View.OnClickListener() {
+            versionViewHolder.linearlayout_parent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     String dateText = null;
@@ -168,7 +179,7 @@ public class SignUpOngoingAdapter extends RecyclerView.Adapter<SignUpOngoingAdap
         } else {
             if (OpenSpot.equalsIgnoreCase("Volunteered")) {
 
-                versionViewHolder.linearLayoutVolunteered.setOnClickListener(new View.OnClickListener() {
+                versionViewHolder.linearlayout_parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         String dateText = null;
@@ -239,7 +250,7 @@ public class SignUpOngoingAdapter extends RecyclerView.Adapter<SignUpOngoingAdap
                     versionViewHolder.mTextViewDate.setText(dateText);
 
                 }
-                versionViewHolder.linearLayoutVolunteered.setOnClickListener(new View.OnClickListener() {
+                versionViewHolder.linearlayout_parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
@@ -280,6 +291,7 @@ public class SignUpOngoingAdapter extends RecyclerView.Adapter<SignUpOngoingAdap
                         Prefs.setDate(activity,dateText);
                         Prefs.setSignUpType(activity,null);
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
+                        intent.putExtra(FULL_LIST,true);
                         activity.startActivity(intent);
                     }
                 });
@@ -304,10 +316,10 @@ public class SignUpOngoingAdapter extends RecyclerView.Adapter<SignUpOngoingAdap
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewDate, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
-        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot;
+        TextView mTextViewDate,TextViewSignUp, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
+        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot,linearlayout_parent;
         GifImageView imageViewSignUpType;
-        ImageView imageViewFull;
+        ImageView imageViewFull,imageSignUp;
 
 
         public VersionViewHolder(View itemView) {
@@ -317,7 +329,9 @@ public class SignUpOngoingAdapter extends RecyclerView.Adapter<SignUpOngoingAdap
             mTextViewVolunteered = (TextView) itemView.findViewById(R.id.text_view_volunteered);
             mTextViewDate = (TextView) itemView.findViewById(R.id.text_view_date);
             mteTextViewVolunteerCount = (TextView) itemView.findViewById(R.id.text_view_volunteer_count);
-            linearLayoutVolunteered = (LinearLayout) itemView.findViewById(R.id.layout_volunteered);
+            TextViewSignUp = (TextView) itemView.findViewById(R.id.text_signup);
+            imageSignUp = (ImageView) itemView.findViewById(R.id.img_signup);
+            linearLayoutVolunteered = (LinearLayout) itemView.findViewById(R.id.layout_volunteered);  linearlayout_parent = (LinearLayout) itemView.findViewById(R.id.layout_parent);
             linearLayoutOpenSpot = (LinearLayout) itemView.findViewById(R.id.layout_open_spot);
             imageViewSignUpType = (GifImageView) itemView.findViewById(R.id.image_view_sign_up_type);
             imageViewFull = (ImageView) itemView.findViewById(R.id.image_view_full);
