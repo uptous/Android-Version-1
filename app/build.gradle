@@ -1,14 +1,22 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword '123456'
+            storeFile file('E:/UpToUS/UpToUs.jks')
+            storePassword '123456'
+        }
+    }
     compileSdkVersion 24
     buildToolsVersion '25.0.0'
     defaultConfig {
         applicationId "com.uptous"
         minSdkVersion 15
         targetSdkVersion 24
-        versionCode 11
-        versionName "1.4"
+        versionCode 12
+        versionName "1.5"
     }
     buildTypes {
         release {
@@ -16,7 +24,6 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 repositories {
     mavenCentral()

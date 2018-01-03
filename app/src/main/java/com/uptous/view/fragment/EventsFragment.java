@@ -63,9 +63,10 @@ public class EventsFragment extends Fragment {
 
         if (ConnectionDetector.isConnectingToInternet(getActivity())) {
 
-            getApiCommunityList();
+
 
             getApiEventList();
+            getApiCommunityList();
 
 
         } else {
@@ -95,7 +96,7 @@ public class EventsFragment extends Fragment {
         getData();
 
     }
-    public static void checkEmptyEvent() {
+    public static void checkEmptyEvent2() {
         if (recycler_view_empty != null && mViewEventsRecyclerView != null) {
             if (eventList.size() == 0) {
                 recycler_view_empty.setVisibility(View.VISIBLE);
@@ -130,7 +131,7 @@ public class EventsFragment extends Fragment {
                         if (communityId != 0) {
                             FilterCommunityForSignUp(eventList, communityId);
                         }
-                        checkEmptyEvent();
+                        checkEmptyEvent2();
                     } else {
 //                        final CustomizeDialog customizeDialog = new CustomizeDialog(getActivity());
 //                        customizeDialog.setCancelable(false);
@@ -190,7 +191,7 @@ public class EventsFragment extends Fragment {
                 mViewEventsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 mEventListAdapter = new EventListAdapter(getActivity(), filteredModelList, mCommunityList);
                 mViewEventsRecyclerView.setAdapter(mEventListAdapter);
-                checkEmptyEvent();
+                checkEmptyEvent2();
                 mEventListAdapter.notifyDataSetChanged();
                 if (query.equalsIgnoreCase("")) {
                     mTextViewSearchResult.setVisibility(View.GONE);
@@ -224,14 +225,14 @@ public class EventsFragment extends Fragment {
             MainActivity activity = (MainActivity) getActivity();
             if (Position == 4) {
                 if (eventList.size() == 0) {
-                    checkEmptyEvent();
+                    //checkEmptyEvent();
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
 //                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
                 } else {
                     activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }
             }
-            checkEmptyEvent();
+            //checkEmptyEvent();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -254,7 +255,7 @@ public class EventsFragment extends Fragment {
 
                     if (response.body() != null) {
                         mCommunityList = response.body();
-                        checkEmptyEvent();
+                        //checkEmptyEvent();
                         Log.i("EventsFragment","val "+mCommunityList.toString());
                     } else {
                         BaseActivity baseActivity = (BaseActivity)getActivity();

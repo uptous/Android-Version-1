@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
@@ -80,6 +82,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public SearchView mSearchView;
     private long differenceTime;
     private String text;
+    private static final int REQUEST_RUNTIME_PERMISSION = 123;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -91,29 +94,76 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         initView();
 
 
-        // Get run time permission if device version N
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            if (checkSelfPermission(Manifest.permission.CAMERA)
-                    != PackageManager.PERMISSION_GRANTED) {
+//        // Get run time permission if device version N
+//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+//            if (checkSelfPermission(Manifest.permission.CAMERA)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//
+//                requestPermissions(new String[]{Manifest.permission.CAMERA},
+//                        REQUEST_CAMERA);
+//            }
+//        }
 
-                requestPermissions(new String[]{Manifest.permission.CAMERA},
-                        REQUEST_CAMERA);
-            }
-        }
+        checkAndRequestPermissions();
 
     }
 
+    private boolean checkAndRequestPermissions() {
+//        int permissionPhoneState = ContextCompat.checkSelfPermission(this,
+//                Manifest.permission.READ_PHONE_STATE);
+
+
+        int storagePermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+//
+        int camera = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA);
+
+        int storagePermissionWrite = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+
+        List<String> listPermissionsNeeded = new ArrayList<>();
+//        if (storagePermission != PackageManager.PERMISSION_GRANTED) {
+//            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+//        }
+//        if (storagePermissionWrite != PackageManager.PERMISSION_GRANTED) {
+//            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+//        }
+
+        if (camera != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.CAMERA);
+        }
+//
+
+
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), REQUEST_RUNTIME_PERMISSION);
+            return false;
+        }
+
+        return true;
+    }
+
+
     @Override
+
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_CAMERA) {
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Now user should be able to use camera
-            } else {
-                // Your app will not have this permission. Turn off all functions
-                // that require this permission or it will force close like your
-                // original question
+        switch (requestCode) {
+
+//
+
+            case REQUEST_RUNTIME_PERMISSION: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                } else {
+                    //TODO
+                }
             }
+
         }
     }
 
@@ -207,10 +257,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
                 mTextViewTitle.setText("Library - " + communityName);
             } else if (Position == 4) {
-                EventsFragment.checkEmptyEvent();
+            //    EventsFragment.checkEmptyEvent();
                 if (EventsFragment.eventList.size() == 0) {
                     mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                    EventsFragment.checkEmptyEvent();
+                  //  EventsFragment.checkEmptyEvent();
 //                    Toast.makeText(MainActivity.this, "No Record Found6", Toast.LENGTH_SHORT).show();
                 } else {
                     mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
@@ -428,7 +478,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 int position = tab.getPosition();
                 if (mCommunityId == 0) {
                     if (position == 0) {
-                        HomeFragment.checkEmptyView();
+                       // HomeFragment.checkEmptyView();
                         HomeFragment.mFabPost.setVisibility(View.VISIBLE);
                         mImageViewInvitation.setVisibility(View.VISIBLE);
                         mTextViewSignOut.setVisibility(View.GONE);
@@ -474,14 +524,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
 
                     } else if (position == 2) {
-                        SignUpFragment.checkEmptySignUp();
+                       // SignUpFragment.checkEmptySignUp();
                         mTextViewTitle.setText(R.string.sign_ups_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
                         Prefs.setPosition(MainActivity.this, 2);
                         mImageViewInvitation.setVisibility(View.GONE);
                         SignUpFragment.mViewSignUpRecyclerView.setVisibility(View.VISIBLE);
                     } else if (position == 3) {
-                        LibraryFragment.checkEmptyAlbum();
+                     //   LibraryFragment.checkEmptyAlbum();
                         mTextViewTitle.setText(R.string.library_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
                         Prefs.setPosition(MainActivity.this, 3);
@@ -491,7 +541,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     } else if (position == 4) {
                         mTextViewTitle.setText(R.string.event_all_communities);
                         mTextViewSignOut.setVisibility(View.GONE);
-                        EventsFragment.checkEmptyEvent();
+                      //  EventsFragment.checkEmptyEvent();
                         Prefs.setPosition(MainActivity.this, 4);
                         mImageViewInvitation.setVisibility(View.GONE);
                         EventsFragment.mViewEventsRecyclerView.setVisibility(View.VISIBLE);
@@ -556,7 +606,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         String Album = Prefs.getAlbum(MainActivity.this);
                         String Attachment = Prefs.getAttachment(MainActivity.this);
                         if (Album != null) {
-                            LibraryFragment.checkEmptyAlbum();
+                          //  LibraryFragment.checkEmptyAlbum();
                             if (LibraryFragment.photoAlbumResponseModelList.size() == 0) {
                                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
 //                                Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
@@ -566,7 +616,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         }
                         if (Attachment != null) {
                             //LibraryFragment
-                            LibraryFragment.checkEmptyLib();
+                           // LibraryFragment.checkEmptyLib();
                             if (LibraryFragment.attachmentFileResponseModels.size() == 0) {
                                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
 //                                Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();
@@ -579,7 +629,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         Prefs.setPosition(MainActivity.this, 3);
                         mImageViewInvitation.setVisibility(View.GONE);
                     } else if (position == 4) {
-                        EventsFragment.checkEmptyEvent();
+                        EventsFragment.checkEmptyEvent2();
                         if (EventsFragment.eventList.size() == 0) {
                             mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
                             //   Toast.makeText(MainActivity.this, R.string.no_record_found, Toast.LENGTH_SHORT).show();

@@ -40,7 +40,7 @@
                 android:textSize="@dimen/_12sdp"
                 android:visibility="gone" />
 
-            <com.uptous.controller.utils.PlayGifView
+            <com.uptous.controller.utils.GifImageView
                 android:id="@+id/image_gif"
                 android:layout_width="@dimen/_25sdp"
                 android:layout_height="@dimen/_25sdp"

@@ -17,7 +17,7 @@ public class SignUpDetailResponseModel {
      * location :
      * name : International Night
      * notes : khfsd hk sadfkjh kjhdsakljh
-     sadkfh sdajh k
+     * sadkfh sdajh k
      * id : 19382
      * type : Shifts
      * opportunityStatus : Active
@@ -267,6 +267,7 @@ public class SignUpDetailResponseModel {
          */
 
         private int id;
+        private String extra;
         private long dateTime;
         private String endTime;
         private String name;
@@ -293,6 +294,10 @@ public class SignUpDetailResponseModel {
 
         public String getEndTime() {
             return endTime;
+        }
+
+        public String getExtra() {
+            return extra;
         }
 
         public void setEndTime(String endTime) {

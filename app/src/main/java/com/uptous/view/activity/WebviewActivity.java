@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -92,9 +93,9 @@ public class WebviewActivity extends AppCompatActivity implements View.OnClickLi
             startActivity(intent);
         }else {
             String File="http://drive.google.com/viewerng/viewer?embedded=true&url=" + pdf;
+            mWebView.getSettings().setJavaScriptEnabled(true);
+            mWebView.setWebChromeClient(new WebChromeClient());
             mWebView.loadUrl(File);
-
-
         }
 
       Prefs.setpath(this,null);

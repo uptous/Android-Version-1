@@ -61,7 +61,8 @@ public class SignUpShiftAdapter extends RecyclerView.Adapter<SignUpShiftAdapter.
         // Set Data in your views comes from CollectionClass
 
 
-        val = listEntities.get(i).getDateTime();
+        SignUpDetailResponseModel.ItemsBean itemsBean = listEntities.get(i);
+        val = itemsBean.getDateTime();
         if (val == 0) {
             versionViewHolder.mTextViewDate.setVisibility(View.GONE);
         } else {
@@ -75,11 +76,11 @@ public class SignUpShiftAdapter extends RecyclerView.Adapter<SignUpShiftAdapter.
             if(!dateTextTime.equalsIgnoreCase("1:00AM") &&
                     !dateTextTime.equalsIgnoreCase("1:00 AM")){
 
-                if (listEntities.get(i).getEndTime() != null && !listEntities.get(i).getEndTime().equalsIgnoreCase("")) {
-                    if (!listEntities.get(i).getEndTime().equalsIgnoreCase("1:00AM") &&
-                            !listEntities.get(i).getEndTime().equalsIgnoreCase("1:00 AM")) {
+                if (itemsBean.getEndTime() != null && !itemsBean.getEndTime().equalsIgnoreCase("")) {
+                    if (!itemsBean.getEndTime().equalsIgnoreCase("1:00AM") &&
+                            !itemsBean.getEndTime().equalsIgnoreCase("1:00 AM")) {
 //                        dateTextMain = df2.format(date) + ", " + dfTime.format(date) + " - " + listEntities.get(i).getEndTime();
-                        versionViewHolder.mTextViewDate.setText(dateTextMain +", "+dateTextTime+ " - " + listEntities.get(i).getEndTime());
+                        versionViewHolder.mTextViewDate.setText(dateTextMain +", "+dateTextTime+ " - " + itemsBean.getEndTime());
                     } else {
                         versionViewHolder.mTextViewDate.setText(dateTextMain+", "+dateTextTime);
                     }
@@ -93,17 +94,16 @@ public class SignUpShiftAdapter extends RecyclerView.Adapter<SignUpShiftAdapter.
 
         }
 
-
-        versionViewHolder.mTextViewTitle.setText(listEntities.get(i).getName());
-        String OpenSpot = listEntities.get(i).getVolunteerStatus();
-        VolunteerCount = listEntities.get(i).getVolunteerCount();
-        NumberOfVolunteer = listEntities.get(i).getNumVolunteers();
+        versionViewHolder.mTextViewTitle.setText(itemsBean.getName());
+        String OpenSpot = itemsBean.getVolunteerStatus();
+        VolunteerCount = itemsBean.getVolunteerCount();
+        NumberOfVolunteer = itemsBean.getNumVolunteers();
         Total = NumberOfVolunteer - VolunteerCount;
         versionViewHolder.linearLayoutOpenSpot.setTag(i);
         versionViewHolder.linearLayoutVolunteered.setTag(i);
         versionViewHolder.linearLayoutParent.setTag(i);
-        final String Name = listEntities.get(i).getName();
-        final String Time = listEntities.get(i).getEndTime();
+        final String Name = itemsBean.getName();
+        final String Time = itemsBean.getEndTime();
         if (OpenSpot.equalsIgnoreCase("Open")) {
 
             versionViewHolder.linearLayoutParent.setOnClickListener(new View.OnClickListener() {
@@ -170,7 +170,7 @@ public class SignUpShiftAdapter extends RecyclerView.Adapter<SignUpShiftAdapter.
                 versionViewHolder.linearLayoutOpenSpot.setVisibility(View.VISIBLE);
                 versionViewHolder.mteTextViewVolunteerCount.
                         setText((Html.fromHtml("<font color='#EE0000'>" + Total + "</font> " +
-                                " spots" + " " + listEntities.get(i)
+                                " spots" + " " + itemsBean
                                 .getVolunteerStatus())));
             }
 
@@ -228,7 +228,7 @@ public class SignUpShiftAdapter extends RecyclerView.Adapter<SignUpShiftAdapter.
                 versionViewHolder.imageViewSignUpType.setGifImageResource(R.mipmap.volunteer_one);
                 versionViewHolder.linearLayoutOpenSpot.setVisibility(View.GONE);
                 versionViewHolder.linearLayoutVolunteered.setVisibility(View.VISIBLE);
-                versionViewHolder.mTextViewVolunteered.setText(listEntities.get(i).getVolunteerStatus());
+                versionViewHolder.mTextViewVolunteered.setText(itemsBean.getVolunteerStatus());
             }
 
             if (OpenSpot.equalsIgnoreCase("Full")) {
@@ -241,9 +241,9 @@ public class SignUpShiftAdapter extends RecyclerView.Adapter<SignUpShiftAdapter.
                     df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                     dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                     dateTextMain = df2.format(date) + ", " + dfTime.format(date);
-                    if (listEntities.get(i).getEndTime() != null && !listEntities.get(i).getEndTime().equalsIgnoreCase("")) {
-                        dateTextMain = df2.format(date) + ", " + dfTime.format(date) + " - " + listEntities.get(i).getEndTime();
-                        versionViewHolder.mTextViewDate.setText(dateTextMain + " - " + listEntities.get(i).getEndTime());
+                    if (itemsBean.getEndTime() != null && !itemsBean.getEndTime().equalsIgnoreCase("")) {
+                        dateTextMain = df2.format(date) + ", " + dfTime.format(date) + " - " + itemsBean.getEndTime();
+                        versionViewHolder.mTextViewDate.setText(dateTextMain + " - " + itemsBean.getEndTime());
                     } else {
                         versionViewHolder.mTextViewDate.setText(dateTextMain);
                     }
@@ -309,7 +309,7 @@ public class SignUpShiftAdapter extends RecyclerView.Adapter<SignUpShiftAdapter.
                 versionViewHolder.imageViewFull.setVisibility(View.VISIBLE);
                 versionViewHolder.linearLayoutOpenSpot.setVisibility(View.GONE);
                 versionViewHolder.linearLayoutVolunteered.setVisibility(View.VISIBLE);
-                versionViewHolder.mTextViewVolunteered.setText(listEntities.get(i).getVolunteerStatus());
+                versionViewHolder.mTextViewVolunteered.setText(itemsBean.getVolunteerStatus());
             }
         }
 //        versionViewHolder.mTextViewDate.setText(dateText);

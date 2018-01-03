@@ -53,6 +53,7 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rspv_detail);
 
+
         initView();
 
     }
@@ -85,59 +86,79 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
     private void initView() {
         mHelper = new Helper();
 
-        //Local Variables Initialization
-        LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
-        LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
-        GifImageView playGifView = (GifImageView) findViewById(R.id.image_gif);
-        LinearLayoutManager layoutManagerFiles
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        try {
+            //Local Variables Initialization
+            LinearLayout linearLayoutCommunityFilter = (LinearLayout) findViewById(R.id.layout_community_filter);
+            LinearLayout linearLayoutImageMenuLeft = (LinearLayout) findViewById(R.id.imgmenuleft);
+            GifImageView playGifView = (GifImageView) findViewById(R.id.image_gif);
 
-        //Global Variables Initialization
-        mRecyclerViewRspvComment = (RecyclerView) findViewById(R.id.recycler_view_rspv_comment);
-        mRecyclerViewRspvComment.setLayoutManager(layoutManagerFiles);
+            LinearLayoutManager layoutManagerFiles
+                    = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
-        mEditTextNumberOfAttendees = (EditText) findViewById(R.id.edit_text_number_of_attendees);
-        mEditTextNumberOfAttendees.clearFocus();
-        mViewDateTimeTextView = (TextView) findViewById(R.id.text_view_date_time);
-        mTextViewSignUpSend = (TextView) findViewById(R.id.text_view_send_comment);
-        mTextViewTitle = (TextView) findViewById(R.id.text_view_message_toolbar);
+            //Global Variables Initialization
+            mRecyclerViewRspvComment = (RecyclerView) findViewById(R.id.recycler_view_rspv_comment);
+            mRecyclerViewRspvComment.setLayoutManager(layoutManagerFiles);
 
-        mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
+            mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
+            mEditTextNumberOfAttendees = (EditText) findViewById(R.id.edit_text_number_of_attendees);
+            mEditTextNumberOfAttendees.clearFocus();
+            mViewDateTimeTextView = (TextView) findViewById(R.id.text_view_date_time);
+            mTextViewSignUpSend = (TextView) findViewById(R.id.text_view_send_comment);
+            // mTextViewTitle = (TextView) findViewById(R.id.text_view_message_toolbar);
+            mTextViewTitle = (TextView) findViewById(R.id.text_view_event_name);
 
-        playGifView.setGifImageResource(R.mipmap.smiley_test);
-        mTextViewTitle.setVisibility(View.VISIBLE);
-        mImageViewBack.setVisibility(View.VISIBLE);
-        linearLayoutCommunityFilter.setVisibility(View.GONE);
-        linearLayoutImageMenuLeft.setVisibility(View.GONE);
+            mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
 
-        clickListener();
+            playGifView.setGifImageResource(R.mipmap.smiley_test);
+            mTextViewTitle.setVisibility(View.VISIBLE);
+            mImageViewBack.setVisibility(View.VISIBLE);
+            linearLayoutCommunityFilter.setVisibility(View.GONE);
+            linearLayoutImageMenuLeft.setVisibility(View.GONE);
 
-        getData();
+            clickListener();
 
-        if (ConnectionDetector.isConnectingToInternet(RSPVDetailActivity.this)) {
-            getApiRSPVDetail();
-        } else {
-            Toast.makeText(RSPVDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            getData();
+
+            if (ConnectionDetector.isConnectingToInternet(RSPVDetailActivity.this)) {
+                getApiRSPVDetail();
+            } else {
+                Toast.makeText(RSPVDetailActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
 
     }
 
     // Method to Get data from SharedPreference
     private void getData() {
-        String title = Prefs.getName(this);
-        String endTime ="";
-        String date = Prefs.getDate(this);
-        mAuthenticationId = Prefs.getAuthenticationId(this);
-        mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
 
-        mTextViewTitle.setText("Join the " + title);
 
-        if (endTime == null) {
-            mViewDateTimeTextView.setText(date);
-        } else {
-            mViewDateTimeTextView.setText(date + ", " + endTime);
+        try {
+            String title = Prefs.getName(this);
+            String endTime = "";
+            String date = Prefs.getDate(this);
+            mAuthenticationId = Prefs.getAuthenticationId(this);
+            mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
+
+            mTextViewTitle.setText(title);
+
+            if (endTime == null) {
+                mViewDateTimeTextView.setText(date);
+            } else {
+                if (date != null)
+                    mViewDateTimeTextView.setText(date + ", " + endTime);
+                else {
+                    mViewDateTimeTextView.setText("");
+                }
+            }
+
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
     }
 
     //Method to set on clickListener on views
@@ -149,71 +170,88 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
     // Get webservice to get RSPV sign_up comments
     private void getApiRSPVDetail() {
 
-        showProgressDialog();
-        int OpId = Prefs.getOpportunityId(this);
-        mItemID = Prefs.getNewsItemId(this);
+        try {
+            showProgressDialog();
+            int OpId = Prefs.getOpportunityId(this);
+            mItemID = Prefs.getNewsItemId(this);
 
 
-        APIServices service =
-                ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
-        Call<List<SignUpDetailResponseModel>> call = service.GetItem(OpId, mItemID);
 
-        call.enqueue(new Callback<List<SignUpDetailResponseModel>>() {
-                         @Override
-                         public void onResponse(Call<List<SignUpDetailResponseModel>> call,
-                                                Response<List<SignUpDetailResponseModel>> response) {
-                             try {
-                                hideProgressDialog();
-                                 if (response.isSuccessful()) {
+            APIServices service =
+                    ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+            Call<List<SignUpDetailResponseModel>> call = service.GetItem(OpId, mItemID);
 
-                                     List<SignUpDetailResponseModel> eventResponseModels = response.body();
+            call.enqueue(new Callback<List<SignUpDetailResponseModel>>() {
+                             @Override
+                             public void onResponse(Call<List<SignUpDetailResponseModel>> call,
+                                                    Response<List<SignUpDetailResponseModel>> response) {
 
-                                     for (int i = 0; eventResponseModels.size() >= i; i++) {
+                                 try {
+                                     hideProgressDialog();
+                                     if (response.isSuccessful()) {
+                                         List<SignUpDetailResponseModel> eventResponseModels = response.body();
 
-                                         List<SignUpDetailResponseModel.ItemsBean> eventResponseModelsItem =
-                                                 response.body().get(i).getItems();
-
-                                         for (int j = 0; eventResponseModelsItem.size() > j; j++) {
-                                             int itemid = eventResponseModelsItem.get(j).getId();
-                                             if (itemid == mItemID) {
+//                                         for (int i = 0; eventResponseModels.size() >= i; i++) {
+//
+//                                             List<SignUpDetailResponseModel.ItemsBean> eventResponseModelsItem =
+//                                                     response.body().get(i).getItems();
+//
+//                                             for (int j = 0; eventResponseModelsItem.size() > j; j++) {
+//                                                 int itemid = eventResponseModelsItem.get(j).getId();
+//                                                 logger.setAdEvent("response itemid: "+itemid);
+//                                                 LogFile.createLogFile(logger);
                                                  mRspvDetailAdapter = new RSPVDetailAdapter(RSPVDetailActivity.this,
-                                                         eventResponseModelsItem.get(j).getVolunteers());
+                                                         eventResponseModels.get(0).getItems().get(0).getVolunteers());
                                                  mRecyclerViewRspvComment.setAdapter(mRspvDetailAdapter);
-                                             }
 
 
-                                         }
+
+                                                /* if (mItemID != 0) {
+                                                     if (itemid == mItemID) {
+
+                                                     }
+
+                                                 } else {
+                                                     mRspvDetailAdapter = new RSPVDetailAdapter(RSPVDetailActivity.this,
+                                                             eventResponseModelsItem.get(j).getVolunteers());
+                                                     mRecyclerViewRspvComment.setAdapter(mRspvDetailAdapter);
+                                                 }*/
+
+//                                             }
+//                                         }
+
+
+                                     } else {
+                                         Toast.makeText(RSPVDetailActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
                                      }
 
 
-                                 } else {
-                                     Toast.makeText(RSPVDetailActivity.this, "" + response.raw().code(), Toast.LENGTH_SHORT).show();
+                                 } catch (Exception e) {
+                                     e.printStackTrace();
+
                                  }
 
+                             }
 
-                             } catch (Exception e) {
-                                 e.printStackTrace();
+                             @Override
+                             public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
+                                 hideProgressDialog();
+                                 Toast.makeText(RSPVDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+                                 Log.d("onFailure", t.toString());
                              }
 
                          }
 
-                         @Override
-                         public void onFailure(Call<List<SignUpDetailResponseModel>> call, Throwable t) {
-                            hideProgressDialog();
-                             Toast.makeText(RSPVDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                             Log.d("onFailure", t.toString());
-                         }
+            );
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
-                     }
-
-        );
     }
 
     // Post webservice to post RSPV sign_up comments
     private void postApiComment() {
-       showProgressDialog();
-
-
+        showProgressDialog();
         int OpId = Prefs.getOpportunityId(this);
         int itemID = Prefs.getItemId(this);
         APIServices service =
@@ -224,7 +262,7 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-               hideProgressDialog();
+                hideProgressDialog();
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
@@ -244,7 +282,7 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-              hideProgressDialog();
+                hideProgressDialog();
                 Toast.makeText(RSPVDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
 
 

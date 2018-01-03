@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -37,8 +35,6 @@
                     android:id="@+id/scroll_view_des"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/_55sdp">
-
-
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -108,11 +104,7 @@
                             android:layout_height="@dimen/_40sdp"
                             android:gravity="center"
                             android:orientation="horizontal"
-
-                            android:visibility="gone"
-
-
-                            >
+                            android:visibility="gone"  >
 
 
                             <TextView
@@ -120,7 +112,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:maxLength="1"
-                                android:text="Ram"
                                 android:textSize="@dimen/_15sdp" />
 
                             <TextView
@@ -162,19 +153,13 @@
                             android:layout_height="@dimen/_40sdp"
                             android:gravity="center"
                             android:orientation="horizontal"
-
-                            android:visibility="gone"
-
-
-                            >
-
+                            android:visibility="gone">
 
                             <TextView
                                 android:id="@+id/textview_first_name_second_contact"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:maxLength="1"
-                                android:text="Ram"
                                 android:textSize="@dimen/_15sdp" />
 
                             <TextView
@@ -182,7 +167,6 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:maxLength="1"
-                                android:text="Ram"
                                 android:textSize="@dimen/_15sdp" />
                         </LinearLayout>
 

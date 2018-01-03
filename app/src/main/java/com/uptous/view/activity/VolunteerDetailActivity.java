@@ -48,16 +48,17 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
             mViewDrivingToTextView;
     private int mItemID;
 
-    private Boolean isFullList=false;
+    private Boolean isFullList = false;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cancel_volunteer);
 
-        Intent intent= getIntent();
+        Intent intent = getIntent();
         if (intent.hasExtra(FULL_LIST)) {
             Bundle extras = getIntent().getExtras();
-                isFullList = extras.getBoolean(FULL_LIST);
+            isFullList = extras.getBoolean(FULL_LIST);
         }
         initView();
     }
@@ -95,8 +96,10 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
         mTextViewEventDate = (TextView) findViewById(R.id.text_view_volunteer_event_date);
         mTextViewCancelAssignment = (TextView) findViewById(R.id.text_view_cancel_assignment);
 
-        if(isFullList)
-        mTextViewCancelAssignment.setText("Full");
+        if (isFullList)
+            mTextViewCancelAssignment.setText("Full");
+
+
         mImageViewBack.setVisibility(View.VISIBLE);
         linearLayoutCommunityFilter.setVisibility(View.GONE);
         linearLayoutImageMenuLeft.setVisibility(View.GONE);
@@ -117,7 +120,7 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
         mStringType = Prefs.getSignUpType(this);
         mAuthenticationId = Prefs.getAuthenticationId(this);
         mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
-        mEventName =Prefs.getName(this);
+        mEventName = Prefs.getName(this);
         mDate = Prefs.getDate(this);
         mEndTime = "";
 
@@ -128,13 +131,19 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
     // Method to Set data
     private void setData() {
         if (mStringType != null) {
-            if (!mStringType.equalsIgnoreCase("Party")) {
-
+            if (mStringType.equalsIgnoreCase("RSPV")) {
+                mViewDrivingFromTextView.setVisibility(View.VISIBLE);
+                mViewDrivingToTextView.setVisibility(View.VISIBLE);
+                mTextViewEventName.setVisibility(View.GONE);
+                mViewDrivingFromTextView.setText(mFromName);
+                mViewDrivingToTextView.setText(mToName);
+            } else if (!mStringType.equalsIgnoreCase("Party")) {
                 mViewDrivingFromTextView.setVisibility(View.VISIBLE);
                 mViewDrivingToTextView.setVisibility(View.VISIBLE);
                 mTextViewEventName.setVisibility(View.GONE);
                 mViewDrivingFromTextView.setText("Driving from: " + mFromName);
                 mViewDrivingToTextView.setText("To: " + mToName);
+
             }
         }
 
@@ -164,8 +173,8 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
     //Method to set on clickListener on views
     private void clickListenerOnViews() {
         mImageViewBack.setOnClickListener(this);
-        if(!isFullList)
-        mTextViewCancelAssignment.setOnClickListener(this);
+        if (!isFullList)
+            mTextViewCancelAssignment.setOnClickListener(this);
 
     }
 
@@ -267,10 +276,10 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
 
     // Post webservice to cancel volunteer
     private void postApiCancelAssignment() {
-       showProgressDialog();
+        showProgressDialog();
 
 
-        int OpId =Prefs.getOpportunityId(this);
+        int OpId = Prefs.getOpportunityId(this);
         int itemID = Prefs.getItemId(this);
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
@@ -280,7 +289,7 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {
 
-               hideProgressDialog();
+                hideProgressDialog();
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
@@ -297,7 +306,7 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
 
             @Override
             public void onFailure(Call<PostCommentResponseModel> call, Throwable t) {
-               hideProgressDialog();
+                hideProgressDialog();
                 Toast.makeText(VolunteerDetailActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
             }
         });
