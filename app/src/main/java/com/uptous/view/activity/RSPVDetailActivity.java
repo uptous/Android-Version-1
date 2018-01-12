@@ -15,9 +15,9 @@ import android.widget.Toast;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
+import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.controller.utils.GifImageView;
 import com.uptous.controller.utils.Helper;
-import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.sharedpreference.Prefs;
@@ -52,8 +52,6 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rspv_detail);
-
-
         initView();
 
     }
@@ -155,7 +153,7 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
                 }
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -173,8 +171,7 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
         try {
             showProgressDialog();
             int OpId = Prefs.getOpportunityId(this);
-            mItemID = Prefs.getNewsItemId(this);
-
+            mItemID = Prefs.getItemId(this);
 
 
             APIServices service =
@@ -185,40 +182,39 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
                              @Override
                              public void onResponse(Call<List<SignUpDetailResponseModel>> call,
                                                     Response<List<SignUpDetailResponseModel>> response) {
-
                                  try {
                                      hideProgressDialog();
                                      if (response.isSuccessful()) {
                                          List<SignUpDetailResponseModel> eventResponseModels = response.body();
-
-//                                         for (int i = 0; eventResponseModels.size() >= i; i++) {
-//
-//                                             List<SignUpDetailResponseModel.ItemsBean> eventResponseModelsItem =
-//                                                     response.body().get(i).getItems();
-//
-//                                             for (int j = 0; eventResponseModelsItem.size() > j; j++) {
-//                                                 int itemid = eventResponseModelsItem.get(j).getId();
-//                                                 logger.setAdEvent("response itemid: "+itemid);
-//                                                 LogFile.createLogFile(logger);
-                                                 mRspvDetailAdapter = new RSPVDetailAdapter(RSPVDetailActivity.this,
-                                                         eventResponseModels.get(0).getItems().get(0).getVolunteers());
-                                                 mRecyclerViewRspvComment.setAdapter(mRspvDetailAdapter);
-
-
-
-                                                /* if (mItemID != 0) {
-                                                     if (itemid == mItemID) {
-
-                                                     }
-
-                                                 } else {
+                                         for (int i = 0; eventResponseModels.size() >= i; i++) {
+                                             List<SignUpDetailResponseModel.ItemsBean> eventResponseModelsItem =
+                                                     response.body().get(i).getItems();
+                                             for (int j = 0; eventResponseModelsItem.size() > j; j++) {
+                                                 //search mItemID on response
+                                                 if (mItemID == eventResponseModelsItem.get(j).getId()) {
                                                      mRspvDetailAdapter = new RSPVDetailAdapter(RSPVDetailActivity.this,
                                                              eventResponseModelsItem.get(j).getVolunteers());
                                                      mRecyclerViewRspvComment.setAdapter(mRspvDetailAdapter);
-                                                 }*/
-
+                                                 }
+//                                             for (int j = 0; eventResponseModelsItem.size() > j; j++) {
+//                                                 int itemid = eventResponseModelsItem.get(j).getId();
+////                                                 logger.setAdEvent("response itemid: "+itemid);
+////                                                 LogFile.createLogFile(logger);
+//
+//
+//                                                 if (mItemID != 0) {
+//                                                     mRspvDetailAdapter = new RSPVDetailAdapter(RSPVDetailActivity.this,
+//                                                             eventResponseModels.get(0).getItems().get(0).getVolunteers());
+//                                                     mRecyclerViewRspvComment.setAdapter(mRspvDetailAdapter);
+//                                                 } else {
+//                                                     mRspvDetailAdapter = new RSPVDetailAdapter(RSPVDetailActivity.this,
+//                                                             eventResponseModelsItem.get(j).getVolunteers());
+//                                                     mRecyclerViewRspvComment.setAdapter(mRspvDetailAdapter);
+//                                                 }
+//
 //                                             }
-//                                         }
+                                             }
+                                         }
 
 
                                      } else {
@@ -243,7 +239,7 @@ public class RSPVDetailActivity extends BaseActivity implements View.OnClickList
                          }
 
             );
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

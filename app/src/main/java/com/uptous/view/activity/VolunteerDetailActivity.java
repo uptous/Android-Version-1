@@ -151,7 +151,7 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
 
 
         if (mDate != null) {
-            if (mEndTime != null) {
+            if (mEndTime != null&&mDate!=""&&mEndTime!="") {
                 mTextViewEventDate.setText(mDate + "," + mEndTime);
             } else {
                 mTextViewEventDate.setText(mDate);
@@ -209,15 +209,15 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
                             for (int j = 0; eventResponseModelsItem.size() > j; j++) {
                                 int itemid = eventResponseModelsItem.get(j).getId();
                                 if (itemid == mItemID) {
-                                    if (mStringType == null || mStringType.equalsIgnoreCase("Driver") ||
-                                            mStringType.equalsIgnoreCase("Party")) {
-                                        mVolunteeredAdapter = new VolunteeredAdapter(VolunteerDetailActivity.this,
-                                                eventResponseModelsItem.get(j).getVolunteers());
-                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredAdapter);
-                                    } else {
+                                    if (mStringType == null || !mStringType.equalsIgnoreCase("Driver")) {
                                         mVolunteeredRspvAdapter = new VolunteeredRspvAdapter(VolunteerDetailActivity.this,
                                                 eventResponseModelsItem.get(j).getVolunteers());
                                         mRecyclerViewVolunteerComment.setAdapter(mVolunteeredRspvAdapter);
+
+                                    } else {
+                                        mVolunteeredAdapter = new VolunteeredAdapter(VolunteerDetailActivity.this,
+                                                eventResponseModelsItem.get(j).getVolunteers());
+                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredAdapter);
                                     }
 
                                 }

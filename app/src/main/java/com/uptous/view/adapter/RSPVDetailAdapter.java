@@ -21,7 +21,6 @@ public class RSPVDetailAdapter extends RecyclerView.Adapter<RSPVDetailAdapter.Ve
     Activity activity;
 
 
-
     public RSPVDetailAdapter(Activity a, List<SignUpDetailResponseModel.ItemsBean.VolunteersBean> listEntities) {
 
         this.listEntities = listEntities;
@@ -45,14 +44,19 @@ public class RSPVDetailAdapter extends RecyclerView.Adapter<RSPVDetailAdapter.Ve
         // Set Data in your views comes from CollectionClass
 
 
-
-        if(listEntities.get(i).getAttendees()!=0){
-            versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName()
-                    +" - "+listEntities.get(i).getAttendees()+" attendees");
-        }else {
-            versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName());
+        if (listEntities.get(i).getFirstName() != null && listEntities.get(i).getFirstName() != "") {
+            if (listEntities.get(i).getAttendees() != 0) {
+                versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName()
+                        + " - " + listEntities.get(i).getAttendees() + " attendees");
+            } else {
+                versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName());
+            }
+        }else
+        {
+            versionViewHolder.mTextViewComment= versionViewHolder.mTextViewCommentedUserName;
         }
-        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
+        if (listEntities.get(i).getComment() != null)
+            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
 
     }
 

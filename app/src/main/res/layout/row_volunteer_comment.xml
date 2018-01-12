@@ -24,18 +24,6 @@
             android:textColor="#000"
             android:textSize="@dimen/_13sdp"
             />
-
-        <TextView
-            android:id="@+id/text_view_phone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/text_view_event_date"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:layout_toRightOf="@+id/image_view_file"
-            android:text=" "
-            android:textColor="#000"
-            android:textSize="@dimen/_12sdp" />
-
         <TextView
             android:layout_marginTop="@dimen/_5sdp"
             android:id="@+id/text_view_comment"
@@ -47,7 +35,19 @@
             android:text=""
             android:textColor="#000"
             android:textSize="@dimen/_12sdp"
-          />
+            />
+        <TextView
+            android:id="@+id/text_view_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_view_event_date"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_toRightOf="@+id/image_view_file"
+            android:text=""
+            android:textColor="#000"
+            android:textSize="@dimen/_12sdp" />
+
+
 
 
     </LinearLayout>

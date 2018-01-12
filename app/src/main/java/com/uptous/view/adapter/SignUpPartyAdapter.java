@@ -250,7 +250,7 @@ public class SignUpPartyAdapter extends RecyclerView.Adapter<SignUpPartyAdapter.
                     }
 
                 }
-                versionViewHolder.linearLayoutVolunteered.setOnClickListener(new View.OnClickListener() {
+                versionViewHolder.layout_parent.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 

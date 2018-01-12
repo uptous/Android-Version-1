@@ -2,7 +2,6 @@ package com.uptous.view.adapter;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +9,7 @@ import android.widget.TextView;
 
 import com.uptous.R;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 
 import java.util.List;
 
@@ -22,13 +22,13 @@ public class VolunteeredAdapter extends RecyclerView.Adapter<VolunteeredAdapter.
     Activity activity;
 
     private static int counter = 0;
-
+    String mStringType;
 
     public VolunteeredAdapter(Activity a, List<SignUpDetailResponseModel.ItemsBean.VolunteersBean> listEntities) {
 
         this.listEntities = listEntities;
         this.activity = a;
-
+        mStringType = Prefs.getSignUpType(a);
 
     }
 
@@ -65,18 +65,24 @@ public class VolunteeredAdapter extends RecyclerView.Adapter<VolunteeredAdapter.
 //        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
 
         String Comment = listEntities.get(i).getComment();
-        String Phone = listEntities.get(i).getPhone();
+        // String Phone = listEntities.get(i).getPhone();
 
-        if (Phone != null && Comment == null) {
+//        if (Phone != null) {
+//            versionViewHolder.mTextViewComment.setText(Phone);
+//        }
+        if (Comment != null) {
+            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
+        }
+        if (mStringType != null && mStringType == "Driver") {
             versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
+            if (Comment != null) {
+                versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getComment());
+            }
         }
-        if (Phone == null && Comment != null) {
-            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
-        }
-        if (Phone != null && Comment != null) {
-            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
-            versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
-        }
+//        if ( Comment != null) {
+//            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
+//            versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
+//        }
 //        if (listEntities.get(i).getPhone() != null) {
 
 //            if (Comment != null) {

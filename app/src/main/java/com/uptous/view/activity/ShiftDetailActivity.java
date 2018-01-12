@@ -1,9 +1,7 @@
 package com.uptous.view.activity;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,8 +15,8 @@ import android.widget.Toast;
 import com.uptous.R;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
-import com.uptous.controller.utils.Helper;
 import com.uptous.controller.utils.ConnectionDetector;
+import com.uptous.controller.utils.Helper;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.sharedpreference.Prefs;
@@ -144,11 +142,11 @@ public class ShiftDetailActivity extends BaseActivity implements View.OnClickLis
             mTextViewEventDate.setText(date);
         }
 
-        if (totalSpot != null && !totalSpot.equalsIgnoreCase("null")) {
-            mTextViewMoreSpot.setText(openSpot + " out of " + totalSpot + " spots open");
-        } else {
-            mTextViewMoreSpot.setText("More spots are open");
-        }
+//        if (totalSpot != null && !totalSpot.equalsIgnoreCase("null")) {
+//            mTextViewMoreSpot.setText(openSpot + " out of " + totalSpot + " spots open");
+//        } else {
+//            mTextViewMoreSpot.setText("More spots are open");
+//        }
 
     }
 
