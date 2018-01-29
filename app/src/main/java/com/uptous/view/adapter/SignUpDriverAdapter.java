@@ -95,10 +95,12 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
         if (i == 0) {
             versionViewHolder.mTextViewTitle.setText("From: " + listEntities.get(i).getName());
 
-            if (listEntities.size()>1) {
+            if (listEntities.size() > 1) {
                 versionViewHolder.mTextViewTo.setText("To: " + listEntities.get(1).getName());
+            } else {
+                Prefs.setToName(activity, listEntities.get(0).getExtra());
+                versionViewHolder.mTextViewTo.setText("To: " + listEntities.get(0).getExtra());
             }
-
         } else if (i == 1) {
             versionViewHolder.mTextViewTitle.setText("From: " + listEntities.get(i).getName());
             versionViewHolder.mTextViewTo.setText("To: " + listEntities.get(0).getName());
@@ -110,6 +112,7 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
 
         int VolunteerCount = listEntities.get(i).getVolunteerCount();
         versionViewHolder.linearLayoutOpenSpot.setTag(i);
+        versionViewHolder.layout_parent.setTag(i);
         versionViewHolder.linearLayoutVolunteered.setTag(i);
         final String Name = listEntities.get(i).getName();
         if (OpenSpot.equalsIgnoreCase("Open")) {
@@ -149,16 +152,20 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
 
 
                     int ItemID = listEntities.get(position).getId();
-                    Prefs.setItemId(activity,ItemID);
+                    Prefs.setItemId(activity, ItemID);
                     if (position == 0) {
-                        Prefs.setFromName(activity,listEntities.get(0).getName());
-                        Prefs.setToName(activity,listEntities.get(1).getName());
+                        Prefs.setFromName(activity, listEntities.get(0).getName());
+                        if (listEntities.size() > 1) {
+                            Prefs.setToName(activity, listEntities.get(1).getName());
+                        }
                     } else {
-                        Prefs.setFromName(activity,listEntities.get(1).getName());
-                        Prefs.setToName(activity,listEntities.get(0).getName());
+                        if (listEntities.size() > 1)
+                            Prefs.setFromName(activity, listEntities.get(1).getName());
+
+                        Prefs.setToName(activity, listEntities.get(0).getName());
                     }
 
-                    Prefs.setDate(activity,dateText);
+                    Prefs.setDate(activity, dateText);
                     Intent intent = new Intent(activity, DriverDetailActivity.class);
                     activity.startActivity(intent);
                 }
@@ -203,25 +210,27 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
                         int ItemID = listEntities.get(position).getId();
 
 
-                        Prefs.setSignUpType(activity,"Driver");
-                        Prefs.setItemId(activity,ItemID);
+                        Prefs.setSignUpType(activity, "Driver");
+                        Prefs.setItemId(activity, ItemID);
 
-                        Prefs.setDate(activity,dateText);
+                        Prefs.setDate(activity, dateText);
                         if (position == 0) {
-                            Prefs.setFromName(activity,listEntities.get(0).getName());
-                            Prefs.setToName(activity,listEntities.get(1).getName());
+                            Prefs.setFromName(activity, listEntities.get(0).getName());
+                            if(listEntities.size()>1)
+                            Prefs.setToName(activity, listEntities.get(1).getName());
                         } else {
-                            Prefs.setFromName(activity,listEntities.get(1).getName());
-                            Prefs.setToName(activity,listEntities.get(0).getName());
+                            if(listEntities.size()>1)
+                                Prefs.setFromName(activity, listEntities.get(1).getName());
+                            Prefs.setToName(activity, listEntities.get(0).getName());
                         }
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
-                        intent.putExtra(FULL_LIST,true);
+                        intent.putExtra(FULL_LIST, false);
                         activity.startActivity(intent);
                     }
                 });
 
                 versionViewHolder.imageViewSignUpType.setGifImageResource(R.mipmap.fav_icon);
-                versionViewHolder.linearLayoutOpenSpot.setVisibility(View.GONE);
+////                versionViewHolder.linearLayoutOpenSpot.setVisibility(View.GONE);
                 versionViewHolder.linearLayoutVolunteered.setVisibility(View.VISIBLE);
                 versionViewHolder.mTextViewVolunteered.setText(listEntities.get(i).getVolunteerStatus());
             }
@@ -261,19 +270,19 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
 
                         }
                         int ItemID = listEntities.get(position).getId();
-                        Prefs.setItemId(activity,ItemID);
-                        Prefs.setSignUpType(activity,"Driver");
-                       Prefs.setDate(activity,dateText);
+                        Prefs.setItemId(activity, ItemID);
+                        Prefs.setSignUpType(activity, "Driver");
+                        Prefs.setDate(activity, dateText);
 
                         if (position == 0) {
-                            Prefs.setFromName(activity,listEntities.get(0).getName());
-                            Prefs.setToName(activity,listEntities.get(1).getName());
+                            Prefs.setFromName(activity, listEntities.get(0).getName());
+                            Prefs.setToName(activity, listEntities.get(1).getName());
                         } else {
-                            Prefs.setFromName(activity,listEntities.get(1).getName());
-                            Prefs.setToName(activity,listEntities.get(0).getName());
+                            Prefs.setFromName(activity, listEntities.get(1).getName());
+                            Prefs.setToName(activity, listEntities.get(0).getName());
                         }
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
-                        intent.putExtra(FULL_LIST,true);
+                        intent.putExtra(FULL_LIST, true);
                         activity.startActivity(intent);
                     }
                 });
@@ -298,9 +307,9 @@ public class SignUpDriverAdapter extends RecyclerView.Adapter<SignUpDriverAdapte
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
         TextView mTextViewTo, mTextViewDate, mTextViewTitle, mteTextViewVolunteerCount, mTextViewVolunteered;
-        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot,ll_row_parent,layout_parent;
+        LinearLayout linearLayoutVolunteered, linearLayoutOpenSpot, ll_row_parent, layout_parent;
         GifImageView imageViewSignUpType;
-        ImageView imageViewFull,imageSignUp;
+        ImageView imageViewFull, imageSignUp;
         TextView TextViewSignUp;
 
         public VersionViewHolder(View itemView) {

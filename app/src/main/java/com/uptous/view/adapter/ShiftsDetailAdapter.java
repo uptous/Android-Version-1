@@ -45,7 +45,7 @@ public class ShiftsDetailAdapter extends RecyclerView.Adapter<ShiftsDetailAdapte
         // Set Data in your views comes from CollectionClass
 
         versionViewHolder.mTextViewCommentedUserName.setText(listEntities.get(i).getFirstName());
-        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
+        versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
 
     }
 

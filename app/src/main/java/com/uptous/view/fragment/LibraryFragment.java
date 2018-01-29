@@ -304,7 +304,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                                  mTextViewSearchResult.setVisibility(View.GONE);
 //                                 mTextViewHeading.setVisibility(View.VISIBLE);
                                  if (response.body() != null) {
-                                     checkEmptyLib();
+
                                      attachmentFileResponseModels = response.body();
                                      mAttachmentAdapter = new AttachmentAdapter(getActivity(), attachmentFileResponseModels);
                                      mRecyclerViewFiles.setAdapter(mAttachmentAdapter);
@@ -318,7 +318,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                                      BaseActivity baseActivity = (BaseActivity)getActivity();
                                      baseActivity.showLogOutDialog();
 
-                                 }
+                                 } checkEmptyLib();
 
                              } catch (Exception e)
 

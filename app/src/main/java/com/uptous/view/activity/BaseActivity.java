@@ -18,6 +18,7 @@ import static com.uptous.view.activity.MainActivity.viewPager;
 public class BaseActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
 
+
     public void showProgressDialog()
     {
         showProgressDialog("Please wait..");

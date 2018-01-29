@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.uptous.R;
 import com.uptous.model.SignUpDetailResponseModel;
+import com.uptous.sharedpreference.Prefs;
 
 import java.util.List;
 
@@ -19,16 +20,17 @@ public class VolunteeredRspvAdapter extends RecyclerView.Adapter<VolunteeredRspv
 
     List<SignUpDetailResponseModel.ItemsBean.VolunteersBean> listEntities;
     Activity activity;
+    String mStringType;
 
-    private static int counter = 0;
-
+    boolean isRSVP = false;
 
     public VolunteeredRspvAdapter(Activity a, List<SignUpDetailResponseModel.ItemsBean.VolunteersBean> listEntities) {
 
         this.listEntities = listEntities;
         this.activity = a;
-
-
+        mStringType = Prefs.getSignUpType(a);
+        if (mStringType != null && mStringType.equalsIgnoreCase("RSPV"))
+            isRSVP = true;
     }
 
     @Override
@@ -46,23 +48,20 @@ public class VolunteeredRspvAdapter extends RecyclerView.Adapter<VolunteeredRspv
         // Set Data in your views comes from CollectionClass
 
 
-        if(listEntities.get(i).getAttendees()!=0){
+        if (listEntities.get(i).getAttendees() != 0 && isRSVP) {
             versionViewHolder.mTextViewUserName.setText(listEntities.get(i).getFirstName()
                     + " - " + listEntities.get(i).getAttendees() + " attendees");
-        }else {
-            versionViewHolder.mTextViewUserName.setText(listEntities.get(i).getFirstName()
-                    );
+        } else {
+            versionViewHolder.mTextViewUserName.setText(listEntities.get(i).getFirstName());
         }
 
 
-
-
-        String Comment=listEntities.get(i).getComment();
-        if(Comment!=null){
+        String Comment = listEntities.get(i).getComment();
+        if (Comment != null) {
             versionViewHolder.mTextViewComment.setText(listEntities.get(i).getComment());
-            versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
-        }else {
-            versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
+            //versionViewHolder.mTextViewPhone.setText(listEntities.get(i).getPhone());
+        } else {
+            //    versionViewHolder.mTextViewComment.setText(listEntities.get(i).getPhone());
 
         }
 

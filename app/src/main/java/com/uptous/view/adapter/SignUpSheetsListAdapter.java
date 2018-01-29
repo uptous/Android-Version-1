@@ -3,6 +3,7 @@ package com.uptous.view.adapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+
 
 /**
  * Created by Prakash .
@@ -89,27 +91,27 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
                     int position = (int) view.getTag();
                     if (listEntities.get(position).getType().equalsIgnoreCase("RSVP")) {
                         int OpId = listEntities.get(position).getId();
-                        Prefs.setOpportunityId(activity,OpId);
+                        Prefs.setOpportunityId(activity, OpId);
 //                        signupdetail
-                        Prefs.setSignUpDetail(activity,"signupdetail");
+                        Prefs.setSignUpDetail(activity, "signupdetail");
                         Intent intent = new Intent(activity, SignUpRSPVActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Vote")) {
                         int OpId = listEntities.get(position).getId();
-                        Prefs.setOpportunityId(activity,OpId);
-                        Prefs.setSignUpDetail(activity,"signupdetail");
+                        Prefs.setOpportunityId(activity, OpId);
+                        Prefs.setSignUpDetail(activity, "signupdetail");
                         Intent intent = new Intent(activity, SignUpVoteActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Potluck/Party")) {
                         int OpId = listEntities.get(position).getId();
-                        Prefs.setOpportunityId(activity,OpId);
-                        Prefs.setSignUpDetail(activity,"signupdetail");
+                        Prefs.setOpportunityId(activity, OpId);
+                        Prefs.setSignUpDetail(activity, "signupdetail");
                         Intent intent = new Intent(activity, SignUpPartyActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Drivers")) {
                         int OpId = listEntities.get(position).getId();
-                        Prefs.setOpportunityId(activity,OpId);
-                        Prefs.setSignUpDetail(activity,"signupdetail");
+                        Prefs.setOpportunityId(activity, OpId);
+                        Prefs.setSignUpDetail(activity, "signupdetail");
                         Intent intent = new Intent(activity, SignUpDRIVERActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Shifts") ||
@@ -118,23 +120,23 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
                             listEntities.get(position).getType().equalsIgnoreCase("Volunteer") ||
                             listEntities.get(position).getType().equalsIgnoreCase("Multi Game/Event RSVP")) {
                         int OpId = listEntities.get(position).getId();
-                        Prefs.setOpportunityId(activity,OpId);
-                        Prefs.setSignUpType(activity,listEntities.get(position).getType());
-                        Prefs.setSignUpDetail(activity,"signupdetail");
+                        Prefs.setOpportunityId(activity, OpId);
+                        Prefs.setSignUpType(activity, listEntities.get(position).getType());
+                        Prefs.setSignUpDetail(activity, "signupdetail");
                         Intent intent = new Intent(activity, SignUpShiftsActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Snack Schedule")) {
                         int OpId = listEntities.get(position).getId();
-                        Prefs.setOpportunityId(activity,OpId);
-                        Prefs.setSignUpDetail(activity,"signupdetail");
-                        Prefs.setSignUpType(activity,listEntities.get(position).getType());
+                        Prefs.setOpportunityId(activity, OpId);
+                        Prefs.setSignUpDetail(activity, "signupdetail");
+                        Prefs.setSignUpType(activity, listEntities.get(position).getType());
                         Intent intent = new Intent(activity, SignUpSnackActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Ongoing Volunteering")) {
                         int OpId = listEntities.get(position).getId();
-                        Prefs.setOpportunityId(activity,OpId);
-                        Prefs.setSignUpDetail(activity,"signupdetail");
-                        Prefs.setSignUpType(activity,listEntities.get(position).getType());
+                        Prefs.setOpportunityId(activity, OpId);
+                        Prefs.setSignUpDetail(activity, "signupdetail");
+                        Prefs.setSignUpType(activity, listEntities.get(position).getType());
                         Intent intent = new Intent(activity, SignUpOngoingActivity.class);
                         activity.startActivity(intent);
                     } else {
@@ -145,7 +147,7 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
 
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getName(), "" + e);
         }
 
 
