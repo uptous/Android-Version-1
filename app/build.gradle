@@ -5,17 +5,17 @@ android {
         config {
             keyAlias 'key0'
             keyPassword '123456'
-            storeFile file('E:/UpToUS/UpToUs.jks')
+            storeFile file('C:/Users/Yuval/git/Android-Version-1/UpToUs.jks')
             storePassword '123456'
         }
     }
-    compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.uptous"
         minSdkVersion 15
-        targetSdkVersion 24
-        versionCode 12
+        targetSdkVersion 27
+        versionCode 15
         versionName "1.5"
     }
     buildTypes {
@@ -33,16 +33,17 @@ repositories {
     }
 }
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.intuit.sdp:sdp-android:1.0.3'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
-    compile 'com.squareup.picasso:picasso:2.5.2'
-    compile 'com.google.code.gson:gson:2.4'
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
-    compile 'com.github.bumptech.glide:glide:3.+'
-    compile 'de.hdodenhof:circleimageview:2.1.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:exifinterface:27.1.1'
+    implementation 'com.android.support:support-compat:27.1.1'
+    implementation 'com.intuit.sdp:sdp-android:1.0.3'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.google.code.gson:gson:2.4'
+    implementation 'com.squareup.retrofit2:retrofit:2.1.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
+    implementation 'com.github.bumptech.glide:glide:3.+'
+    implementation 'de.hdodenhof:circleimageview:2.1.0'
 }
