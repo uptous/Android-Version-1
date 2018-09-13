@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fcf9eb"
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar" />
+
+    <RelativeLayout
+        android:id="@+id/layout_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/layout_comment"
+        android:layout_below="@+id/toolbar"
+        android:background="@drawable/rounded_setup"
+        android:padding="@dimen/_10sdp">
+
+        <TextView
+            android:id="@+id/text_view_setup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set Up"
+            android:textColor="#000"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/text_view_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_view_setup"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:text="Feb 15"
+            android:textColor="#000"
+            android:textSize="@dimen/_13sdp" />
+
+        <ImageView
+            android:id="@+id/image_view_favorite"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="@dimen/_20sdp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:src="@mipmap/heart" />
+
+        <RelativeLayout
+            android:id="@+id/layout_child"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_view_date"
+            android:layout_marginTop="@dimen/_20sdp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/_7sdp"
+                android:background="#e5e1d3"
+
+                >
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/text_view_open_spots"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5 out of 5 spots open" />
+
+        </RelativeLayout>
+
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_comment"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_50sdp"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <EditText
+            android:cursorVisible="true"
+            android:textCursorDrawable="@drawable/cursor_drawable"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:layout_weight=".5"
+            android:background="#fff"
+            android:hint="Type comments here..."
+            android:paddingLeft="@dimen/_10sdp"
+            android:textColor="#000" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_weight="1.5"
+            android:height="@dimen/_40sdp"
+            android:gravity="center"
+            android:text="Sign-Up"
+            android:textSize="@dimen/_15sdp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</RelativeLayout>
