@@ -1,27 +1,48 @@
 package com.uptous.view.fragment;
 
+import android.app.ProgressDialog;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.uptous.controller.apiservices.APIServices;
+import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.ContactListResponseModel;
 import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.adapter.ContactListAdapter;
 import com.uptous.R;
+import com.uptous.view.adapter.ContactListForSearchAdapter;
+import com.uptous.view.adapter.CustomComparator;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.uptous.view.activity.MainActivity.LoadOnce;
 import static com.uptous.view.activity.MainActivity.contactListResponseModels;
+import static com.uptous.view.activity.MainActivity.mContactListResponseSearch;
+import static com.uptous.view.activity.MainActivity.mIsFromSearch;
+import static com.uptous.view.activity.MainActivity.mLimit;
 
 
 /**
@@ -30,22 +51,33 @@ import static com.uptous.view.activity.MainActivity.contactListResponseModels;
  * Dependencies :ContactListAdapter
  */
 public class ContactFragment extends Fragment {
-
     private ContactListAdapter mContactListAdapter;
-
     public static RecyclerView mViewContactRecyclerView;
-
-   // public static List<ContactListResponseModel> contactListResponseModels = new ArrayList<>();
-
+    // public static List<ContactListResponseModel> contactListResponseModels = new ArrayList<>();
     public static TextView mTextViewSearchResult;
+    public static View recycler_view_empty1;
+    private final int PROGRESS_DISPLAY_LENGTH = 10000;
 
-    private static View recycler_view_empty1;
+    // pagination element
+//    private ProgressBar progressBar;
+//    public static LinearLayoutManager layoutManager;
+//    private boolean isScrolling = false;
+//    private int currentItem, totalItem, scrolledOutItem;
+//    private int pageN0 = 0;
+
+    public static ProgressBar progressBar;
+    public static LinearLayoutManager layoutManager;
+    public static boolean isScrolling = false;
+    public static int currentItem, totalItem, scrolledOutItem;
+    public static int pageN0 = 1;
+    public static ContactListForSearchAdapter mContactListForSearchAdapter;
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_contact, container, false);
 
         initView(view);
-
 
         MainActivity activity = (MainActivity) getActivity();
         activity.mTextViewSignOut.setOnClickListener(new View.OnClickListener() {
@@ -62,36 +94,85 @@ public class ContactFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-
         if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-
-          getContactList();
-
+            getContactList();
         } else {
-
             Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
         }
-
-//        }
     }
 
     //Method to initialize view
     private void initView(View view) {
-
-        //Local Variables Initialization
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
-
         //Global Variables Initialization
         mViewContactRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_contact);
+        progressBar = (ProgressBar) view.findViewById(R.id.main_progress);
+        mContactListAdapter = new ContactListAdapter(getActivity(), contactListResponseModels);
+
+//        mContactListForSearchAdapter= new ContactListForSearchAdapter(getActivity(), mContactListResponseSearch);
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mViewContactRecyclerView.setLayoutManager(layoutManager);
+        mViewContactRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mViewContactRecyclerView.setAdapter(mContactListForSearchAdapter);
+
 
         mTextViewSearchResult = (TextView) view.findViewById(R.id.search_result);
         recycler_view_empty1 = view.findViewById(R.id.recycler_view_empty);
-        ((TextView)view.findViewById(R.id.text_title1)).setText("Hey, where is everybody?");
-        ((TextView)view.findViewById(R.id.text_title2)).setText("There are no contacts to show, most likely because you haven’t joined any communities (yet).");
-        ((TextView)view.findViewById(R.id.text_contain)).setText("Once you create a community (on the website) or join a community to which you’ve been invited, you’ll start to see contact info for yourself and other community members.");
+        ((TextView) view.findViewById(R.id.text_title1)).setText("Hey, where is everybody?");
+        ((TextView) view.findViewById(R.id.text_title2)).setText("There are no contacts to show, most likely because you haven’t joined any communities (yet).");
+        ((TextView) view.findViewById(R.id.text_contain)).setText("Once you create a community (on the website) or join a community to which you’ve been invited, you’ll start to see contact info for yourself and other community members.");
+
+
+        setScrollView();
+    }
+
+    private void setScrollView() {
+        layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
+        mViewContactRecyclerView.setLayoutManager(layoutManager);
+        mViewContactRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        mViewContactRecyclerView.setAdapter(mContactListAdapter);
+        mViewContactRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScrolling = true;
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                currentItem = layoutManager.getChildCount();
+                totalItem = layoutManager.getItemCount();
+                scrolledOutItem = layoutManager.findFirstVisibleItemPosition();
+
+                if (isScrolling && (currentItem + scrolledOutItem == totalItem)) {
+                    isScrolling = false;
+                    if (!mIsFromSearch) {
+                        getData();
+                    }
+                }
+            }
+        });
+    }
+
+    private void getData() {
+
+        progressBar.setVisibility(View.VISIBLE);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.GONE);
+                int offset = pageN0*mLimit;
+                pageN0++;
+                // all again api with new limit and offset request
+                if (ConnectionDetector.isConnectingToInternet(getActivity())) {
+                    getApiContactListApi(mLimit, offset);
+                } else {
+                    Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }, 1000); // 1 sec delay
 
     }
 
@@ -110,27 +191,24 @@ public class ContactFragment extends Fragment {
 
     // Get webservice to show all UpToUs member
     public void getContactList() {
-
         try {
             if (contactListResponseModels.size() != 0) {
-                mTextViewSearchResult.setVisibility(View.GONE);
 
-                String Message =Prefs.getMessage(getActivity());
+                String Message = Prefs.getMessage(getActivity());
                 if (Message == null) {
                     mContactListAdapter = new ContactListAdapter(getActivity(), contactListResponseModels);
                     mViewContactRecyclerView.setAdapter(mContactListAdapter);
-                    Log.i("ContactFragment","Setting Adapter .... contact ");
+                    Log.i("ContactFragment", "Setting Adapter .... contact ");
                 }
 
                 mViewContactRecyclerView.setVisibility(View.VISIBLE);
                 int communityId = Prefs.getCommunityId(getActivity());
                 if (Message == null) {
                     if (communityId != 0) {
-                        Log.i("ContactFragment","Filtering  Adapter .... contact ");
+                        Log.i("ContactFragment", "Filtering  Adapter .... contact ");
                         FilterCommunityForContact(contactListResponseModels, communityId);
                     }
                 }
-
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -165,26 +243,26 @@ public class ContactFragment extends Fragment {
 
                 } else {
                     List<ContactListResponseModel.ChildrenBean> com = model.getChildren();
-
                     for (ContactListResponseModel.ChildrenBean c : com) {
-
                         final String text1 = c.getFirstName().toLowerCase();
                         if (text1 != null) {
                             if (text1.contains(query)) {
                                 filteredModelList.add(model);
                             }
-
                         }
                     }
-
                 }
-
-
             }
-            mViewContactRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mContactListAdapter = new ContactListAdapter(getActivity(), filteredModelList);
-            mViewContactRecyclerView.setAdapter(mContactListAdapter);
-            mContactListAdapter.notifyDataSetChanged();
+//            mViewContactRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+//            mContactListAdapter = new ContactListAdapter(getActivity(), filteredModelList);
+//            mViewContactRecyclerView.setAdapter(mContactListAdapter);
+//            mContactListAdapter.notifyDataSetChanged();
+
+
+            mContactListResponseSearch = filteredModelList;
+            mContactListForSearchAdapter = new ContactListForSearchAdapter(getActivity(), mContactListResponseSearch);
+            mViewContactRecyclerView.setAdapter(mContactListForSearchAdapter);
+
 
             if (query.equalsIgnoreCase("")) {
                 mTextViewSearchResult.setVisibility(View.GONE);
@@ -203,22 +281,17 @@ public class ContactFragment extends Fragment {
         contactListResponseModels = new ArrayList<>();
         try {
             for (ContactListResponseModel model : models) {
-
                 List<ContactListResponseModel.CommunitiesBean> com = model.getCommunities();
-
                 for (ContactListResponseModel.CommunitiesBean c : com) {
-
                     final int CommunityID = c.getId();
                     if (CommunityID == Id) {
                         contactListResponseModels.add(model);
                     }
                 }
-
                 mViewContactRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                 mContactListAdapter = new ContactListAdapter(getActivity(), contactListResponseModels);
                 mViewContactRecyclerView.setAdapter(mContactListAdapter);
-            //    mContactListAdapter.notifyDataSetChanged();
-
+                //    mContactListAdapter.notifyDataSetChanged();
 
             }
             int Position = Prefs.getPosition(getActivity());
@@ -240,4 +313,119 @@ public class ContactFragment extends Fragment {
         return contactListResponseModels;
     }
 
+
+    // Get webservice to show all UpToUs member
+    public void getApiContactListApi(int limit, int offset) {
+        if (contactListResponseModels != null) {
+            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setMessage("Please wait...");
+            progressDialog.setCancelable(false);
+            progressDialog.show(); //add
+
+            String mAuthenticationId = Prefs.getAuthenticationId(getActivity());
+            String mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
+            APIServices service =
+                    ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+            Call<List<ContactListResponseModel>> call = service.GetContactList(limit, offset);
+            call.enqueue(new Callback<List<ContactListResponseModel>>() {
+                @Override
+                public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
+                    try {
+                        Log.i("MainActivity", "Got Request .... contact ");
+
+                        if (response.body() != null && response.body().size() > 0) {
+                            for (ContactListResponseModel item : response.body()) {
+                                if (item.getFirstName() != null && item.getFirstName() != "" ||
+                                        item.getLastName() != null && item.getLastName() != "") {
+                                    MainActivity.contactListResponseModels.add(item);
+                                }
+                            }
+                          /*  Gson gson = new Gson();
+                            String json = gson.toJson((response.body()));
+                            Log.i("MainActivity", "Got Request .... contact "+json);*/
+                            Collections.sort(MainActivity.contactListResponseModels, new CustomComparator());
+                            mViewContactRecyclerView.getAdapter().notifyDataSetChanged();
+                            Prefs.setContactList(getActivity(), MainActivity.contactListResponseModels.toString());
+                            LoadOnce = true;
+                            mTextViewSearchResult.setVisibility(View.GONE);
+                            mViewContactRecyclerView.setVisibility(View.VISIBLE);
+
+                            int communityId = Prefs.getCommunityId(getActivity());
+                            if (communityId != 0) {
+                                FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
+                            }
+                            checkEmptyContact();
+                            progressDialog.dismiss();
+                        } else {
+                            //  Toast.makeText(MainActivity.this, "End list - No Contact", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<ContactListResponseModel>> call, Throwable t) {
+                    Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            });
+        }
+    }
+
+
+    // Get webservice to show all UpToUs member
+//    public void getApiContactListForSearch(String newText, int limit, int offset) {
+//        if (contactListResponseModels == null || contactListResponseModels.size() == 0 || !LoadOnce) {
+//            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+//            progressDialog.setMessage("Please wait...");
+//            progressDialog.setCancelable(false);
+//            progressDialog.show(); //add
+//            String mAuthenticationId = Prefs.getAuthenticationId(getActivity());
+//            String mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
+//            APIServices service =
+//                    ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+//            Call<List<ContactListResponseModel>> call = service.GetContactListForSearch();
+//
+//            call.enqueue(new Callback<List<ContactListResponseModel>>() {
+//                @RequiresApi(api = Build.VERSION_CODES.N)
+//                @Override
+//                public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
+//                    try {
+//                        if (response.body() != null && response.body().size() > 0) {
+//                            progressDialog.dismiss();
+////                            for (ContactListResponseModel item : response.body()) {
+////                                if (item.getFirstName() != null && item.getFirstName() != "" ||
+////                                        item.getLastName() != null && item.getLastName() != "") {
+////                                    MainActivity.contactListResponseModels.add(item);
+////                                }
+////                            }
+//                            //    mViewContactRecyclerView.getAdapter().notifyDataSetChanged();
+//                            mViewContactRecyclerView.setVisibility(View.VISIBLE);
+//                            Prefs.setContactList(getActivity(), contactListResponseModels.toString());
+//                            LoadOnce = true;
+//                            ContactFragment.mTextViewSearchResult.setVisibility(View.GONE);
+//                            Collections.sort(MainActivity.contactListResponseModels, new CustomComparator());
+//                            int communityId = Prefs.getCommunityId(getActivity());
+//                            if (communityId != 0) {
+//                                FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
+//                            }
+//                            ContactFragment.checkEmptyContact();
+//                            progressDialog.dismiss();
+//                        } else {
+//                            // Toast.makeText(MainActivity.this, "End list - No Contact", Toast.LENGTH_SHORT).show();
+//                        }
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                @Override
+//                public void onFailure(Call<List<ContactListResponseModel>> call, Throwable t) {
+//                    Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
+//                    progressDialog.dismiss();
+//                }
+//            });
+//        }
+//    }
 }

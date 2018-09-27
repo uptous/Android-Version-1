@@ -6,6 +6,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.uptous.MyApplication;
+import com.uptous.model.ContactListResponseModel;
+
+import java.util.List;
 
 public class Prefs {
 
@@ -60,6 +63,7 @@ public class Prefs {
     private static final String FeedDetail = "FeedDetail";
     private static final String ContactList = "ContactList";
     private static final String ContactListUpdated = "ContactListDate";
+
 
 
 
@@ -476,9 +480,10 @@ public class Prefs {
     }
 
     public static String getContactList(Context context) {
-
         return PreferenceManager.getDefaultSharedPreferences(context).getString(ContactList, null);
     }
+
+
 
     public static boolean setContactListUpdated(Context context, int str) {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();

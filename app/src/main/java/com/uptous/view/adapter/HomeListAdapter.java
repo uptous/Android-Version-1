@@ -66,18 +66,14 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
 
     @Override
     public VersionViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view =
-                LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_home, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_home, viewGroup, false);
         VersionViewHolder viewHolder = new VersionViewHolder(view);
-
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(final VersionViewHolder versionViewHolder, int i) {
-
         // Set Data in your views comes from CollectionClass
-
 
         FeedResponseModel feedResponseModel = listEntities.get(i);
         versionViewHolder.mTextViewTitle.setText(Html.fromHtml(feedResponseModel.getNewsItemName().replace("%20", " ").replace("%2520", "%20")));

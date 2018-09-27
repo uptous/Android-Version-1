@@ -92,11 +92,10 @@ public class Utilities {
     }
 
 
-    public static Boolean isLastAppActivity(Context context)
-    {
-        ActivityManager mngr = (ActivityManager) context.getSystemService( ACTIVITY_SERVICE );
+    public static Boolean isLastAppActivity(Context context) {
+        ActivityManager mngr = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> taskList = mngr.getRunningTasks(5);
-        if(taskList.get(0).numActivities == 1 ) {
+        if (taskList.get(0).numActivities == 1) {
             return true;
         }
         return false;

@@ -38,8 +38,18 @@ public interface APIServices {
     @GET("api/profile")
     Call<PostCommentResponseModel> login();
 
-    @GET("api/members")
-    Call<List<ContactListResponseModel>> GetContactList();
+//    @GET("api/members")     // /api/members/community/0/search/0/limit/150/offset/0
+//    Call<List<ContactListResponseModel>> GetContactList();
+
+    @GET("api/members/community/0/search/0/limit/{limit}/offset/{offset}")
+    Call<List<ContactListResponseModel>> GetContactList(@Path("limit") int limit,
+                                                        @Path("offset") int offset);
+
+    @GET("api/members/community/0/search/{search}/limit/{limit}/offset/{offset}")
+    Call<List<ContactListResponseModel>> GetContactListForSearch(@Path("search") String search,
+                                                                 @Path("limit") int limit,
+                                                                 @Path("offset") int offset);
+
 
     @GET("api/communities")
     Call<List<CommnunitiesResponseModel>> GetCommunity();
@@ -112,15 +122,15 @@ public interface APIServices {
     @FormUrlEncoded
     @POST("api/photoalbums/community/{communityId}/title/{title}")
     Call<PostCommentResponseModel> PostNewPicture(@Path("title") String title, @Path("communityId") int communityId,
-                                               @Field("caption") String caption, @Field("filename") String filename,
-                                               @Field("photo") String photo);
+                                                  @Field("caption") String caption, @Field("filename") String filename,
+                                                  @Field("photo") String photo);
 
     //sample url https://www.uptous.com/api/photoalbums/community/351/album/26605
     @FormUrlEncoded
     @POST("api/photoalbums/community/{communityId}/album/{album}")
     Call<PostCommentResponseModel> PostPictureinAlbum(@Path("album") int album, @Path("communityId") int communityId,
-                                               @Field("caption") String caption, @Field("filename") String filename,
-                                               @Field("photo") String photo);
+                                                      @Field("caption") String caption, @Field("filename") String filename,
+                                                      @Field("photo") String photo);
 
     @FormUrlEncoded
     @POST("api/signupsheets/opportunity/{opportunityId}/item/{item_id}/Add")

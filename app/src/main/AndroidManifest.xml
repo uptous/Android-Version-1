@@ -103,6 +103,8 @@
         <activity
             android:name=".view.activity.InvitationsActivity"
             android:screenOrientation="portrait" />
+
+
         <activity
             android:name=".view.activity.CommunityActivity"
             android:screenOrientation="portrait"
