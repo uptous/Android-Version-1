@@ -120,7 +120,9 @@ public class CommunityActivity extends BaseActivity implements View.OnClickListe
 
         if (ConnectionDetector.isConnectingToInternet(CommunityActivity.this)) {
             getApiCommunityList();
-        } else {
+        }
+
+        else {
            showToast(getString(R.string.network_error));
         }
     }

@@ -120,7 +120,6 @@ public class SignUpFragment extends Fragment {
 
     // Get webservice to show all sign_up_types
     private void getApiSignUp() {
-
         ((MainActivity)getActivity()).showProgressDialog();
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);

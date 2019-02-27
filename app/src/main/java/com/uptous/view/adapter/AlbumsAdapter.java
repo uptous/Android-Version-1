@@ -14,6 +14,7 @@ import com.uptous.R;
 import com.uptous.model.PhotoAlbumResponseModel;
 import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.AlbumDetailActivity;
+import com.uptous.view.listeners.AlbumListner;
 
 import java.util.List;
 
@@ -24,13 +25,13 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.VersionVie
 
     List<PhotoAlbumResponseModel> listEntities;
     Activity activity;
+    private AlbumListner albumListner;
 
-
-    public AlbumsAdapter(Activity a, List<PhotoAlbumResponseModel> listEntities) {
+    public AlbumsAdapter(Activity a, List<PhotoAlbumResponseModel> listEntities, AlbumListner albumListner) {
 
         this.listEntities = listEntities;
         this.activity = a;
-
+        this.albumListner = albumListner;
 
     }
 
@@ -55,10 +56,13 @@ public class AlbumsAdapter extends RecyclerView.Adapter<AlbumsAdapter.VersionVie
             public void onClick(View view) {
                 int Position = (int) view.getTag();
                 int AlbumID = listEntities.get(Position).getId();
-                Prefs.setNewsItemId(activity, AlbumID);
+
+                /*  Prefs.setNewsItemId(activity, AlbumID);
                 Prefs.setAlbumDetail(activity, "albumdetail");
                 Intent intent = new Intent(activity, AlbumDetailActivity.class);
-                activity.startActivity(intent);
+                activity.startActivity(intent);*/
+
+                albumListner.AlbumItemClick(AlbumID);
             }
         });
 

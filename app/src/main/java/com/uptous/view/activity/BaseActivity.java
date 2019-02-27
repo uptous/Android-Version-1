@@ -19,10 +19,10 @@ public class BaseActivity extends AppCompatActivity {
     private ProgressDialog mProgressDialog;
 
 
-    public void showProgressDialog()
-    {
+    public void showProgressDialog() {
         showProgressDialog("Please wait..");
     }
+
     public void showProgressDialog(String title) {
         if (mProgressDialog == null) {
             mProgressDialog = new ProgressDialog(this);
@@ -31,11 +31,11 @@ public class BaseActivity extends AppCompatActivity {
             mProgressDialog.setCancelable(false);
         }
         mProgressDialog.setMessage(title);
-            if(viewPager!= null&&viewPager.getCurrentItem()==1)
-            {
+        if (viewPager != null && viewPager.getCurrentItem() == 1) {
 
-            }else
-                mProgressDialog.show();
+        }
+        else
+            mProgressDialog.show();
     }
 
     public void hideProgressDialog() {
@@ -50,13 +50,13 @@ public class BaseActivity extends AppCompatActivity {
         hideProgressDialog();
     }
 
-    public void showToast(String msg){
-        Toast.makeText(BaseActivity.this,msg,Toast.LENGTH_SHORT).show();
+    public void showToast(String msg) {
+        Toast.makeText(BaseActivity.this, msg, Toast.LENGTH_SHORT).show();
 
     }
 
 
-    public void showLogOutDialog(){
+    public void showLogOutDialog() {
         final CustomizeDialog customizeDialog = new CustomizeDialog(BaseActivity.this);
         customizeDialog.setCancelable(false);
         customizeDialog.setContentView(R.layout.dialog_password_change);
@@ -70,6 +70,7 @@ public class BaseActivity extends AppCompatActivity {
             }
         });
     }
+
     //Method to logout from app
     public void logOut() {
         if (MainActivity.contactListResponseModels != null) {
@@ -92,11 +93,10 @@ public class BaseActivity extends AppCompatActivity {
         Prefs.setClose(this, null);
         Prefs.setCommunityFilter(this, null);
 
-        Prefs.setAttachment(this,null);
-        Prefs.setAlbum(this,null);
-        Prefs.setIsAlreadyLogin(this,false);
-        Prefs.setIsAlreadyLogin(this,false);
-
+        Prefs.setAttachment(this, null);
+        Prefs.setAlbum(this, null);
+        Prefs.setIsAlreadyLogin(this, false);
+        Prefs.setIsAlreadyLogin(this, false);
 
 
     }

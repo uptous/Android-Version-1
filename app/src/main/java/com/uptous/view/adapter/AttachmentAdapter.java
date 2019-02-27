@@ -47,7 +47,7 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
         // Set Data in your views comes from CollectionClass
         String s = listEntities.get(i).getPath();
         String result = s.substring(s.lastIndexOf(".") + 1);
-        if (result.equalsIgnoreCase("jpeg")) {
+        if (result.equalsIgnoreCase("jpeg")||result.equalsIgnoreCase("png")) {
             versionViewHolder.imageView.setImageResource(R.mipmap.imageicon);
         } else if (result.equalsIgnoreCase("pdf")) {
             versionViewHolder.imageView.setImageResource(R.mipmap.pdficon);
@@ -78,7 +78,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                     Prefs.setAlbumDetail(activity, "albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
                     activity.startActivity(intent);
-                } else if (result.equalsIgnoreCase("jpg")) {
+                } else if (result.equalsIgnoreCase("jpg")
+                        ||result.equalsIgnoreCase("png") ) {
                     Prefs.setImagepath(activity, path);
                     Prefs.setAlbumDetail(activity, "albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
@@ -103,9 +104,12 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                     Toast.makeText(activity, "Files in this format cannot be \n download to the Android", Toast.LENGTH_SHORT).
                             show();
                 } else if (result.equalsIgnoreCase("csv")) {
+
+
                     Toast.makeText(activity, "Files in this format cannot be \n download to the Android", Toast.LENGTH_SHORT).
                             show();
                 } else {
+
                     Toast.makeText(activity, "Files in this format cannot be \n download to the Android", Toast.LENGTH_SHORT).
                             show();
                 }

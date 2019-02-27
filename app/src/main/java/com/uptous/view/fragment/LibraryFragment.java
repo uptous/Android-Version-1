@@ -1,7 +1,9 @@
 package com.uptous.view.fragment;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -21,10 +23,12 @@ import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.FileResponseModel;
 import com.uptous.model.PhotoAlbumResponseModel;
 import com.uptous.sharedpreference.Prefs;
+import com.uptous.view.activity.AlbumDetailActivity;
 import com.uptous.view.activity.BaseActivity;
 import com.uptous.view.activity.MainActivity;
 import com.uptous.view.adapter.AlbumsAdapter;
 import com.uptous.view.adapter.AttachmentAdapter;
+import com.uptous.view.listeners.AlbumListner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +42,13 @@ import retrofit2.Response;
  * Description :Show all albums and attachment files  and also show all photos of album by clicking particular album
  * Dependencies :LibraryFragment,AlbumsAdapter,AttachmentAdapter
  */
-public class LibraryFragment extends Fragment implements View.OnClickListener {
+public class LibraryFragment extends Fragment implements View.OnClickListener ,AlbumListner {
 
     public static RecyclerView mViewAlbumsRecyclerView, mRecyclerViewFiles;
     public static LinearLayout mLinearLayoutAlbumFile;
 
     private String mAuthenticationId, mAuthenticationPassword;
+
 
     private AlbumsAdapter mAlbumsAdapter;
     private AttachmentAdapter mAttachmentAdapter;
@@ -55,12 +60,14 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
 
     public static List<FileResponseModel> attachmentFileResponseModels = new ArrayList<>();
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_library, container, false);
 
         initView(view);
-
+       // showListItems();
         return view;
     }
 
@@ -100,62 +107,9 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
 
     }
 
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        String Album = Prefs.getAlbum(getActivity());
-        String Attachment = Prefs.getAttachment(getActivity());
-        String Detail = Prefs.getAlbumDetail(getActivity());
-
-        if (Detail == null) {
-            if (Album != null) {
-                if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-                    mTextViewAlbums.setBackgroundResource(R.drawable.rounded_all_files_fill);
-                    mTextViewAlbums.setTextColor(Color.WHITE);
-                    mTextViewFiles.setTextColor(Color.BLACK);
-                    mTextViewFiles.setBackgroundResource(R.drawable.rounded_all_files_empty_second);
-                    mTextViewHeading.setVisibility(View.GONE);
-                    mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
-                    mRecyclerViewFiles.setVisibility(View.GONE);
-                    getApiAlbumList();
-                } else {
-                    Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
-                }
-            } else if (Attachment != null) {
-                if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-                    mTextViewFiles.setBackgroundResource(R.drawable.rounded_all_files_fill_second);
-                    mTextViewFiles.setTextColor(Color.WHITE);
-                    mTextViewAlbums.setTextColor(Color.BLACK);
-                    mTextViewAlbums.setBackgroundResource(R.drawable.rounded_all_files_empty);
-                    mViewAlbumsRecyclerView.setVisibility(View.GONE);
-                    getApiFileList();
-                } else {
-                    Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-                    mTextViewAlbums.setBackgroundResource(R.drawable.rounded_all_files_fill);
-                    mTextViewAlbums.setTextColor(Color.WHITE);
-                    mTextViewFiles.setTextColor(Color.BLACK);
-                    mTextViewFiles.setBackgroundResource(R.drawable.rounded_all_files_empty_second);
-                    mTextViewHeading.setVisibility(View.GONE);
-                    mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
-                    mRecyclerViewFiles.setVisibility(View.GONE);
-                    getApiAlbumList();
-                } else {
-                    Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
-                }
-            }
-
-
-        }
-
-
-    }
-
     //Method to initialize view
     private void initView(View view) {
+
         mTextViewAlbums = (TextView) view.findViewById(R.id.text_view_albums);
         mTextViewFiles = (TextView) view.findViewById(R.id.text_view_files);
         mTextViewHeading = (TextView) view.findViewById(R.id.text_view_heading);
@@ -184,10 +138,71 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
         getData();
     }
 
+    //show list items method
+    private void showListItems()
+    {
+        new Handler().postDelayed(() -> {
+
+            String Album = Prefs.getAlbum(getActivity());
+            String Attachment = Prefs.getAttachment(getActivity());
+            String Detail = Prefs.getAlbumDetail(getActivity());
+
+            if (Detail == null) {
+                if (Album != null) {
+                    if (ConnectionDetector.isConnectingToInternet(getActivity())) {
+                        mTextViewAlbums.setBackgroundResource(R.drawable.rounded_all_files_fill);
+                        mTextViewAlbums.setTextColor(Color.WHITE);
+                        mTextViewFiles.setTextColor(Color.BLACK);
+                        mTextViewFiles.setBackgroundResource(R.drawable.rounded_all_files_empty_second);
+                        mTextViewHeading.setVisibility(View.GONE);
+                        mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
+                        mRecyclerViewFiles.setVisibility(View.GONE);
+                        getApiAlbumList();
+
+                    } else {
+                        Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else if (Attachment != null) {
+                    if (ConnectionDetector.isConnectingToInternet(getActivity())) {
+                        mTextViewFiles.setBackgroundResource(R.drawable.rounded_all_files_fill_second);
+                        mTextViewFiles.setTextColor(Color.WHITE);
+                        mTextViewAlbums.setTextColor(Color.BLACK);
+                        mTextViewAlbums.setBackgroundResource(R.drawable.rounded_all_files_empty);
+                        mViewAlbumsRecyclerView.setVisibility(View.GONE);
+                        getApiFileList();
+                    } else {
+                        Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    if (ConnectionDetector.isConnectingToInternet(getActivity())) {
+                        mTextViewAlbums.setBackgroundResource(R.drawable.rounded_all_files_fill);
+                        mTextViewAlbums.setTextColor(Color.WHITE);
+                        mTextViewFiles.setTextColor(Color.BLACK);
+                        mTextViewFiles.setBackgroundResource(R.drawable.rounded_all_files_empty_second);
+                        mTextViewHeading.setVisibility(View.GONE);
+                        mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
+                        mRecyclerViewFiles.setVisibility(View.GONE);
+                        getApiAlbumList();
+                    } else {
+                        Toast.makeText(getActivity(), R.string.network_error, Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                }
+
+        }, 300);
+
+    }
+
+
+
     // Get data from SharedPreference
     private void getData() {
         mAuthenticationId = Prefs.getAuthenticationId(getActivity());
         mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
+
+
     }
 
     //Method to setClickListener On views
@@ -239,18 +254,22 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
 
         call.enqueue(new Callback<List<PhotoAlbumResponseModel>>() {
             @Override
-            public void onResponse(Call<List<PhotoAlbumResponseModel>> call, Response<List<PhotoAlbumResponseModel>> response) {
+            public void onResponse(Call<List<PhotoAlbumResponseModel>> call,
+                                   Response<List<PhotoAlbumResponseModel>> response) {
 
                 ((MainActivity)getActivity()).hideProgressDialog();
                 try {
 
                     Prefs.setAlbum(getActivity(),"album");
 
-
                     if (response.body() != null) {
                         mTextViewSearchResult.setVisibility(View.GONE);
+
                         photoAlbumResponseModelList = response.body();
-                        mAlbumsAdapter = new AlbumsAdapter(getActivity(), photoAlbumResponseModelList);
+
+                        mAlbumsAdapter = new AlbumsAdapter(getActivity(),
+                                photoAlbumResponseModelList,LibraryFragment.this);
+
                         mViewAlbumsRecyclerView.setAdapter(mAlbumsAdapter);
                         mViewAlbumsRecyclerView.setVisibility(View.VISIBLE);
                         mRecyclerViewFiles.setVisibility(View.GONE);
@@ -362,7 +381,7 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
 
                 RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
                 mViewAlbumsRecyclerView.setLayoutManager(layoutManager);
-                mAlbumsAdapter = new AlbumsAdapter(getActivity(), filteredModelList);
+                mAlbumsAdapter = new AlbumsAdapter(getActivity(), filteredModelList,this);
                 mViewAlbumsRecyclerView.setAdapter(mAlbumsAdapter);
                 mAlbumsAdapter.notifyDataSetChanged();
                 checkEmptyAlbum();
@@ -423,11 +442,15 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
                 if (CommunityID == Id) {
                     photoAlbumResponseModelList.add(model);
                 }
-                RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity().getApplicationContext(), 3);
+                RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity()
+                        .getApplicationContext(), 3);
+
                 mViewAlbumsRecyclerView.setLayoutManager(layoutManager);
-                mAlbumsAdapter = new AlbumsAdapter(getActivity(), photoAlbumResponseModelList);
+                mAlbumsAdapter = new AlbumsAdapter(getActivity(), photoAlbumResponseModelList,
+                        LibraryFragment.this);
                 mViewAlbumsRecyclerView.setAdapter(mAlbumsAdapter);
                 mAlbumsAdapter.notifyDataSetChanged();
+
             }
             int Position = Prefs.getPosition(getActivity());
 
@@ -435,10 +458,14 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
             if (Position == 3) {
                 checkEmptyAlbum();
                 if (photoAlbumResponseModelList.size() == 0) {
-                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-//                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+                    activity.mImageViewSorting
+                            .setBackgroundResource(R.mipmap.down_sorting_arrow);
+//
+// Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
+
                 } else {
-                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
+                    activity.mImageViewSorting.
+                            setBackgroundResource(R.mipmap.up_sorting_arrow);
                 }
             }
 
@@ -477,6 +504,27 @@ public class LibraryFragment extends Fragment implements View.OnClickListener {
             e.printStackTrace();
         }
         return attachmentFileResponseModels;
+    }
+
+    private void callAlbumVIewScreen(int albumID)
+    {
+        Prefs.setNewsItemId(getActivity(), albumID);
+        Prefs.setAlbumDetail(getActivity(), "albumdetail");
+        Intent intent = new Intent(getActivity(), AlbumDetailActivity.class);
+        getActivity().startActivity(intent);
+    }
+
+    @Override
+    public void AlbumItemClick(int albumID) {
+        callAlbumVIewScreen(albumID);
+        }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        showListItems();
     }
 
 }

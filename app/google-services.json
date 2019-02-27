@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "113168238304",
+    "firebase_url": "https://uptous-8e830.firebaseio.com",
+    "project_id": "uptous-8e830",
+    "storage_bucket": "uptous-8e830.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113168238304:android:6449d4081c2de2a2",
+        "android_client_info": {
+          "package_name": "com.uptous"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "113168238304-hspav683m9rre92i9dvtir3qm1bc6acb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCxxafeKcc-CBEa1vthh8dnmPLRmyTDPwk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

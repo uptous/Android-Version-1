@@ -40,16 +40,35 @@
         android:layout_marginTop="@dimen/_10sdp"
 
         android:orientation="horizontal">
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:background="#000" />
+    <ImageView
+        android:id="@+id/image_view_down_arrow"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_gravity="bottom|end"
+        android:visibility="visible"
+        android:padding="@dimen/_2sdp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:src="@drawable/downloadclick" />
+
+</FrameLayout>
 
 
-        <android.support.v4.view.ViewPager
-            android:id="@+id/pager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="@dimen/_5sdp"
-            android:layout_marginLeft="@dimen/_5sdp"
-            android:layout_marginRight="@dimen/_5sdp"
-            android:background="#000" />
 
 
     </LinearLayout>
@@ -67,3 +86,4 @@
         android:layout_marginTop="@dimen/_5sdp"
         android:background="#fff"></android.support.v7.widget.RecyclerView>
 </RelativeLayout>
+

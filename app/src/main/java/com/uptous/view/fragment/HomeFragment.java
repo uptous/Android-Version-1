@@ -42,17 +42,13 @@ import retrofit2.Response;
  * Dependencies : HomeAdapter
  */
 public class HomeFragment extends Fragment implements View.OnClickListener {
-
     public static RecyclerView mViewHomeRecyclerView;
     private HomeListAdapter mHomeListAdapter;
-
     public static List<FeedResponseModel> feedResponseModelList = new ArrayList<>();
-
     private boolean FAB_Status = false;
     public static FloatingActionButton mFabPost, mFabMessagePost, mFabPicturePost;
     private Animation mAnimationFabMessagePost, mHideAnimationFabMessagePost, mAnimationFabPicturePost,
             mHideAnimationFabPicturePost;
-
     private String mAuthenticationId, mAuthenticationPassword;
     static View recycler_view_empty;
     private TextView mTextViewSearchResult;
@@ -311,7 +307,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                         }
 
                     } else {
-
                         BaseActivity baseActivity = (BaseActivity) getActivity();
                         baseActivity.showLogOutDialog();
                     }

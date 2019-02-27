@@ -6,8 +6,10 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.GET_TASKS"></uses-permission>
+
+
     <application
         android:name="com.uptous.MyApplication"
         android:allowBackup="true"
@@ -103,10 +105,13 @@
         <activity
             android:name=".view.activity.InvitationsActivity"
             android:screenOrientation="portrait" />
+
+
         <activity
+
             android:name=".view.activity.CommunityActivity"
-            android:screenOrientation="portrait"
-            android:theme="@style/Theme" />
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar"
+             />
 
         <activity android:name=".view.activity.WebsiteActivity"
             android:screenOrientation="portrait"
@@ -124,7 +129,15 @@
                 <data android:host="uptous.com" />
                 <data  android:pathPrefix="/"/>
             </intent-filter>
+
         </activity>
+
+        <!--<service android:name=".controller.fcm.FirebaseInstanceIDService">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="com.google.firebase.INSTANCE_ID_EVENT" />-->
+            <!--</intent-filter>-->
+        <!--</service>-->
+
     </application>
 
 </manifest>

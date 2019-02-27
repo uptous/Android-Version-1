@@ -54,10 +54,8 @@
 
 
         <RelativeLayout
-
             android:id="@+id/layout_searchbar"
             android:layout_width="match_parent"
-
             android:layout_height="@dimen/_25sdp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/_10sdp"
@@ -72,11 +70,9 @@
                 style="@style/AppTheme.SearchView"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/_25sdp"
-
                 android:layout_centerVertical="true" />
 
             <TextView
-
                 android:id="@+id/text_view_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -3,23 +3,18 @@
 
     <string name="network_error">Please check your network connection</string>
     <string name="error">Some error occurred</string>
-    <string name="please_wait">Please wait..</string>
-    <string name="AuthenticationId">AuthenticationId</string>
-    <string name="AuthenticationPassword">AuthenticationPassword</string>
     <string name="sing_up_not_allow">We\'re sorry but for now, this type of sign-up is not accessible with the app</string>
     <string name="feed_all_communities">Feed - All Communities</string>
     <string name="contacts_all_communities">Contacts - All Communities</string>
     <string name="sign_ups_all_communities">Sign-Ups - All Communities</string>
     <string name="library_all_communities">Library - All Communities</string>
     <string name="event_all_communities">Calendar - All Communities</string>
-    <string name="all_communities">All Communities</string>
     <string name="invitations">Invitations</string>
     <!--<string name="no_record_found">No Record Found</string>-->
     <string name="sign_out">Sign out</string>
     <string name="my_profile">My profile</string>
     <string name="message_post">Message Post</string>
     <string name="picture_post">Picture Post</string>
-    <string name="spinner_hint">SELECT ALBUM</string>
 
 
     <string name="fill_all_field">Please fill all field</string>
@@ -33,6 +28,9 @@
     <string name="no_app">No default is associated</string>
     <string name="invitation_accepted">You have accepted the invitation</string>
 
-    <string name="website_content">website</string>
+    <string name="photo_save_successfully">Photo saved successfully</string>
+    <string name="some_thing_went_wrong">Some thing went wrong</string>
+    <string name="image_url_not_found">Image url can not empty</string>
+    <string name="please_give_permission">Please give storage permission</string>
 
 </resources>

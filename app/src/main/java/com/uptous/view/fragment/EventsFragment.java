@@ -59,12 +59,7 @@ public class EventsFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-
-
         if (ConnectionDetector.isConnectingToInternet(getActivity())) {
-
-
-
             getApiEventList();
             getApiCommunityList();
 

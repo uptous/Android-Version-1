@@ -10,19 +10,24 @@ android {
         }
     }
     compileSdkVersion 27
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.uptous"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 15
-        versionName "1.5"
+        versionCode 17
+        versionName "1.7"
+        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        targetCompatibility 1.8
+        sourceCompatibility 1.8
     }
 }
 repositories {
@@ -46,4 +51,16 @@ dependencies {
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
     implementation 'com.github.bumptech.glide:glide:3.+'
     implementation 'de.hdodenhof:circleimageview:2.1.0'
+
+    // Check for v11.4.2 or higher
+    implementation 'com.google.firebase:firebase-core:16.0.7'
+
+    // Add dependency
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
+
+//    // Add dependency
+//    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.9'
 }
+
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'io.fabric'

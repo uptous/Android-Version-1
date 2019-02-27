@@ -2,9 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://E:\prakash\GITHUBUPTOUS\UpToUS\Android-Version-1.iml" filepath="E:\prakash\GITHUBUPTOUS\UpToUS\Android-Version-1.iml" />
-      <module fileurl="file://$PROJECT_DIR$/UpToUS.iml" filepath="$PROJECT_DIR$/UpToUS.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/uptousworkspace.iml" filepath="$PROJECT_DIR$/uptousworkspace.iml" />
     </modules>
   </component>
 </project>
