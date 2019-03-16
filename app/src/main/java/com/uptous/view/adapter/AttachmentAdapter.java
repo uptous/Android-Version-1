@@ -45,6 +45,8 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
     @Override
     public void onBindViewHolder(final VersionViewHolder versionViewHolder, int i) {
         // Set Data in your views comes from CollectionClass
+
+
         String s = listEntities.get(i).getPath();
         String result = s.substring(s.lastIndexOf(".") + 1);
         if (result.equalsIgnoreCase("jpeg")||result.equalsIgnoreCase("png")) {
@@ -73,7 +75,12 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                 String s = listEntities.get(position).getTitle();
                 String result = path.substring(path.lastIndexOf(".") + 1);
 
-                if (result.equalsIgnoreCase("jpeg")) {
+                if(listEntities.get(position).getType()!=null && listEntities.get(position).getType().equalsIgnoreCase("link"))
+                {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(path));
+                    activity.startActivity(browserIntent);
+                }
+               else if (result.equalsIgnoreCase("jpeg")) {
                     Prefs.setImagepath(activity, path);
                     Prefs.setAlbumDetail(activity, "albumdetail");
                     Intent intent = new Intent(activity, WebviewActivity.class);
@@ -101,9 +108,12 @@ public class AttachmentAdapter extends RecyclerView.Adapter<AttachmentAdapter.Ve
                     Intent intent = new Intent(activity, WebviewActivity.class);
                     activity.startActivity(intent);
                 } else if (result.equalsIgnoreCase("zip")) {
+
                     Toast.makeText(activity, "Files in this format cannot be \n download to the Android", Toast.LENGTH_SHORT).
                             show();
-                } else if (result.equalsIgnoreCase("csv")) {
+                }
+
+                else if (result.equalsIgnoreCase("csv")) {
 
 
                     Toast.makeText(activity, "Files in this format cannot be \n download to the Android", Toast.LENGTH_SHORT).

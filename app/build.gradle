@@ -15,8 +15,8 @@ android {
         applicationId "com.uptous"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 17
-        versionName "1.7"
+        versionCode 19
+        versionName "1.9"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {

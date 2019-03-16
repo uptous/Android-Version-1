@@ -66,6 +66,8 @@ public interface APIServices {
     @GET("api/attachment/days/3650")
     Call<List<FileResponseModel>> GetAttachment();
 
+
+
     @GET("/api/photothumbs/album/{albumId}")
     Call<List<AlbumDetailResponseModel>> GetAlbum(@Path("albumId") int albumId);
 
