@@ -405,7 +405,7 @@ public class ContactListForSearchAdapter extends RecyclerView.Adapter<ContactLis
             mImageViewExpand = (ImageView) itemView.findViewById(R.id.image_view_contact_expand);
             mImageViewCollapsd = (ImageView) itemView.findViewById(R.id.image_view_contact_collpsd);
             mImageViewContactDetailImage = (ImageView) itemView.findViewById(R.id.image_view_contact_detail);
-            mImageViewProgress = (ProgressBar) itemView.findViewById(R.id.image_view_contact_progress);
+            //mImageViewProgress = (ProgressBar) itemView.findViewById(R.id.image_view_contact_progress);
             relativeLayoutMain = (RelativeLayout) itemView.findViewById(R.id.main_layout);
             mView = itemView;
             mRelativeLayoutContact.setOnClickListener(new View.OnClickListener() {

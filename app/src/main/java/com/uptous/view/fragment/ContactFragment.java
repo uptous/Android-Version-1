@@ -1,10 +1,8 @@
 package com.uptous.view.fragment;
 
 import android.app.ProgressDialog;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,7 +16,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.uptous.controller.apiservices.APIServices;
 import com.uptous.controller.apiservices.ServiceGenerator;
 import com.uptous.controller.utils.ConnectionDetector;
@@ -38,7 +35,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.uptous.view.activity.MainActivity.LoadOnce;
 import static com.uptous.view.activity.MainActivity.contactListResponseModels;
 import static com.uptous.view.activity.MainActivity.mContactListResponseSearch;
 import static com.uptous.view.activity.MainActivity.mIsFromSearch;
@@ -56,15 +52,8 @@ public class ContactFragment extends Fragment {
     // public static List<ContactListResponseModel> contactListResponseModels = new ArrayList<>();
     public static TextView mTextViewSearchResult;
     public static View recycler_view_empty1;
-    private final int PROGRESS_DISPLAY_LENGTH = 10000;
 
     // pagination element
-//    private ProgressBar progressBar;
-//    public static LinearLayoutManager layoutManager;
-//    private boolean isScrolling = false;
-//    private int currentItem, totalItem, scrolledOutItem;
-//    private int pageN0 = 0;
-
     public static ProgressBar progressBar;
     public static LinearLayoutManager layoutManager;
     public static boolean isScrolling = false;
@@ -104,18 +93,16 @@ public class ContactFragment extends Fragment {
     //Method to initialize view
     private void initView(View view) {
         //Global Variables Initialization
-        mViewContactRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view_contact);
-        progressBar = (ProgressBar) view.findViewById(R.id.main_progress);
+        mViewContactRecyclerView = view.findViewById(R.id.recycler_view_contact);
         mContactListAdapter = new ContactListAdapter(getActivity(), contactListResponseModels);
 
-//        mContactListForSearchAdapter= new ContactListForSearchAdapter(getActivity(), mContactListResponseSearch);
         layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
         mViewContactRecyclerView.setLayoutManager(layoutManager);
         mViewContactRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mViewContactRecyclerView.setAdapter(mContactListForSearchAdapter);
 
 
-        mTextViewSearchResult = (TextView) view.findViewById(R.id.search_result);
+        mTextViewSearchResult = view.findViewById(R.id.search_result);
         recycler_view_empty1 = view.findViewById(R.id.recycler_view_empty);
         ((TextView) view.findViewById(R.id.text_title1)).setText("Hey, where is everybody?");
         ((TextView) view.findViewById(R.id.text_title2)).setText("There are no contacts to show, most likely because you haven’t joined any communities (yet).");
@@ -158,11 +145,9 @@ public class ContactFragment extends Fragment {
 
     private void getData() {
 
-        progressBar.setVisibility(View.VISIBLE);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                progressBar.setVisibility(View.GONE);
                 int offset = pageN0*mLimit;
                 pageN0++;
                 // all again api with new limit and offset request
@@ -202,13 +187,6 @@ public class ContactFragment extends Fragment {
                 }
 
                 mViewContactRecyclerView.setVisibility(View.VISIBLE);
-                int communityId = Prefs.getCommunityId(getActivity());
-                if (Message == null) {
-                    if (communityId != 0) {
-                        Log.i("ContactFragment", "Filtering  Adapter .... contact ");
-                        FilterCommunityForContact(contactListResponseModels, communityId);
-                    }
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -234,30 +212,11 @@ public class ContactFragment extends Fragment {
                 if (phone != null)
                     text = text + phone.toLowerCase();
 
-
-                if (text != null) {
-                    if (text.contains(query)) {
-                        filteredModelList.add(model);
-                    }
-
-
-                } else {
-                    List<ContactListResponseModel.ChildrenBean> com = model.getChildren();
-                    for (ContactListResponseModel.ChildrenBean c : com) {
-                        final String text1 = c.getFirstName().toLowerCase();
-                        if (text1 != null) {
-                            if (text1.contains(query)) {
-                                filteredModelList.add(model);
-                            }
-                        }
-                    }
+                if (text.contains(query)) {
+                    filteredModelList.add(model);
                 }
-            }
-//            mViewContactRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-//            mContactListAdapter = new ContactListAdapter(getActivity(), filteredModelList);
-//            mViewContactRecyclerView.setAdapter(mContactListAdapter);
-//            mContactListAdapter.notifyDataSetChanged();
 
+            }
 
             mContactListResponseSearch = filteredModelList;
             mContactListForSearchAdapter = new ContactListForSearchAdapter(getActivity(), mContactListResponseSearch);
@@ -276,45 +235,7 @@ public class ContactFragment extends Fragment {
         return filteredModelList;
     }
 
-    // Method to filter feed by community
-    private List<ContactListResponseModel> FilterCommunityForContact(List<ContactListResponseModel> models, int Id) {
-        contactListResponseModels = new ArrayList<>();
-        try {
-            for (ContactListResponseModel model : models) {
-                List<ContactListResponseModel.CommunitiesBean> com = model.getCommunities();
-                for (ContactListResponseModel.CommunitiesBean c : com) {
-                    final int CommunityID = c.getId();
-                    if (CommunityID == Id) {
-                        contactListResponseModels.add(model);
-                    }
-                }
-                mViewContactRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                mContactListAdapter = new ContactListAdapter(getActivity(), contactListResponseModels);
-                mViewContactRecyclerView.setAdapter(mContactListAdapter);
-                //    mContactListAdapter.notifyDataSetChanged();
-
-            }
-            int Position = Prefs.getPosition(getActivity());
-
-            MainActivity activity = (MainActivity) getActivity();
-            if (Position == 1) {
-                ContactFragment.checkEmptyContact();
-                if (contactListResponseModels.size() == 0) {
-                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-//                    Toast.makeText(getActivity(), R.string.no_record_found, Toast.LENGTH_SHORT).show();
-                } else {
-                    activity.mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return contactListResponseModels;
-    }
-
-
-    // Get webservice to show all UpToUs member
+    // Get contact list while scrolling
     public void getApiContactListApi(int limit, int offset) {
         if (contactListResponseModels != null) {
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
@@ -322,11 +243,12 @@ public class ContactFragment extends Fragment {
             progressDialog.setCancelable(false);
             progressDialog.show(); //add
 
+            int communityId = Prefs.getCommunityId(getActivity());
             String mAuthenticationId = Prefs.getAuthenticationId(getActivity());
             String mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
             APIServices service =
                     ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
-            Call<List<ContactListResponseModel>> call = service.GetContactList(limit, offset);
+            Call<List<ContactListResponseModel>> call = service.GetContactList(communityId, limit, offset);
             call.enqueue(new Callback<List<ContactListResponseModel>>() {
                 @Override
                 public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
@@ -340,23 +262,16 @@ public class ContactFragment extends Fragment {
                                     MainActivity.contactListResponseModels.add(item);
                                 }
                             }
-                          /*  Gson gson = new Gson();
-                            String json = gson.toJson((response.body()));
-                            Log.i("MainActivity", "Got Request .... contact "+json);*/
                             Collections.sort(MainActivity.contactListResponseModels, new CustomComparator());
                             mViewContactRecyclerView.getAdapter().notifyDataSetChanged();
                             Prefs.setContactList(getActivity(), MainActivity.contactListResponseModels.toString());
-                            LoadOnce = true;
                             mTextViewSearchResult.setVisibility(View.GONE);
                             mViewContactRecyclerView.setVisibility(View.VISIBLE);
 
-                            int communityId = Prefs.getCommunityId(getActivity());
-                            if (communityId != 0) {
-                                FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
-                            }
                             checkEmptyContact();
                             progressDialog.dismiss();
                         } else {
+                            progressDialog.dismiss();
                             //  Toast.makeText(MainActivity.this, "End list - No Contact", Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
@@ -372,60 +287,4 @@ public class ContactFragment extends Fragment {
             });
         }
     }
-
-
-    // Get webservice to show all UpToUs member
-//    public void getApiContactListForSearch(String newText, int limit, int offset) {
-//        if (contactListResponseModels == null || contactListResponseModels.size() == 0 || !LoadOnce) {
-//            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-//            progressDialog.setMessage("Please wait...");
-//            progressDialog.setCancelable(false);
-//            progressDialog.show(); //add
-//            String mAuthenticationId = Prefs.getAuthenticationId(getActivity());
-//            String mAuthenticationPassword = Prefs.getAuthenticationPassword(getActivity());
-//            APIServices service =
-//                    ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
-//            Call<List<ContactListResponseModel>> call = service.GetContactListForSearch();
-//
-//            call.enqueue(new Callback<List<ContactListResponseModel>>() {
-//                @RequiresApi(api = Build.VERSION_CODES.N)
-//                @Override
-//                public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
-//                    try {
-//                        if (response.body() != null && response.body().size() > 0) {
-//                            progressDialog.dismiss();
-////                            for (ContactListResponseModel item : response.body()) {
-////                                if (item.getFirstName() != null && item.getFirstName() != "" ||
-////                                        item.getLastName() != null && item.getLastName() != "") {
-////                                    MainActivity.contactListResponseModels.add(item);
-////                                }
-////                            }
-//                            //    mViewContactRecyclerView.getAdapter().notifyDataSetChanged();
-//                            mViewContactRecyclerView.setVisibility(View.VISIBLE);
-//                            Prefs.setContactList(getActivity(), contactListResponseModels.toString());
-//                            LoadOnce = true;
-//                            ContactFragment.mTextViewSearchResult.setVisibility(View.GONE);
-//                            Collections.sort(MainActivity.contactListResponseModels, new CustomComparator());
-//                            int communityId = Prefs.getCommunityId(getActivity());
-//                            if (communityId != 0) {
-//                                FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
-//                            }
-//                            ContactFragment.checkEmptyContact();
-//                            progressDialog.dismiss();
-//                        } else {
-//                            // Toast.makeText(MainActivity.this, "End list - No Contact", Toast.LENGTH_SHORT).show();
-//                        }
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Call<List<ContactListResponseModel>> call, Throwable t) {
-//                    Toast.makeText(getActivity(), R.string.error, Toast.LENGTH_SHORT).show();
-//                    progressDialog.dismiss();
-//                }
-//            });
-//        }
-//    }
 }

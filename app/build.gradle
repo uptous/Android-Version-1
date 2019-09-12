@@ -9,14 +9,14 @@ android {
             storePassword '123456'
         }
     }
-    compileSdkVersion 27
-    buildToolsVersion '28.0.2'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "com.uptous"
         minSdkVersion 15
-        targetSdkVersion 27
-        versionCode 16
-        versionName "1.6"
+        targetSdkVersion 28
+        versionCode 20
+        versionName "1.9"
         vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
@@ -39,15 +39,15 @@ repositories {
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:exifinterface:27.1.1'
-    implementation 'com.android.support:support-compat:27.1.1'
+    implementation 'com.android.support:exifinterface:28.0.0'
+    implementation 'com.android.support:support-compat:28.0.0'
     implementation 'com.intuit.sdp:sdp-android:1.0.3'
-    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'com.google.code.gson:gson:2.4'
     implementation 'com.squareup.retrofit2:retrofit:2.1.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.1.0'
-    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.android.support:design:28.0.0'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.4.+'
     implementation 'com.github.bumptech.glide:glide:3.+'
     implementation 'de.hdodenhof:circleimageview:2.1.0'

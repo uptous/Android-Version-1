@@ -345,12 +345,14 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             versionViewHolder.mTextViewKids.setText("");
             versionViewHolder.TextViewKidsDetail.setText("");
             try {
-                for (int j = 0; j < listEntities.get(i).getChildren().size(); j++) {
-                    versionViewHolder.mTextViewKids.append(listEntities.get(i).getChildren().get(j).getFirstName());
-                    versionViewHolder.TextViewKidsDetail.append(listEntities.get(i).getChildren().get(j).getFirstName());
-                    if (j < listEntities.get(i).getChildren().size() - 1) {
-                        versionViewHolder.mTextViewKids.append(", ");
-                        versionViewHolder.TextViewKidsDetail.append(", ");
+                if(listEntities.get(i).getChildren() != null) {
+                    for (int j = 0; j < listEntities.get(i).getChildren().size(); j++) {
+                        versionViewHolder.mTextViewKids.append(listEntities.get(i).getChildren().get(j).getFirstName());
+                        versionViewHolder.TextViewKidsDetail.append(listEntities.get(i).getChildren().get(j).getFirstName());
+                        if (j < listEntities.get(i).getChildren().size() - 1) {
+                            versionViewHolder.mTextViewKids.append(", ");
+                            versionViewHolder.TextViewKidsDetail.append(", ");
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -414,7 +416,7 @@ public class ContactListAdapter extends RecyclerView.Adapter<ContactListAdapter.
             mImageViewExpand = (ImageView) itemView.findViewById(R.id.image_view_contact_expand);
             mImageViewCollapsd = (ImageView) itemView.findViewById(R.id.image_view_contact_collpsd);
             mImageViewContactDetailImage = (ImageView) itemView.findViewById(R.id.image_view_contact_detail);
-            mImageViewProgress = (ProgressBar) itemView.findViewById(R.id.image_view_contact_progress);
+            //mImageViewProgress = (ProgressBar) itemView.findViewById(R.id.image_view_contact_progress);
             relativeLayoutMain = (RelativeLayout) itemView.findViewById(R.id.main_layout);
             mView = itemView;
             mRelativeLayoutContact.setOnClickListener(new View.OnClickListener() {

@@ -41,12 +41,14 @@ public interface APIServices {
 //    @GET("api/members")     // /api/members/community/0/search/0/limit/150/offset/0
 //    Call<List<ContactListResponseModel>> GetContactList();
 
-    @GET("api/members/community/0/search/0/limit/{limit}/offset/{offset}")
-    Call<List<ContactListResponseModel>> GetContactList(@Path("limit") int limit,
+    @GET("api/members/community/{communityid}/search/0/limit/{limit}/offset/{offset}")
+    Call<List<ContactListResponseModel>> GetContactList(@Path("communityid") int communityid,
+                                                        @Path("limit") int limit,
                                                         @Path("offset") int offset);
 
-    @GET("api/members/community/0/search/{search}/limit/{limit}/offset/{offset}")
-    Call<List<ContactListResponseModel>> GetContactListForSearch(@Path("search") String search,
+    @GET("api/members/community/{communityid}/search/{search}/limit/{limit}/offset/{offset}")
+    Call<List<ContactListResponseModel>> GetContactListForSearch(@Path("communityid") int communityid,
+                                                                 @Path("search") String search,
                                                                  @Path("limit") int limit,
                                                                  @Path("offset") int offset);
 

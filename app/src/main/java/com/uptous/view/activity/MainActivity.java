@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
@@ -16,17 +15,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,7 +40,6 @@ import com.uptous.view.fragment.EventsFragment;
 import com.uptous.view.fragment.HomeFragment;
 import com.uptous.view.fragment.SignUpFragment;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -56,17 +48,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.uptous.view.fragment.ContactFragment.currentItem;
-import static com.uptous.view.fragment.ContactFragment.isScrolling;
-import static com.uptous.view.fragment.ContactFragment.layoutManager;
 import static com.uptous.view.fragment.ContactFragment.mContactListForSearchAdapter;
 import static com.uptous.view.fragment.ContactFragment.mTextViewSearchResult;
 import static com.uptous.view.fragment.ContactFragment.mViewContactRecyclerView;
-import static com.uptous.view.fragment.ContactFragment.pageN0;
-import static com.uptous.view.fragment.ContactFragment.progressBar;
 import static com.uptous.view.fragment.ContactFragment.recycler_view_empty1;
-import static com.uptous.view.fragment.ContactFragment.scrolledOutItem;
-import static com.uptous.view.fragment.ContactFragment.totalItem;
 
 
 /**
@@ -98,10 +83,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public ImageView mImageViewSorting;
     public static List<ContactListResponseModel> contactListResponseModels = new ArrayList<>();
     private ContactListAdapter mContactListAdapter;
-    public static Boolean LoadOnce;
 
     public SearchView mSearchView;
-    private long differenceTime;
     private String text;
     private static final int REQUEST_RUNTIME_PERMISSION = 123;
     // pagination element
@@ -120,29 +103,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
         initView();
 
-
-//        // Get run time permission if device version N
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-//            if (checkSelfPermission(Manifest.permission.CAMERA)
-//                    != PackageManager.PERMISSION_GRANTED) {
-//
-//                requestPermissions(new String[]{Manifest.permission.CAMERA},
-//                        REQUEST_CAMERA);
-//            }
-//        }
-
         checkAndRequestPermissions();
-
     }
 
     private boolean checkAndRequestPermissions() {
 //        int permissionPhoneState = ContextCompat.checkSelfPermission(this,
 //                Manifest.permission.READ_PHONE_STATE);
 
-
-        int storagePermission = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_EXTERNAL_STORAGE);
-//
         int camera = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA);
 
@@ -151,18 +118,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
 
         List<String> listPermissionsNeeded = new ArrayList<>();
-//        if (storagePermission != PackageManager.PERMISSION_GRANTED) {
-//            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-//        }
-//        if (storagePermissionWrite != PackageManager.PERMISSION_GRANTED) {
-//            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-//        }
 
         if (camera != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.CAMERA);
         }
-//
-
 
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this,
@@ -180,12 +139,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         switch (requestCode) {
 
-//
-
             case REQUEST_RUNTIME_PERMISSION: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 } else {
                     //TODO
                 }
@@ -211,11 +166,10 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             case R.id.text_view_cancel:
                 mSearchView.clearFocus();
                 mSearchView.onActionViewCollapsed();
-                mTextViewSearch.setVisibility(View.VISIBLE);
+                mTextViewSearch.setVisibility(View.GONE);
 
                 if (mIsQueryText) {
                     getContactList();
-                    setScrollView();
                     mIsQueryText = false;
                 }
 
@@ -312,26 +266,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
                 mTextViewTitle.setText(R.string.contacts_all_communities);
 
-                String Message = Prefs.getMessage(this);
-                String Close = Prefs.getClose(this);
-                if (Message == null) {
-
-
-                    if (Close == null) {
-                        if (contactListResponseModels != null) {
-                            // contactListResponseModels.clear();
-                        }
-                        if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
-                            getApiContactList();
-                        } else {
-                            Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-
-//
-                }
-
             } else if (Position == 2) {
                 mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
                 mTextViewTitle.setText(R.string.sign_ups_all_communities);
@@ -359,8 +293,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         Prefs.setMessage(this, null);
         Prefs.setSignUpDetail(this, null);
         Prefs.setAlbum(this, null);
-
-
     }
 
     @Override
@@ -476,7 +408,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 mIsFromSearch = false;
 
                 if (HomeFragment.mViewHomeRecyclerView != null) {
-                    HomeFragment.mFabPost.setVisibility(View.GONE);
+                    //HomeFragment.mFabPost.setVisibility(View.GONE);
+                    HomeFragment.mFabPost.hide();
                 }
                 mViewContactRecyclerView.setVisibility(View.GONE);
                 if (LibraryFragment.mViewAlbumsRecyclerView != null) {
@@ -508,7 +441,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 if (mCommunityId == 0) {
                     if (position == 0) {
                         // HomeFragment.checkEmptyView();
-                        HomeFragment.mFabPost.setVisibility(View.VISIBLE);
+                        //HomeFragment.mFabPost.setVisibility(View.VISIBLE);
+                        HomeFragment.mFabPost.show();
                         mImageViewInvitation.setVisibility(View.VISIBLE);
                         mTextViewSignOut.setVisibility(View.GONE);
                         mTextViewTitle.setText(R.string.feed_all_communities);
@@ -524,30 +458,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         mIsFromSearch = false;
 
                         if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
-                            if (contactListResponseModels.size() == 0) {
                                 getApiContactList();
-                            } else {
-                                mViewContactRecyclerView.setVisibility(View.VISIBLE);
-                                ContactFragment.checkEmptyContact();
-
-                                String CommunityFilter = Prefs.getCommunityFilter(MainActivity.this);
-
-                                if (CommunityFilter != null) {
-                                    Prefs.setCommunityFilter(MainActivity.this, null);
-                                    if (contactListResponseModels != null) {
-                                        //e  contactListResponseModels.clear();
-                                    }
-                                    if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
-                                        getApiContactList();
-                                        //  setScrollView();
-                                    } else {
-                                        Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    getContactList();
-                                    setScrollView();
-                                }
-                            }
                         } else {
                             Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                         }
@@ -582,7 +493,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
                 } else {
                     if (position == 0) {
-                        HomeFragment.mFabPost.setVisibility(View.VISIBLE);
+                        //HomeFragment.mFabPost.setVisibility(View.VISIBLE);
+                        HomeFragment.mFabPost.show();
                         HomeFragment.mViewHomeRecyclerView.setVisibility(View.VISIBLE);
                         if (HomeFragment.feedResponseModelList.size() == 0) {
                             mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
@@ -709,16 +621,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             mTextViewSearch.setVisibility(View.GONE);
 
         }
-        int limit = 150, offset = 0;
-        if (newText != null || newText != "") {
-            if (newText.length() > 2)
-                if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
-                    getApiContactListForSearch(newText, limit, offset);
-                } else {
-                    Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-                }
-        }
-
 
         int Position = Prefs.getPosition(this);
         String CommunityFilter = Prefs.getCommunityFilter(this);
@@ -731,23 +633,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 Prefs.setCommunityFilter(this, null);
             }
         } else if (Position == 1) {
-            mIsFromSearch = false;
-            if (CommunityFilter == null) {
-                int communityId = Prefs.getCommunityId(this);
-                if (communityId != 0) {
-                    ContactFragment contactFragment = (ContactFragment) mViewPagerAdapter.getItem(1);
-                    // if()
-                    contactFragment.SearchFilterForContact(mContactListResponseSearch, newText);
-                    mIsFromSearch = true;
+            int limit = 150, offset = 0;
+            if (newText != null && newText != "" && newText.length() > 2) {
+                if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
+                    getApiContactListForSearch(newText, limit, offset);
                 } else {
-                    ContactFragment contactFragment = (ContactFragment) mViewPagerAdapter.getItem(1);
-                    contactFragment.SearchFilterForContact(mContactListResponseSearch, newText);
-                    mIsFromSearch = true;
+                    Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
                 }
-            } else {
-                Prefs.setCommunityFilter(this, null);
-            }
 
+                mIsFromSearch = false;
+                if (CommunityFilter == null) {
+                    int communityId = Prefs.getCommunityId(this);
+                    if (communityId != 0) {
+                        ContactFragment contactFragment = (ContactFragment) mViewPagerAdapter.getItem(1);
+                        contactFragment.SearchFilterForContact(mContactListResponseSearch, newText);
+                        mIsFromSearch = true;
+                    } else {
+                        ContactFragment contactFragment = (ContactFragment) mViewPagerAdapter.getItem(1);
+                        contactFragment.SearchFilterForContact(mContactListResponseSearch, newText);
+                        mIsFromSearch = true;
+                    }
+                } else {
+                    Prefs.setCommunityFilter(this, null);
+                }
+            }
 
         } else if (Position == 2) {
             mIsFromSearch = false;
@@ -779,12 +688,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         }
         return true;
     }
-
-
-    public long getDifferenceTime() {
-        return differenceTime;
-    }
-
 
     public class ViewPagerAdapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragmentList = new ArrayList<>();
@@ -822,109 +725,50 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     }
 
-
-    // Get webservice to show all UpToUs member
+    // Get contacts on screen changes
     public void getApiContactList() {
         Log.i("MainActivity", "Requesting .... contact ");
-        //Check if model is not empty and last update must once  in a while default 45411ms
 
-        //   int contactLastUpdated = Prefs.getContactLastUpdated(this);
-        //  long difference = getDifferenceTime();
-
-
-        if (contactListResponseModels == null || contactListResponseModels.size() == 0 || !LoadOnce) {
-            //  showProgressDialog();
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Please wait...");
-            progressDialog.setCancelable(false);
-            progressDialog.show(); //add
-            String mAuthenticationId = Prefs.getAuthenticationId(this);
-            String mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
-            APIServices service =
-                    ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
-            Call<List<ContactListResponseModel>> call = service.GetContactList(mLimit, mOffset);
-
-            call.enqueue(new Callback<List<ContactListResponseModel>>() {
-                @RequiresApi(api = Build.VERSION_CODES.N)
-                @Override
-                public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
-                    try {
-                        Log.i("MainActivity", "Got Request .... contact ");
-                        if (response.body() != null && response.body().size() > 0) {
-                            //     progressDialog.dismiss();
-                            for (ContactListResponseModel item : response.body()) {
-                                if (item.getFirstName() != null && item.getFirstName() != "" ||
-                                        item.getLastName() != null && item.getLastName() != "") {
-                                    MainActivity.contactListResponseModels.add(item);
-                                }
-                            }
-
-                            Prefs.setContactList(MainActivity.this, contactListResponseModels.toString());
-                            LoadOnce = true;
-                            mTextViewSearchResult.setVisibility(View.GONE);
-                            Collections.sort(MainActivity.contactListResponseModels, new CustomComparator());
-                            int communityId = Prefs.getCommunityId(MainActivity.this);
-                            if (communityId != 0) {
-                                FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
-                            }
-                            ContactFragment.checkEmptyContact();
-                            mViewContactRecyclerView.getAdapter().notifyDataSetChanged();
-                            mViewContactRecyclerView.setVisibility(View.VISIBLE);
-                            progressDialog.dismiss();
-                        } else {
-                            // Toast.makeText(MainActivity.this, "End list - No Contact", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<ContactListResponseModel>> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                }
-            });
-        }
-    }
-
-
-    //    // Get webservice to show all UpToUs member
-    public void getApiContactListForSearch(String queryText, int limit, int offset) {
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setMessage("Please wait...");
         progressDialog.setCancelable(false);
         progressDialog.show(); //add
+        int communityId = Prefs.getCommunityId(this);
         String mAuthenticationId = Prefs.getAuthenticationId(this);
         String mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
+
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
-        Call<List<ContactListResponseModel>> call = service.GetContactListForSearch(queryText, limit, offset);
+        Call<List<ContactListResponseModel>> call = service.GetContactList(communityId, mLimit, mOffset);
 
         call.enqueue(new Callback<List<ContactListResponseModel>>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
                 try {
+                    Log.i("MainActivity", "Got Request .... contact ");
                     if (response.body() != null && response.body().size() > 0) {
-                        //   progressDialog.dismiss();
-                        mContactListResponseSearch.clear();
+                        //progressDialog.dismiss();
+                        if (contactListResponseModels != null) {
+                            contactListResponseModels.clear();
+                        }
                         for (ContactListResponseModel item : response.body()) {
                             if (item.getFirstName() != null && item.getFirstName() != "" ||
                                     item.getLastName() != null && item.getLastName() != "") {
-                                mContactListResponseSearch.add(item);
+                                MainActivity.contactListResponseModels.add(item);
                             }
                         }
 
-                        mIsQueryText = true;
+                        Prefs.setContactList(MainActivity.this, contactListResponseModels.toString());
                         mTextViewSearchResult.setVisibility(View.GONE);
-                        Collections.sort(MainActivity.mContactListResponseSearch, new CustomComparator());
+                        Collections.sort(MainActivity.contactListResponseModels, new CustomComparator());
                         ContactFragment.checkEmptyContact();
-                        mContactListForSearchAdapter.notifyCategoryAdapter(mContactListResponseSearch);
+                        mViewContactRecyclerView.getAdapter().notifyDataSetChanged();
+                        mViewContactRecyclerView.setVisibility(View.VISIBLE);
                         progressDialog.dismiss();
                     } else {
                         progressDialog.dismiss();
-                        //  Toast.makeText(MainActivity.this, "No Contact", Toast.LENGTH_SHORT).show();
+                        // Toast.makeText(MainActivity.this, "End list - No Contact", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -937,42 +781,50 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 progressDialog.dismiss();
             }
         });
-
     }
 
-    // Method to filter feed by community
-    private List<ContactListResponseModel> FilterCommunityForContact(List<ContactListResponseModel> models, int Id) {
-        MainActivity.contactListResponseModels = new ArrayList<>();
-        try {
-            for (ContactListResponseModel model : models) {
-                List<ContactListResponseModel.CommunitiesBean> com = model.getCommunities();
-                for (ContactListResponseModel.CommunitiesBean c : com) {
-                    final int CommunityID = c.getId();
-                    if (CommunityID == Id) {
-                        MainActivity.contactListResponseModels.add(model);
+    //  Get contacts while searching
+    public void getApiContactListForSearch(String queryText, int limit, int offset) {
+        int communityId = Prefs.getCommunityId(this);
+        String mAuthenticationId = Prefs.getAuthenticationId(this);
+        String mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
+        APIServices service =
+                ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
+        Call<List<ContactListResponseModel>> call = service.GetContactListForSearch(communityId, queryText, limit, offset);
+
+        call.enqueue(new Callback<List<ContactListResponseModel>>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
+                try {
+                    mIsQueryText = true;
+                    if (response.body() != null && response.body().size() > 0) {
+                        mContactListResponseSearch.clear();
+                        for (ContactListResponseModel item : response.body()) {
+                            if (item.getFirstName() != null && item.getFirstName() != "" ||
+                                    item.getLastName() != null && item.getLastName() != "") {
+                                mContactListResponseSearch.add(item);
+                            }
+                        }
+
+                        mTextViewSearchResult.setVisibility(View.GONE);
+                        Collections.sort(MainActivity.mContactListResponseSearch, new CustomComparator());
+                        ContactFragment.checkEmptyContact();
+                        mContactListForSearchAdapter.notifyCategoryAdapter(mContactListResponseSearch);
+                    } else {
+                        //  Toast.makeText(MainActivity.this, "No Contact", Toast.LENGTH_SHORT).show();
                     }
-                }
-
-                mViewContactRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-                mContactListAdapter = new ContactListAdapter(MainActivity.this, MainActivity.contactListResponseModels);
-                mViewContactRecyclerView.setAdapter(mContactListAdapter);
-                mContactListAdapter.notifyDataSetChanged();
-            }
-            int Position = Prefs.getPosition(this);
-
-            if (Position == 1) {
-                mIsFromSearch = false;
-                if (MainActivity.contactListResponseModels.size() == 0) {
-                    mImageViewSorting.setBackgroundResource(R.mipmap.down_sorting_arrow);
-                } else {
-                    mImageViewSorting.setBackgroundResource(R.mipmap.up_sorting_arrow);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return MainActivity.contactListResponseModels;
+            @Override
+            public void onFailure(Call<List<ContactListResponseModel>> call, Throwable t) {
+                Toast.makeText(MainActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
 
     @Override
@@ -981,7 +833,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (requestCode == TAG_COMMUNITY_CHANGE) {
             if (homeFragment != null)
                 homeFragment.refresh();
-            LoadOnce = false;
             showProgressDialog();
             if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
                 getApiContactList();
@@ -991,18 +842,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         } else if (requestCode == 121) {
             if (homeFragment != null)
                 homeFragment.refresh();
-            LoadOnce = false;
             showProgressDialog();
         }
 
     }
 
-
     // Get webservice to show all UpToUs member
     public void getContactList() {
         try {
-            if (contactListResponseModels.size() != 0) {
-
+            if (contactListResponseModels != null && contactListResponseModels.size() != 0) {
                 String Message = Prefs.getMessage(this);
                 if (Message == null) {
                     mContactListAdapter = new ContactListAdapter(this, contactListResponseModels);
@@ -1011,150 +859,9 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 }
 
                 mViewContactRecyclerView.setVisibility(View.VISIBLE);
-                int communityId = Prefs.getCommunityId(this);
-                if (Message == null) {
-                    if (communityId != 0) {
-                        Log.i("ContactFragment", "Filtering  Adapter .... contact ");
-                        FilterCommunityForContact(contactListResponseModels, communityId);
-                    }
-                }
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-
-    private void setScrollView() {
-        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-        mViewContactRecyclerView.setLayoutManager(layoutManager);
-        mViewContactRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        mViewContactRecyclerView.setAdapter(mContactListAdapter);
-        mViewContactRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    isScrolling = true;
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                currentItem = layoutManager.getChildCount();
-                totalItem = layoutManager.getItemCount();
-                scrolledOutItem = layoutManager.findFirstVisibleItemPosition();
-
-                if (isScrolling && (currentItem + scrolledOutItem == totalItem)) {
-                    isScrolling = false;
-                    getData();
-                }
-            }
-        });
-    }
-
-    private void getData() {
-
-        progressBar.setVisibility(View.VISIBLE);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisibility(View.GONE);
-
-//                ______________________ IOS Logic start_______________________________
-                // first time
-//                var isDataLoading:Bool=false
-//                var pageNo:Int=0
-//                var limit:Int=150
-//                var offset:Int=0 //pageNo*limit
-//                var didEndReached:Bool=false
-//
-                // calling time
-//                self.pageNo=self.pageNo+1
-//                self.limit=self.limit+150
-//                self.offset=self.limit * self.pageNo
-                //loadCallLogData(offset: self.offset, limit: self.limit)
-                //            ______________________ IOS Logic end_______________________________
-
-
-                int offset = pageN0*mLimit;
-                pageN0++;
-                // all again api with new limit and offset request
-                if (ConnectionDetector.isConnectingToInternet(MainActivity.this)) {
-                    getApiContactListApi(mLimit, offset);
-                } else {
-                    Toast.makeText(MainActivity.this, R.string.network_error, Toast.LENGTH_SHORT).show();
-                }
-            }
-        }, 1000); // 1 sec delay
-
-    }
-
-    public static void checkEmptyContact() {
-        if (recycler_view_empty1 != null && mViewContactRecyclerView != null) {
-            if (contactListResponseModels.size() == 0) {
-                recycler_view_empty1.setVisibility(View.VISIBLE);
-                mViewContactRecyclerView.setVisibility(View.GONE);
-            } else {
-                mViewContactRecyclerView.setVisibility(View.VISIBLE);
-                recycler_view_empty1.setVisibility(View.GONE);
-            }
-        }
-    }
-
-    // Get webservice to show all UpToUs member
-    public void getApiContactListApi(int limit, int offset) {
-        if (contactListResponseModels != null) {
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setMessage("Please wait...");
-            progressDialog.setCancelable(false);
-            progressDialog.show(); //add
-
-            String mAuthenticationId = Prefs.getAuthenticationId(this);
-            String mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
-            APIServices service =
-                    ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
-            Call<List<ContactListResponseModel>> call = service.GetContactList(limit, offset);
-            call.enqueue(new Callback<List<ContactListResponseModel>>() {
-                @Override
-                public void onResponse(Call<List<ContactListResponseModel>> call, Response<List<ContactListResponseModel>> response) {
-                    try {
-                        Log.i("MainActivity", "Got Request .... contact ");
-
-                        if (response.body() != null && response.body().size() > 0) {
-                            for (ContactListResponseModel item : response.body()) {
-                                if (item.getFirstName() != null && item.getFirstName() != "" ||
-                                        item.getLastName() != null && item.getLastName() != "") {
-                                    MainActivity.contactListResponseModels.add(item);
-                                }
-                            }
-                            mViewContactRecyclerView.getAdapter().notifyDataSetChanged();
-                            Prefs.setContactList(MainActivity.this, MainActivity.contactListResponseModels.toString());
-                            LoadOnce = true;
-                            mTextViewSearchResult.setVisibility(View.GONE);
-                            mViewContactRecyclerView.setVisibility(View.VISIBLE);
-                            Collections.sort(MainActivity.contactListResponseModels, new CustomComparator());
-                            int communityId = Prefs.getCommunityId(MainActivity.this);
-                            if (communityId != 0) {
-                                FilterCommunityForContact(MainActivity.contactListResponseModels, communityId);
-                            }
-                            checkEmptyContact();
-                            progressDialog.dismiss();
-                        } else {
-                            //  Toast.makeText(MainActivity.this, "End list - No Contact", Toast.LENGTH_SHORT).show();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<List<ContactListResponseModel>> call, Throwable t) {
-                    Toast.makeText(MainActivity.this, R.string.error, Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                }
-            });
         }
     }
 

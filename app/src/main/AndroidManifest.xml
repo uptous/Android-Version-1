@@ -107,7 +107,6 @@
 
         <activity
             android:name=".view.activity.CommunityActivity"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme" />
 
         <activity android:name=".view.activity.WebsiteActivity"
