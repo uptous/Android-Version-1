@@ -141,7 +141,7 @@ public interface APIServices {
 
     @FormUrlEncoded
     @POST("api/signupsheets/opportunity/{opportunityId}/item/{item_id}/Add")
-    Call<PostCommentResponseModel> SignUp_Send_RSPV(@Path("opportunityId") int opportunityId, @Path("item_id") int item_id,
+    Call<PostCommentResponseModel> SignUp_Send_RSVP(@Path("opportunityId") int opportunityId, @Path("item_id") int item_id,
                                                     @Field("comment") String comment, @Field("numberOfAttendees") String numberOfAttendees);
 
     @FormUrlEncoded

@@ -64,7 +64,7 @@
                 android:id="@+id/text_view_volunteer_event_date"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginTop="@dimen/_3sdp"
                 android:text=""
                 android:textColor="#000"
                 android:textSize="@dimen/_12sdp" />

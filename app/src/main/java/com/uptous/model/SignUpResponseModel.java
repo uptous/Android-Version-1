@@ -36,6 +36,7 @@ public class SignUpResponseModel {
     private String contact2;
     private long dateTime;
     private String endTime;
+    private long cutoffDate;
     private String location;
     private String name;
     private String notes;
@@ -81,6 +82,14 @@ public class SignUpResponseModel {
 
     public void setEndTime(String endTime) {
         this.endTime = endTime;
+    }
+
+    public long getCutoffDate() {
+        return cutoffDate;
+    }
+
+    public void setCutoffDate(long cutoffDate) {
+        this.cutoffDate = cutoffDate;
     }
 
     public String getLocation() {

@@ -20,8 +20,9 @@ import com.uptous.controller.utils.CustomizeDialog;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.sharedpreference.Prefs;
-import com.uptous.view.adapter.VolunteeredAdapter;
-import com.uptous.view.adapter.VolunteeredRspvAdapter;
+import com.uptous.view.adapter.VolunteeredDriverAdapter;
+import com.uptous.view.adapter.VolunteeredPotluckAdapter;
+import com.uptous.view.adapter.VolunteeredGeneralAdapter;
 
 import java.util.List;
 
@@ -39,8 +40,9 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
 
     public static final String FULL_LIST = "full_list";
     private ImageView mImageViewBack;
-    private VolunteeredAdapter mVolunteeredAdapter;
-    private VolunteeredRspvAdapter mVolunteeredRspvAdapter;
+    private VolunteeredDriverAdapter mVolunteeredDriverAdapter;
+    private VolunteeredPotluckAdapter mVolunteeredPotluckAdapter;
+    private VolunteeredGeneralAdapter mVolunteeredGeneralAdapter;
     private RecyclerView mRecyclerViewVolunteerComment;
     private String mEventName, mDate, mEndTime, mAuthenticationId, mAuthenticationPassword, mStringType, mFromName,
             mToName;
@@ -131,20 +133,16 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
     // Method to Set data
     private void setData() {
         if (mStringType != null) {
-            if (mStringType.equalsIgnoreCase("RSPV")) {
-                mViewDrivingFromTextView.setVisibility(View.VISIBLE);
-                mViewDrivingToTextView.setVisibility(View.VISIBLE);
-                mTextViewEventName.setVisibility(View.GONE);
+            mTextViewEventName.setVisibility(View.VISIBLE);
+            if (mStringType.equalsIgnoreCase("RSVP")) {
                 mViewDrivingFromTextView.setText(mFromName);
                 mViewDrivingToTextView.setText(mToName);
-            } else if (!mStringType.equalsIgnoreCase("Party")) {
-                mViewDrivingFromTextView.setVisibility(View.VISIBLE);
-                mViewDrivingToTextView.setVisibility(View.VISIBLE);
-                mTextViewEventName.setVisibility(View.GONE);
+            } else if (!mStringType.equalsIgnoreCase("Potluck/Party")) {
                 mViewDrivingFromTextView.setText("Driving from: " + mFromName);
                 mViewDrivingToTextView.setText("To: " + mToName);
-
             }
+            mViewDrivingFromTextView.setVisibility(View.GONE);
+            mViewDrivingToTextView.setVisibility(View.GONE);
         }
 
         mTextViewEventName.setText(mEventName);
@@ -159,7 +157,7 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
         }
 
         if (mStringType != null) {
-            if (mStringType.equalsIgnoreCase("RSPV")) {
+            if (mStringType.equalsIgnoreCase("RSVP")) {
                 mTextViewEventDate.setVisibility(View.GONE);
             } else if (mStringType.equalsIgnoreCase("Driver")) {
                 mTextViewEventDate.setVisibility(View.VISIBLE);
@@ -209,15 +207,18 @@ public class VolunteerDetailActivity extends BaseActivity implements View.OnClic
                             for (int j = 0; eventResponseModelsItem.size() > j; j++) {
                                 int itemid = eventResponseModelsItem.get(j).getId();
                                 if (itemid == mItemID) {
-                                    if (mStringType == null || !mStringType.equalsIgnoreCase("Driver")) {
-                                        mVolunteeredRspvAdapter = new VolunteeredRspvAdapter(VolunteerDetailActivity.this,
+                                    if (mStringType != null && mStringType.equalsIgnoreCase("Driver")) {
+                                        mVolunteeredDriverAdapter = new VolunteeredDriverAdapter(VolunteerDetailActivity.this,
                                                 eventResponseModelsItem.get(j).getVolunteers());
-                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredRspvAdapter);
-
+                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredDriverAdapter);
+                                    } else if (mStringType != null && mStringType.equalsIgnoreCase("Potluck/Party")) {
+                                        mVolunteeredPotluckAdapter = new VolunteeredPotluckAdapter(VolunteerDetailActivity.this,
+                                                eventResponseModelsItem.get(j).getVolunteers());
+                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredPotluckAdapter);
                                     } else {
-                                        mVolunteeredAdapter = new VolunteeredAdapter(VolunteerDetailActivity.this,
+                                        mVolunteeredGeneralAdapter = new VolunteeredGeneralAdapter(VolunteerDetailActivity.this,
                                                 eventResponseModelsItem.get(j).getVolunteers());
-                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredAdapter);
+                                        mRecyclerViewVolunteerComment.setAdapter(mVolunteeredGeneralAdapter);
                                     }
 
                                 }

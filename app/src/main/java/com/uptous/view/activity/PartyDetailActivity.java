@@ -34,27 +34,20 @@ import retrofit2.Response;
  */
 public class PartyDetailActivity extends BaseActivity implements View.OnClickListener {
 
-
     private ImageView mImageViewBack;
-
     private TextView mTextViewEventName, mTextViewEventDate, mTextViewSignUpSend, mTextViewMoreSpot;
-
-    private EditText mEditTextComment;
-
+    private EditText mEditTextComment, mEditTextNumberOfAttendees;
     private PartyDetailAdapter mPartyDetailAdapter;
-
-    private RecyclerView mRecyclerViewShiftsComment;
-
+    private RecyclerView mRecyclerViewPotluckComment;
     private String mComment, mAuthenticationId, mAuthenticationPassword;
-
     private int mItemID;
-
-   private Helper mHelper;
+    private String mNumberOfAttendees;
+    private Helper mHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sign_up_voulnteer);
+        setContentView(R.layout.activity_potluck_detail);
 
         initView();
 
@@ -69,6 +62,7 @@ public class PartyDetailActivity extends BaseActivity implements View.OnClickLis
             case R.id.text_view_send_comment:
                 mHelper.keyBoardHidden(PartyDetailActivity.this);
                 mComment = mEditTextComment.getText().toString().replace("\n", "<br>");
+                mNumberOfAttendees = mEditTextNumberOfAttendees.getText().toString();
 
 
                 if (ConnectionDetector.isConnectingToInternet(this)) {
@@ -95,8 +89,8 @@ public class PartyDetailActivity extends BaseActivity implements View.OnClickLis
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         //Global Variables Initialization
-        mRecyclerViewShiftsComment = (RecyclerView) findViewById(R.id.recycler_view_shifts_comment);
-        mRecyclerViewShiftsComment.setLayoutManager(layoutManagerFiles);
+        mRecyclerViewPotluckComment = (RecyclerView) findViewById(R.id.recycler_view_potluck_comment);
+        mRecyclerViewPotluckComment.setLayoutManager(layoutManagerFiles);
 
         mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
 
@@ -106,6 +100,7 @@ public class PartyDetailActivity extends BaseActivity implements View.OnClickLis
         mTextViewMoreSpot = (TextView) findViewById(R.id.text_view_more_spots);
 
         mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
+        mEditTextNumberOfAttendees = (EditText) findViewById(R.id.edit_text_number_of_attendees);
 
         mImageViewBack.setVisibility(View.VISIBLE);
         linearLayoutCommunityFilter.setVisibility(View.GONE);
@@ -187,7 +182,7 @@ public class PartyDetailActivity extends BaseActivity implements View.OnClickLis
                                              if (itemid == mItemID) {
                                                  mPartyDetailAdapter = new PartyDetailAdapter(PartyDetailActivity.this,
                                                          eventResponseModelsItem.get(j).getVolunteers());
-                                                 mRecyclerViewShiftsComment.setAdapter(mPartyDetailAdapter);
+                                                 mRecyclerViewPotluckComment.setAdapter(mPartyDetailAdapter);
                                              }
 
 
@@ -219,14 +214,12 @@ public class PartyDetailActivity extends BaseActivity implements View.OnClickLis
     // Post webservice to post Shifts sign_up comments
     private void postApiComment() {
 
-
-
         int OpId = Prefs.getOpportunityId(this);
         int itemID = Prefs.getItemId(this);
         final APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
-        Call<PostCommentResponseModel> call = service.SignUp_Send(OpId, itemID, mComment, "");
+        Call<PostCommentResponseModel> call = service.SignUp_Send_RSVP(OpId, itemID, mComment, mNumberOfAttendees);
         call.enqueue(new Callback<PostCommentResponseModel>() {
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {

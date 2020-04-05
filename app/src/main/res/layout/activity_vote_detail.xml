@@ -23,10 +23,9 @@
                 android:id="@+id/text_view_event_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:singleLine="true"
-                android:text="Yeah! You have just RSVP'd as joining the party!"
+                android:text="Event Name"
                 android:textColor="#000"
-                android:textSize="@dimen/_16sdp"
+                android:textSize="@dimen/_15sdp"
                 android:textStyle="bold" />
 
             <TextView
@@ -45,7 +44,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_below="@id/text_view_event_name"
                 android:layout_marginRight="@dimen/_20sdp"
-                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginTop="@dimen/_5sdp"
                 android:visibility="gone" />
 
             <TextView
@@ -58,44 +57,11 @@
 
                 android:textSize="@dimen/_12sdp" />
 
-
-            <LinearLayout
-                android:id="@+id/layout_attendees"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/_50sdp"
-                android:layout_below="@+id/text_view_date_time"
-                android:layout_marginTop="@dimen/_20sdp"
-                android:background="#f1f1f1"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:visibility="gone">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Number of Attendees:"
-                    android:textColor="#000"
-                    android:textSize="@dimen/_13sdp" />
-
-                <EditText
-                    android:id="@+id/edit_text_number_of_attendees"
-                    android:layout_width="@dimen/_30sdp"
-                    android:layout_height="@dimen/_30sdp"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="@dimen/_10sdp"
-                    android:background="@drawable/black_edit_text"
-
-                    android:paddingLeft="@dimen/_2sdp"
-                    android:singleLine="true" />
-
-
-            </LinearLayout>
-
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/recycler_view_rspv_comment"
+                android:id="@+id/recycler_view_vote_comment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/layout_attendees"
+                android:layout_below="@+id/text_view_date_time"
                 android:layout_marginTop="@dimen/_10sdp"></android.support.v7.widget.RecyclerView>
         </RelativeLayout>
 

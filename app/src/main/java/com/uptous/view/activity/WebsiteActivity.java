@@ -213,7 +213,7 @@ public class WebsiteActivity extends BaseActivity {
                                     mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Vote")) {
                                 int OpId = mSignUpResponseModelList.get(j).getId();
                                 Prefs.setOpportunityId(activity, OpId);
-                                Intent intent = new Intent(activity, SignUpRSPVActivity.class);
+                                Intent intent = new Intent(activity, SignUpRSVPActivity.class);
                                 activity.startActivity(intent);
                                 finish();
                             } else if (mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Drivers")) {

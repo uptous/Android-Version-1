@@ -14,7 +14,7 @@ import com.uptous.R;
 import com.uptous.controller.utils.GifImageView;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.sharedpreference.Prefs;
-import com.uptous.view.activity.PartyDetailActivity;
+import com.uptous.view.activity.VoteDetailActivity;
 import com.uptous.view.activity.VolunteerDetailActivity;
 
 import java.text.SimpleDateFormat;
@@ -43,7 +43,7 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
     @Override
     public SignUpVoteAdapter.VersionViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view =
-                LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_rspv_sign_up, viewGroup, false);
+                LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_vote_sign_up, viewGroup, false);
         SignUpVoteAdapter.VersionViewHolder viewHolder = new SignUpVoteAdapter.VersionViewHolder(view);
         return viewHolder;
     }
@@ -89,7 +89,7 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                     Prefs.setName(activity, listEntities.get(position).getName());
                     Prefs.setDate(activity, "");
                     Prefs.setSignUpType(activity, null);
-                    Intent intent = new Intent(activity, PartyDetailActivity.class);
+                    Intent intent = new Intent(activity, VoteDetailActivity.class);
                     activity.startActivity(intent);
                 }
             });
@@ -106,7 +106,7 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                         Prefs.setItemId(activity, ItemId);
                         Prefs.setName(activity, listEntities.get(position).getName());
                         Prefs.setDate(activity, "");
-                        Prefs.setSignUpType(activity, "Party");
+                        Prefs.setSignUpType(activity, "Vote");
                         Prefs.setToName(activity, "");
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         activity.startActivity(intent);
@@ -116,7 +116,7 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                 versionViewHolder.imageViewSignUpType.setGifImageResource(R.mipmap.volunteer_two);
                 versionViewHolder.linearLayoutOpenSpot.setVisibility(View.GONE);
                 versionViewHolder.linearLayoutVolunteered.setVisibility(View.VISIBLE);
-                versionViewHolder.mTextViewVolunteered.setText(listEntities.get(i).getVolunteerStatus());
+                versionViewHolder.mTextViewVolunteered.setText("Voted");
             }
 
             if (OpenSpot.equalsIgnoreCase("Full")) {
@@ -129,7 +129,7 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
                         Prefs.setItemId(activity, ItemId);
                         Prefs.setName(activity, listEntities.get(position).getName());
                         Prefs.setDate(activity, "");
-                        Prefs.setSignUpType(activity, "Party");
+                        Prefs.setSignUpType(activity, "Vote");
                         Prefs.setToName(activity, "");
                         Intent intent = new Intent(activity, VolunteerDetailActivity.class);
                         intent.putExtra(FULL_LIST,true);
@@ -166,7 +166,7 @@ public class SignUpVoteAdapter extends RecyclerView.Adapter<SignUpVoteAdapter.Ve
             super(itemView);
             ll_row_parent = (LinearLayout) itemView.findViewById(R.id.row_parent);
             mTextViewTitle = (TextView) itemView.findViewById(R.id.text_view__name);
-            mTextViewVolunteered = (TextView) itemView.findViewById(R.id.text_view_volunteered);
+            mTextViewVolunteered = (TextView) itemView.findViewById(R.id.text_view_voted);
             mTextViewDate = (TextView) itemView.findViewById(R.id.text_view_date);
 
             TextViewSignUp = (TextView) itemView.findViewById(R.id.text_signup);

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/_3sdp"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:padding="@dimen/_5sdp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_all_files"
+        android:orientation="vertical"
+      >
+        <TextView
+            android:textStyle="bold"
+            android:id="@+id/text_view_user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/image_view_file"
+            android:text=""
+            android:textColor="#000"
+            android:textSize="@dimen/_13sdp"
+            />
+
+        <LinearLayout
+            android:id="@+id/layout_phone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/text_view_date_time"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Phone #: "
+                android:textColor="#000"
+                android:textSize="@dimen/_12sdp" />
+            <TextView
+                android:id="@+id/text_view_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/text_view_event_date"
+                android:layout_toRightOf="@+id/image_view_file"
+                android:text=""
+                android:textColor="#000"
+                android:textSize="@dimen/_12sdp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_comment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/layout_phone"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="# of seats: "
+                android:textColor="#000"
+                android:textSize="@dimen/_12sdp" />
+            <TextView
+                android:id="@+id/text_view_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/_10sdp"
+                android:layout_toLeftOf="@+id/image_view_detail"
+                android:text=""
+                android:textColor="#000"
+                android:textSize="@dimen/_12sdp"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

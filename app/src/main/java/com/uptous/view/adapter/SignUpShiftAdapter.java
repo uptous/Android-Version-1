@@ -232,16 +232,22 @@ public class SignUpShiftAdapter extends RecyclerView.Adapter<SignUpShiftAdapter.
             }
 
             if (OpenSpot.equalsIgnoreCase("Full")) {
+
                 if (val == 0) {
                     versionViewHolder.mTextViewDate.setVisibility(View.GONE);
                 } else {
+                    String dateText = null;
+                    String TimeText = null;
                     Date date = new Date(val);
                     SimpleDateFormat df2 = new SimpleDateFormat("MMM d");
                     SimpleDateFormat dfTime = new SimpleDateFormat("h:mm aa");
                     df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
                     dfTime.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
-                    dateTextMain = df2.format(date) + ", " + dfTime.format(date);
-                    if (itemsBean.getEndTime() != null && !itemsBean.getEndTime().equalsIgnoreCase("")) {
+                    dateText = df2.format(date)  ;
+                    TimeText = dfTime.format(date);
+                    if(!TimeText.equalsIgnoreCase("1:00AM") && !TimeText.equalsIgnoreCase("1:00 AM")) {
+                        dateTextMain = dateText + ", " + TimeText;
+                    } else if (itemsBean.getEndTime() != null && !itemsBean.getEndTime().equalsIgnoreCase("1:00AM")) {
                         dateTextMain = df2.format(date) + ", " + dfTime.format(date) + " - " + itemsBean.getEndTime();
                         versionViewHolder.mTextViewDate.setText(dateTextMain + " - " + itemsBean.getEndTime());
                     } else {

@@ -32,8 +32,10 @@ import com.uptous.view.activity.AlbumDetailActivity;
 import com.uptous.view.activity.CommentDetailActivity;
 import com.uptous.view.activity.SignUpDRIVERActivity;
 import com.uptous.view.activity.SignUpOngoingActivity;
-import com.uptous.view.activity.SignUpRSPVActivity;
+import com.uptous.view.activity.SignUpRSVPActivity;
 import com.uptous.view.activity.SignUpShiftsActivity;
+import com.uptous.view.activity.SignUpPartyActivity;
+import com.uptous.view.activity.SignUpVoteActivity;
 import com.uptous.view.activity.WebviewActivity;
 
 import java.text.SimpleDateFormat;
@@ -574,30 +576,39 @@ public class HomeListAdapter extends RecyclerView.Adapter<HomeListAdapter.Versio
                     for (int j = 0; mSignUpResponseModelList.size() > j; j++) {
                         int CommId = mSignUpResponseModelList.get(j).getId();
                         if (CommId ==mCommunityID) {
-                            if (mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("RSVP") ||
-                                    mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Vote")) {
+                            if (mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("RSVP")) {
                                 int OpId = mSignUpResponseModelList.get(j).getId();
                                 Prefs.setOpportunityId(activity, OpId);
-                                Intent intent = new Intent(activity, SignUpRSPVActivity.class);
+                                Intent intent = new Intent(activity, SignUpRSVPActivity.class);
                                 activity.startActivity(intent);
                             } else if (mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Drivers")) {
                                 int OpId = mSignUpResponseModelList.get(j).getId();
                                 Prefs.setOpportunityId(activity, OpId);
                                 Intent intent = new Intent(activity, SignUpDRIVERActivity.class);
                                 activity.startActivity(intent);
+                            } else if (mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Vote")) {
+                                int OpId = mSignUpResponseModelList.get(j).getId();
+                                Prefs.setOpportunityId(activity, OpId);
+                                Prefs.setSignUpType(activity, mSignUpResponseModelList.get(j).getType());
+                                Intent intent = new Intent(activity, SignUpVoteActivity.class);
+                                activity.startActivity(intent);
                             } else if (mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Shifts") ||
                                     mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Games") ||
-                                    mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Potluck/Party") ||
                                     mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Wish List") ||
                                     mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Volunteer") ||
-                                    mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Snack Schedule")
-
-                                    || mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Multi Game/Event RSVP")
+                                    mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Snack Schedule") ||
+                                    mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Multi Game/Event RSVP")
                                     ) {
                                 int OpId = mSignUpResponseModelList.get(j).getId();
                                 Prefs.setOpportunityId(activity, OpId);
                                 Prefs.setSignUpType(activity, mSignUpResponseModelList.get(j).getType());
                                 Intent intent = new Intent(activity, SignUpShiftsActivity.class);
+                                activity.startActivity(intent);
+                            } else if (mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Potluck/Party")) {
+                                int OpId = mSignUpResponseModelList.get(j).getId();
+                                Prefs.setOpportunityId(activity, OpId);
+                                Prefs.setSignUpType(activity, mSignUpResponseModelList.get(j).getType());
+                                Intent intent = new Intent(activity, SignUpPartyActivity.class);
                                 activity.startActivity(intent);
                             } else if (
                                     mSignUpResponseModelList.get(j).getType().equalsIgnoreCase("Ongoing Volunteering")

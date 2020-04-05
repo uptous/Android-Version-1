@@ -32,7 +32,7 @@ public class DriverDetailAdapter extends RecyclerView.Adapter<DriverDetailAdapte
     @Override
     public VersionViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view =
-                LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_volunteer_comment, viewGroup, false);
+                LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.row_driver_comment, viewGroup, false);
         VersionViewHolder viewHolder = new VersionViewHolder(view);
 
         return viewHolder;

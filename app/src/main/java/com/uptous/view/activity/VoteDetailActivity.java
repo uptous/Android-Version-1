@@ -21,7 +21,7 @@ import com.uptous.controller.utils.ConnectionDetector;
 import com.uptous.model.PostCommentResponseModel;
 import com.uptous.model.SignUpDetailResponseModel;
 import com.uptous.sharedpreference.Prefs;
-import com.uptous.view.adapter.RSPVDetailAdapter;
+import com.uptous.view.adapter.ShiftsDetailAdapter;
 
 import java.util.List;
 
@@ -37,14 +37,13 @@ import retrofit2.Response;
 public class VoteDetailActivity extends BaseActivity implements View.OnClickListener {
 
     private ImageView mImageViewBack;
-    private TextView mTextViewTitle, mViewDateTimeTextView, mTextViewSignUpSend;
+    private TextView mTextViewTitle, mViewDateTimeTextView, mTextViewSignUpSend, mTextViewEventName;
 
     private EditText mEditTextComment, mEditTextNumberOfAttendees;
-    private RSPVDetailAdapter mRspvDetailAdapter;
-    private RecyclerView mRecyclerViewRspvComment;
+    private ShiftsDetailAdapter mShiftsDetailAdapter;
+    private RecyclerView mRecyclerViewVoteComment;
     private String mComment, mAuthenticationId, mAuthenticationPassword;
     private int mItemID;
-    private String mNumberOfAttendees;
     private Helper mHelper;
 
     @Override
@@ -66,7 +65,6 @@ public class VoteDetailActivity extends BaseActivity implements View.OnClickList
 
                 mHelper.keyBoardHidden(VoteDetailActivity.this);
                 mComment = mEditTextComment.getText().toString().replace("\n", "<br>");
-                mNumberOfAttendees = mEditTextNumberOfAttendees.getText().toString();
 
                 if (ConnectionDetector.isConnectingToInternet(this)) {
                     postApiComment();
@@ -92,15 +90,15 @@ public class VoteDetailActivity extends BaseActivity implements View.OnClickList
                 = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
         //Global Variables Initialization
-        mRecyclerViewRspvComment = (RecyclerView) findViewById(R.id.recycler_view_rspv_comment);
-        mRecyclerViewRspvComment.setLayoutManager(layoutManagerFiles);
+        mRecyclerViewVoteComment = (RecyclerView) findViewById(R.id.recycler_view_vote_comment);
+        mRecyclerViewVoteComment.setLayoutManager(layoutManagerFiles);
 
         mViewDateTimeTextView = (TextView) findViewById(R.id.text_view_date_time);
         mTextViewSignUpSend = (TextView) findViewById(R.id.text_view_send_comment);
         mTextViewTitle = (TextView) findViewById(R.id.text_view_message_toolbar);
+        mTextViewEventName = (TextView) findViewById(R.id.text_view_event_name);
 
         mEditTextComment = (EditText) findViewById(R.id.edit_text_comment);
-        mEditTextNumberOfAttendees = (EditText) findViewById(R.id.edit_text_number_of_attendees);
 
         mImageViewBack = (ImageView) findViewById(R.id.image_view_back);
 
@@ -129,7 +127,10 @@ public class VoteDetailActivity extends BaseActivity implements View.OnClickList
         mAuthenticationId = Prefs.getAuthenticationId(this);
         mAuthenticationPassword = Prefs.getAuthenticationPassword(this);
 
-        mTextViewTitle.setText("Join the " + mTitle);
+        String name = Prefs.getName(this);
+        mTextViewEventName.setText(name);
+
+        mTextViewTitle.setText(mTitle);
 
         if (mEndTime == null) {
             mViewDateTimeTextView.setText(mDate);
@@ -174,9 +175,9 @@ public class VoteDetailActivity extends BaseActivity implements View.OnClickList
                                          for (int j = 0; eventResponseModelsItem.size() > j; j++) {
                                              int itemid = eventResponseModelsItem.get(j).getId();
                                              if (itemid == mItemID) {
-                                                 mRspvDetailAdapter = new RSPVDetailAdapter(VoteDetailActivity.this,
+                                                 mShiftsDetailAdapter = new ShiftsDetailAdapter(VoteDetailActivity.this,
                                                          eventResponseModelsItem.get(j).getVolunteers());
-                                                 mRecyclerViewRspvComment.setAdapter(mRspvDetailAdapter);
+                                                 mRecyclerViewVoteComment.setAdapter(mShiftsDetailAdapter);
                                              }
 
 
@@ -216,7 +217,7 @@ public class VoteDetailActivity extends BaseActivity implements View.OnClickList
         APIServices service =
                 ServiceGenerator.createService(APIServices.class, mAuthenticationId, mAuthenticationPassword);
 
-        Call<PostCommentResponseModel> call = service.SignUp_Send_RSPV(OpId, itemID, mComment, mNumberOfAttendees);
+        Call<PostCommentResponseModel> call = service.SignUp_Send(OpId, itemID, mComment, "");
         call.enqueue(new Callback<PostCommentResponseModel>() {
             @Override
             public void onResponse(Call<PostCommentResponseModel> call, Response<PostCommentResponseModel> response) {

@@ -216,7 +216,7 @@ public class SignUpPartyAdapter extends RecyclerView.Adapter<SignUpPartyAdapter.
 
                         int ItemID = listEntities.get(position).getId();
                         Prefs.setNumberofvolunteer(activity, null);
-                        Prefs.setSignUpType(activity, "Party");
+                        Prefs.setSignUpType(activity, "Potluck/Party");
                         Prefs.setItemId(activity, ItemID);
                         Prefs.setName(activity, listEntities.get(position).getName());
                         Prefs.setDate(activity, dateText);
@@ -296,7 +296,7 @@ public class SignUpPartyAdapter extends RecyclerView.Adapter<SignUpPartyAdapter.
                             Prefs.setNumberofvolunteer(activity, "" + NumberOfVolunteer);
                         }
                         Prefs.setNumberofvolunteer(activity, null);
-                        Prefs.setSignUpType(activity, "Party");
+                        Prefs.setSignUpType(activity, "Potluck/Party");
                         Prefs.setItemId(activity, ItemID);
                         Prefs.setName(activity, listEntities.get(position).getName());
                         Prefs.setDate(activity, dateText);

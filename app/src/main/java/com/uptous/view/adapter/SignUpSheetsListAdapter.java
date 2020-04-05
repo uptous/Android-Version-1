@@ -18,7 +18,7 @@ import com.uptous.sharedpreference.Prefs;
 import com.uptous.view.activity.SignUpDRIVERActivity;
 import com.uptous.view.activity.SignUpOngoingActivity;
 import com.uptous.view.activity.SignUpPartyActivity;
-import com.uptous.view.activity.SignUpRSPVActivity;
+import com.uptous.view.activity.SignUpRSVPActivity;
 import com.uptous.view.activity.SignUpShiftsActivity;
 import com.uptous.view.activity.SignUpSnackActivity;
 import com.uptous.view.activity.SignUpVoteActivity;
@@ -71,8 +71,18 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
             df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
             final String dateText = df2.format(date);
             versionViewHolder.mTextViewDate.setText("Event date: " + dateText);
-
         }
+        long cutoffVal = listEntities.get(i).getCutoffDate();
+        if (cutoffVal == 0) {
+            versionViewHolder.mTextViewCutoffDate.setText("Cutoff date: ");
+        } else {
+            Date date = new Date(cutoffVal);
+            SimpleDateFormat df2 = new SimpleDateFormat("MM/dd/yyyy");
+            df2.setTimeZone(TimeZone.getTimeZone("America/Los_Angeles"));
+            final String dateText = df2.format(date);
+            versionViewHolder.mTextViewCutoffDate.setText("Cutoff date: " + dateText);
+        }
+
         versionViewHolder.mTextViewTitle.setText(listEntities.get(i).getName());
 
         int ID = listEntities.get(i).getCommunityId();
@@ -94,7 +104,7 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
                         Prefs.setOpportunityId(activity, OpId);
 //                        signupdetail
                         Prefs.setSignUpDetail(activity, "signupdetail");
-                        Intent intent = new Intent(activity, SignUpRSPVActivity.class);
+                        Intent intent = new Intent(activity, SignUpRSVPActivity.class);
                         activity.startActivity(intent);
                     } else if (listEntities.get(position).getType().equalsIgnoreCase("Vote")) {
                         int OpId = listEntities.get(position).getId();
@@ -163,7 +173,7 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
 
     class VersionViewHolder extends RecyclerView.ViewHolder {
         public View mView;
-        TextView mTextViewDate, mTextViewTitle, mTextViewType;
+        TextView mTextViewDate, mTextViewCutoffDate, mTextViewTitle, mTextViewType;
         ImageView imageViewDetail;
 
 
@@ -172,6 +182,7 @@ public class SignUpSheetsListAdapter extends RecyclerView.Adapter<SignUpSheetsLi
 
             mTextViewTitle = (TextView) itemView.findViewById(R.id.text_view_title);
             mTextViewDate = (TextView) itemView.findViewById(R.id.text_view_event_date);
+            mTextViewCutoffDate = (TextView) itemView.findViewById(R.id.text_view_cutoff_date);
             mTextViewType = (TextView) itemView.findViewById(R.id.text_view_community_name);
             imageViewDetail = (ImageView) itemView.findViewById(R.id.image_view_detail);
             mView = itemView;
